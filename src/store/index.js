@@ -5,12 +5,12 @@ Vue.use(Vuex);
 
 const state = {
   subioArchivo: false,
-  cursos: [],
+  disponibles: [],
 };
 
 const mutations = {
-  setCursos(state, cursos) {
-    state.cursos = cursos;
+  setDisponibles(state, disponibles) {
+    state.disponibles = disponibles;
   }
 };
 
