@@ -18,6 +18,9 @@ export default {
   methods: {
     ...mapMutations(['setDisponibles']),
     
+    // TODO
+    // Esto en algun momento va a fallar. Tienes que hacer algo para capturar el error
+    // y evitar que todo explote
     async handleUploadedFile() {
       // console.log('[LOG] Archivo recivido')
       const rows = await this.readFileContent(this.uploadedFiles);
@@ -96,10 +99,9 @@ export default {
         });
         return {
           carrera: carrera,
-          ramosDisponibles: mismaCarrera
+          ramos: mismaCarrera
         }
       });
-      console.log(collection);
       return collection;
     }
   }
