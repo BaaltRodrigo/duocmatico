@@ -5,7 +5,7 @@
       <v-card-title>Aca va el calendario</v-card-title>
       <v-card-text>Intentar mostrarlo por semana</v-card-text>
     </v-card>
-    
+
     <!-- Espacio para decir que suban el archivo -->
     <v-card class="mb-3" outlined>
       <v-card-text>
@@ -15,30 +15,42 @@
 
     <v-card class="mb-3" outlined>
       <v-card-title>Filtros del listado de cursos</v-card-title>
-      <v-card-text>Quizas termine quitando esto y poniendolo en otro lado</v-card-text>
+      <v-card-text>
+        {{ disponibles.map((d) => d.carrera) }}
+      </v-card-text>
+    </v-card>
+
+    <v-card>
+      <v-container>
+        <h1>hola</h1>
+      </v-container>
     </v-card>
 
     <!-- Lugar para escoger los cursos -->
-    <v-card outlined>
-      <v-card-title>Listado con los cursos</v-card-title>
-      <v-card-text>{{cursos}}</v-card-text>
-    </v-card>
+    <h2>Listado de cursos</h2>
+    <!-- <v-text-field v-model="busqueda" clearable @click:clear="busqueda = null"></v-text-field> -->
   </v-container>
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import CargarArchivo from "../components/CargarArchivo.vue"
+import { mapState } from "vuex";
+import CargarArchivo from "../components/CargarArchivo.vue";
 
 export default {
   name: "Home",
 
   components: {
-    CargarArchivo
+    CargarArchivo,
   },
 
   computed: {
-    ...mapState(['cursos']),
-  }
+    ...mapState(["disponibles"]),
+  },
+
+  data() {
+    return {
+      busqueda: null,
+    };
+  },
 };
 </script>
