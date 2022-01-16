@@ -6,12 +6,17 @@ Vue.use(Vuex);
 const state = {
   subioArchivo: false,
   disponibles: [],
+  carrera: null,
 };
 
 const mutations = {
   setDisponibles(state, disponibles) {
     state.disponibles = disponibles;
-  }
+  },
+
+  setCarrera(state, carrera) {
+    state.carreraSeleccionada = carrera;
+  },
 };
 
 const actions = {};

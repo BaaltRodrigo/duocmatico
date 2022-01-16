@@ -14,37 +14,59 @@
     </v-card>
 
     <v-card class="mb-3" outlined>
-      <v-card-title>Filtros del listado de cursos</v-card-title>
-      <v-card-text>
-        {{ disponibles.map((d) => d.carrera) }}
-      </v-card-text>
+      <seleccion-carrera />
     </v-card>
 
-    <v-card>
-      <v-container>
-        <h1>hola</h1>
-      </v-container>
+    <!-- Aca empiezan los cursos y las cosas para buscarlos -->
+    <h2 id="inicio-listado" class="text-center">Listado de cursos</h2>
+    <v-text-field
+      outlined
+      dense
+      prepend-inner-icon="mdi-magnify"
+      v-model="busqueda"
+      clearable
+      @click:clear="limpiarBusqueda"
+    ></v-text-field>
+    <!-- Listado de cursos -->
+    <v-card v-if="!!carrera" outlined>
+      <div
+        v-for="curso in filtroCursos"
+        :key="curso.seccion"
+      >
+        <curso :curso="curso" />
+        <v-divider></v-divider>
+      </div>
     </v-card>
-
-    <!-- Lugar para escoger los cursos -->
-    <h2>Listado de cursos</h2>
-    <!-- <v-text-field v-model="busqueda" clearable @click:clear="busqueda = null"></v-text-field> -->
   </v-container>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import CargarArchivo from "../components/CargarArchivo.vue";
+import Curso from "../components/Curso.vue";
+import SeleccionCarrera from "../components/SeleccionCarrera.vue";
 
 export default {
   name: "Home",
 
   components: {
     CargarArchivo,
+    Curso,
+    SeleccionCarrera,
   },
 
   computed: {
-    ...mapState(["disponibles"]),
+    ...mapState(["carrera"]),
+    
+    filtroCursos() {
+      if (!this.carreraSeleccionada) return [];
+      if (!this.busqueda) return this.carrera.ramos;
+      const buscar = this.busqueda.toUpperCase();
+      return this.carrera.ramos.filter( r => 
+        r.seccion.toUpperCase().includes(buscar) ||
+        r.asignatura.toUpperCase().includes(buscar)
+      );
+    },
   },
 
   data() {
@@ -52,5 +74,12 @@ export default {
       busqueda: null,
     };
   },
+
+  methods: {
+    limpiarBusqueda() {
+      this.busqueda = null;
+      this.$vuetify.goTo("#inicio-listado")
+    },
+  }
 };
 </script>
