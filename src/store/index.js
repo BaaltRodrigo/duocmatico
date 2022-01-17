@@ -15,7 +15,7 @@ const mutations = {
   },
 
   setCarrera(state, carrera) {
-    state.carreraSeleccionada = carrera;
+    state.carrera = carrera;
   },
 };
 
