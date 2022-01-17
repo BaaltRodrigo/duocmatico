@@ -28,6 +28,7 @@ export default {
       const secciones = this.agruparPorSecciones(rows);
       const disponibles = this.agruparPorCarrera(secciones);
       this.setDisponibles(disponibles);
+      this.$emit('done');
     },
     
     async readFileContent(file) {
@@ -85,6 +86,8 @@ export default {
         delete seccionAgrupada.sala;
         secciones.push(seccionAgrupada)
       });
+      // Ordenamos las secciones de forma alfabetica segun el nombre
+      secciones.sort((a, b) => a.asignatura > b.asignatura ? 1 : 0);
       return secciones;
     },
 
@@ -102,6 +105,8 @@ export default {
           ramos: mismaCarrera
         }
       });
+      // Ordenamos las carreras alfabeticamente
+      collection.sort((a, b) => a.carrera > b.carrera ? 1 : 0);
       return collection;
     }
   }
