@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <!-- Espacio para el calendario -->
+    <en-construccion-alert />
     <v-card class="mb-3" outlined>
       <v-card-title>Aca va el calendario</v-card-title>
       <v-card-text>Intentar mostrarlo por semana</v-card-text>
@@ -43,6 +44,7 @@
 import { mapState } from "vuex";
 import CargarArchivo from "../components/CargarArchivo.vue";
 import Curso from "../components/Curso.vue";
+import EnConstruccionAlert from  "../components/EnConstruccionAlert.vue";
 import SeleccionCarrera from "../components/SeleccionCarrera.vue";
 
 export default {
@@ -51,6 +53,7 @@ export default {
   components: {
     CargarArchivo,
     Curso,
+    EnConstruccionAlert,
     SeleccionCarrera,
   },
 
