@@ -4,7 +4,7 @@
       <!-- Headers -->
       <thead>
         <tr>
-          <th class="text-left">Horario</th>
+          <th class="text-left">Dia y Hora</th>
           <th class="text-left">Sala</th>
         </tr>
       </thead>
