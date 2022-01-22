@@ -1,25 +1,9 @@
 <template>
   <v-card>
-    <v-list-item @click="test" two-line>
-      <v-list-item-content>
-        <v-list-item-subtitle>
-          <small>{{curso.seccion}}</small>
-          <v-chip class="ml-2" x-small>Semestre {{curso.nivel}}</v-chip>
-        </v-list-item-subtitle>
-        <v-list-item-title class="text-capitalize font-weight-bold">
-          {{curso.asignatura.toLowerCase()}}
-        </v-list-item-title>
-      </v-list-item-content>
-      <v-list-item-action>
-        <v-btn icon outlined>
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
-      </v-list-item-action>
-    </v-list-item>
-    <v-divider class="mx=4"></v-divider>
+    <curso-header :curso="curso"></curso-header>
+    <v-divider></v-divider>
     <!-- Esto se muestra al hacer click en el ramo -->
     <v-container>
-      <v-container>
         <v-row>
           <!-- Horarios -->
           <v-col cols="12" md="6">
@@ -33,18 +17,19 @@
               <!-- Plan de estudios: {{curso.planes}} -->
           </v-col>
         </v-row>
-      </v-container>
     </v-container>
   </v-card>
 </template>
 
 <script>
+import CursoHeader from "./CursoHeader.vue";
 import CursoHorario from "../components/CursoHorario.vue";
 
 export default {
   name: "Curso",
 
   components: {
+    CursoHeader,
     CursoHorario,
   },
 
