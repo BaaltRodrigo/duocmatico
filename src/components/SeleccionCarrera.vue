@@ -35,6 +35,7 @@ export default {
 
     confirmarCarrera() {
       this.setCarrera(this.carrera);
+      this.$emit('done');
     },
   },
 }
