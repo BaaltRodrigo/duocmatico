@@ -11,9 +11,9 @@
       <!-- Datos -->
       <tbody>
         <tr v-for="horario in horariosValidos" :key="horario.id">
-          <td>{{horario.horario}}</td>
+          <td>{{ horario.horario }}</td>
           <td v-if="salaOnline(horario)">
-            {{horario.sala}}
+            {{ horario.sala }}
           </td>
           <td v-else>
             <v-icon>mdi-remote-desktop</v-icon>
@@ -27,25 +27,25 @@
 
 <script>
 export default {
-  name: 'CrusoHorario',
+  name: "CrusoHorario",
 
   props: {
     horarios: {
       type: Array,
-      required: true
-    }
+      required: true,
+    },
   },
 
   computed: {
     horariosValidos() {
-      return this.horarios.filter( h => h.horario != "0:00:00 - 0:00:00");
-    }
+      return this.horarios.filter((h) => h.horario != "0:00:00 - 0:00:00");
+    },
   },
 
   methods: {
     salaOnline(horario) {
-      return !!horario.sala
-    }
+      return !!horario.sala;
+    },
   },
-}
+};
 </script>
