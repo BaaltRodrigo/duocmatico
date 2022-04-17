@@ -1,72 +1,101 @@
 <template>
-  <v-container>
-    <!-- Espacio para el calendario -->
-    <en-construccion-alert />
-    <v-card class="mb-3" outlined>
-      <v-card-title>Aca va el calendario</v-card-title>
-      <v-card-text>Intentar mostrarlo por semana</v-card-text>
-    </v-card>
-
-    <!-- Espacio para decir que suban el archivo -->
-    <v-card class="mb-3" outlined>
-      <v-card-text>
-        <cargar-archivo />
-      </v-card-text>
-    </v-card>
-
-    <v-card class="mb-3" outlined>
-      <seleccion-carrera />
-    </v-card>
-
-    <!-- Aca empiezan los cursos y las cosas para buscarlos -->
-    <div v-if="!!carrera">
-      <h2 id="inicio-listado" class="text-center">Listado de cursos</h2>
-      <v-text-field
-        outlined
-        dense
-        prepend-inner-icon="mdi-magnify"
-        v-model="busqueda"
-        clearable
-        @click:clear="limpiarBusqueda"
-      ></v-text-field>
-      <!-- Listado de cursos -->
-      <curso
-        v-for="curso in filtroCursos"
-        :key="curso.seccion"
-        :curso="curso"
-        class="mb-3 elevation-6"
-      />
-    </div>
-  </v-container>
+  <div>
+    <v-toolbar fixed dark color="purple" flat>
+      <v-toolbar-title>Duocmatico</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="test">
+        <v-icon>{{ "mdi-github" }}</v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-container>
+      <v-row justify="center">
+        <v-col cols="12" md="9">
+          <h2 id="inicio-listado">Listado de cursos</h2>
+          <v-text-field
+            outlined
+            dense
+            prepend-inner-icon="mdi-magnify"
+            v-model="busqueda"
+            clearable
+            @click:clear="limpiarBusqueda"
+          ></v-text-field>
+          <curso
+            v-for="curso in filtroCursos"
+            :key="curso.seccion"
+            :curso="curso"
+            class="mb-3"
+          />
+        </v-col>
+      </v-row>
+      <!-- Pop up para subir un nuevo archivo -->
+      <v-dialog
+        content-class="elevation-0"
+        v-model="wantUpload"
+        max-width="700px"
+      >
+        <cargar-archivo @done="wantUpload = false" />
+      </v-dialog>
+      <!-- <v-window v-model="paso"> -->
+      <!-- Primer sector para subir archivo y decir OK -->
+      <!-- <v-window-item :value="1">
+          <cargar-archivo @done="paso = 2" />
+        </v-window-item> -->
+      <!-- Seleccionar la carrera -->
+      <!-- <v-window-item :value="2">
+          <seleccion-carrera @done="paso = 3" />
+        </v-window-item> -->
+      <!-- Mostrar los cursos -->
+      <!-- <v-window-item :value="3">
+          <div v-if="!!carrera">
+            <h2 id="inicio-listado" class="text-center">Listado de cursos</h2>
+            <v-text-field
+              outlined
+              dense
+              prepend-inner-icon="mdi-magnify"
+              v-model="busqueda"
+              clearable
+              @click:clear="limpiarBusqueda"
+            ></v-text-field>
+            <curso
+              v-for="curso in filtroCursos"
+              :key="curso.seccion"
+              :curso="curso"
+              class="mb-3"
+            />
+          </div>
+        </v-window-item> -->
+      <!-- </v-window> -->
+    </v-container>
+  </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
-import CargarArchivo from "../components/CargarArchivo.vue";
+import { mapGetters, mapState } from "vuex";
 import Curso from "../components/Curso.vue";
-import EnConstruccionAlert from  "../components/EnConstruccionAlert.vue";
-import SeleccionCarrera from "../components/SeleccionCarrera.vue";
+import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
+import { delay } from "../helpers/utilities";
 
 export default {
   name: "Home",
 
   components: {
-    CargarArchivo,
     Curso,
-    EnConstruccionAlert,
-    SeleccionCarrera,
+    CargarArchivo,
   },
 
   computed: {
-    ...mapState(["carrera"]),
-    
+    ...mapGetters(["careerCourses"]),
+    ...mapState(["careersData", "career"]),
+
     filtroCursos() {
-      if (!this.carrera) return [];
-      if (!this.busqueda) return this.carrera.ramos;
+      delay(500);
+      if (!this.career) return [];
+      if (!this.busqueda) return this.careerCourses;
       const buscar = this.busqueda.toUpperCase();
-      return this.carrera.ramos.filter( r => 
-        r.seccion.toUpperCase().includes(buscar) ||
-        r.asignatura.toUpperCase().includes(buscar)
+      return this.careerCourses.filter(
+        (r) =>
+          r.seccion.toUpperCase().includes(buscar) ||
+          r.asignatura.toUpperCase().includes(buscar)
       );
     },
   },
@@ -74,14 +103,18 @@ export default {
   data() {
     return {
       busqueda: null,
+      wantUpload: true,
     };
   },
 
   methods: {
+    test() {
+      console.log(this.careerCourses);
+    },
     limpiarBusqueda() {
       this.busqueda = null;
-      this.$vuetify.goTo("#inicio-listado")
+      this.$vuetify.goTo("#inicio-listado");
     },
-  }
+  },
 };
 </script>
