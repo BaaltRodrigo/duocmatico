@@ -3,7 +3,11 @@
     <v-toolbar fixed dark color="purple" flat>
       <v-toolbar-title>Duocmatico</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="test">
+      <v-btn
+        icon
+        href="https://github.com/BaaltRodrigo/duocmatico"
+        target="none"
+      >
         <v-icon>{{ "mdi-github" }}</v-icon>
       </v-btn>
     </v-toolbar>
