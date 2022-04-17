@@ -39,36 +39,6 @@
       >
         <cargar-archivo @done="wantUpload = false" />
       </v-dialog>
-      <!-- <v-window v-model="paso"> -->
-      <!-- Primer sector para subir archivo y decir OK -->
-      <!-- <v-window-item :value="1">
-          <cargar-archivo @done="paso = 2" />
-        </v-window-item> -->
-      <!-- Seleccionar la carrera -->
-      <!-- <v-window-item :value="2">
-          <seleccion-carrera @done="paso = 3" />
-        </v-window-item> -->
-      <!-- Mostrar los cursos -->
-      <!-- <v-window-item :value="3">
-          <div v-if="!!carrera">
-            <h2 id="inicio-listado" class="text-center">Listado de cursos</h2>
-            <v-text-field
-              outlined
-              dense
-              prepend-inner-icon="mdi-magnify"
-              v-model="busqueda"
-              clearable
-              @click:clear="limpiarBusqueda"
-            ></v-text-field>
-            <curso
-              v-for="curso in filtroCursos"
-              :key="curso.seccion"
-              :curso="curso"
-              class="mb-3"
-            />
-          </div>
-        </v-window-item> -->
-      <!-- </v-window> -->
     </v-container>
   </div>
 </template>
