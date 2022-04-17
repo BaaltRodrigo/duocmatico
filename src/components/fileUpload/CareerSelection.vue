@@ -1,10 +1,10 @@
 <template>
   <div>
-    <v-checkbox
+    <!-- <v-checkbox
       v-model="rememberFile"
       label="Usar este archivo y carrera al iniciar Duocmatico?"
     >
-    </v-checkbox>
+    </v-checkbox> -->
     <v-autocomplete
       outlined
       dense
@@ -30,6 +30,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations } from "vuex";
+
 export default {
   name: "CareerSelection",
 
@@ -52,13 +53,12 @@ export default {
       // DISABLE BUTTON TO PREVENT EXECUTE THIS MULTIPLE TIMES
       this.$emit("loading");
       this.disabledBtn = true;
-      if (this.rememberFile) {
-        console.log("Guardar path en cookies");
-      }
+      // if (this.rememberFile) {
+      //   console.log("Guardar path en cookies");
+      // }
       // Copy data from fileConverter store to general store
       this.setCareersData(this.temporaryData);
       this.setCareer(this.carrera);
-      console.log("Data copiada");
       this.$emit("stop");
     },
   },
