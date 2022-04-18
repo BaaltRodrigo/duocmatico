@@ -1,0 +1,15 @@
+name: ✨Feature request
+description: Propone cosas nuevas para el proyecto.
+labels: Feature-request
+body:
+- type: textaera
+  attributes:
+    label: Problema a resolver
+  validation:
+    required: true
+- type: textaera
+  attributes:
+    label: Solucion propuesta.
+    placeholder: Explicacions como solucionarias el problema
+  validation:
+    required: true
