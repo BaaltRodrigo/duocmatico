@@ -5,11 +5,11 @@ body:
 - type: textarea
   attributes:
     label: Problema a resolver
-  validation:
+  validations:
     required: true
 - type: textarea
   attributes:
     label: Solucion propuesta.
     placeholder: Explicacions como solucionarias el problema
-  validation:
+  validations:
     required: true
