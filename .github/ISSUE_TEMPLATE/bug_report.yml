@@ -36,6 +36,8 @@ body:
   attributes:
     label: Comportamiento actual
     placeholder: Lo que ocurrio de verdad
+  validations:
+    required: true
 - type: textarea
   attributes:
     label: Informacion extra
