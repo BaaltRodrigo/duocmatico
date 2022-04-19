@@ -1,7 +1,7 @@
 name: 🐛 Bug Report
 description: Cuentanos cuando encuentres un error.
-labels:
- - bug
+title: "[Bug]: "
+labels: ["bug"]
 body:
 - type: markdown
   attributes:
