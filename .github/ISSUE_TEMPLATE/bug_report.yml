@@ -1,0 +1,42 @@
+name: 🐛 Bug Report
+description: Cuentanos cuando encuentres un error.
+labels:
+ - bug
+body:
+- type: markdown
+  attributes:
+    value: |
+      Asegurate de revisar [las issues de duocmatico](https://github.com/BaaltRodrigo/duocmatico/issues) antes de agregar una nueva!
+- type: textarea
+  attributes:
+    label: Ambiente donde ocurre el error
+    description: Describenos como es tu computador o telefono y el buscador que estas usando
+    placeholder: |
+      OS: Windows 11
+      Buscador: Mozilla Firefox
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Pasos para reproducir el error
+    description: Cuentanos lo que hiciste para llegar al error. Asi podemos reproducirlo nosotros.
+    placeholder: |
+      1. Abrir la aplicacion
+      2. Hice click en "..."
+      3. Ver como todo explotaba
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Comportamiento esperado
+    placeholder: Pon aqui lo que deberia ocurrir normalmente, o lo que esperabas que ocurriera
+  validations:
+    required: true
+- type: textarea
+    attributes:
+      label: Comportamiento actual
+      placeholder: Lo que ocurrio de verdad
+- type: textarea
+  attributes:
+    label: Informacion extra
+    descripcion: Si necesitas dar algun otro tipo de informacion, puedes hacerlo aqui.
