@@ -1,7 +1,7 @@
 name: ✨ Feature request
+title: "[Feature request]: "
 description: Propone cosas nuevas para el proyecto.
-labels:
-- feature request
+labels: ["feature request"]
 body:
 - type: textarea
   attributes:
