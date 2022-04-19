@@ -39,4 +39,4 @@ body:
 - type: textarea
   attributes:
     label: Informacion extra
-    descripcion: Si necesitas dar algun otro tipo de informacion, puedes hacerlo aqui.
+    description: Si necesitas dar algun otro tipo de informacion, puedes hacerlo aqui.
