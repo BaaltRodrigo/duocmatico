@@ -24,7 +24,7 @@
 
 <script>
 import CursoHeader from "./CursoHeader.vue";
-import CursoHorario from "../components/CursoHorario.vue";
+import CursoHorario from "./CursoHorario.vue";
 
 export default {
   name: "Curso",

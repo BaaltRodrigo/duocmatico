@@ -45,7 +45,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import Curso from "../components/Curso.vue";
+import Curso from "../components/curso/Curso.vue";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
 import { delay } from "../helpers/utilities";
 
