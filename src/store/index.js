@@ -33,6 +33,17 @@ const getters = {
   careers(state) {
     return [...new Set(state.careersData.map((data) => data.carrera))];
   },
+
+  semesters(state, getters) {
+    let allSemesters = getters.careerCourses.map(
+      (course) => course.nivel || null
+    );
+    return [...new Set(allSemesters)].sort((a, b) => a > b);
+  },
+
+  times(state, getters) {
+    return [...new Set(getters.careerCourses.map((c) => c.jornada))];
+  },
 };
 
 const actions = {
