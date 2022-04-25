@@ -29,7 +29,6 @@ async function mapFileContent(file) {
 
 function groupBySections(rows) {
   const uniqueNames = [...new Set(rows.map((row) => row.seccion))];
-  console.log("Cantidad secciones:", uniqueNames.length);
   const sections = uniqueNames.map((sectionName) => {
     let sameSection = rows.filter((row) => row.seccion === sectionName);
     let horarios = sameSection.map(({ horario, dia, sala }) => {
@@ -46,6 +45,7 @@ function groupBySections(rows) {
       ...first,
       horarios,
       planes,
+      nivel: first.nivel || null,
     };
   });
   console.log("Secciones agrupadas:", sections.length);
