@@ -36,6 +36,7 @@
         content-class="elevation-0"
         v-model="wantUpload"
         max-width="700px"
+        persistent
       >
         <cargar-archivo @done="wantUpload = false" />
       </v-dialog>
@@ -77,7 +78,7 @@ export default {
   data() {
     return {
       busqueda: null,
-      wantUpload: true,
+      wantUpload: !localStorage.isRemembered,
     };
   },
 
