@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 export default {
   name: "App",
 
@@ -15,15 +15,25 @@ export default {
     //
   }),
 
-  methods: {
-    ...mapMutations(["setCareersData", "setCareer"]),
+  computed: {
+    ...mapState(["careersData"]),
   },
 
-  mounted() {
+  methods: {
+    ...mapMutations(["setCareersData"]),
+    ...mapActions(["findCareerData"]),
+    ...mapMutations("courses", ["setCareer", "setCourses"]),
+  },
+
+  async mounted() {
     // Check LocalStorage for xlsxJsonData
     if (localStorage.isRemembered) {
-      this.setCareersData(JSON.parse(localStorage.xslxJsonData));
-      this.setCareer(localStorage.selectedCareer);
+      const savedCareer = localStorage.selectedCareer;
+      const savedData = JSON.parse(localStorage.xslxJsonData);
+      this.setCareersData(savedData);
+      const careerData = await this.findCareerData(savedCareer);
+      this.setCareer(savedCareer);
+      this.setCourses(careerData.ramos);
     }
   },
 };
