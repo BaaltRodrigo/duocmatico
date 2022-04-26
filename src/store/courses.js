@@ -28,8 +28,6 @@ const getters = {
   getTimes(state) {
     return [...new Set(state.courses.map((c) => c.jornada))];
   },
-
-  getFilteredCourses(state) {},
 };
 
 const mutations = {
