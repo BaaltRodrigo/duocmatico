@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations } from "vuex";
+import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
 
 export default {
   name: "CareerSelection",
@@ -48,8 +48,10 @@ export default {
   },
 
   methods: {
-    ...mapMutations(["setCareersData", "setCareer"]),
-    showCourses() {
+    ...mapMutations(["setCareersData"]),
+    ...mapActions(["findCareerData"]),
+    ...mapMutations("courses", ["setCareer", "setCourses"]),
+    async showCourses() {
       // DISABLE BUTTON TO PREVENT EXECUTE THIS MULTIPLE TIMES
       this.$emit("loading");
       this.disabledBtn = true;
@@ -60,7 +62,9 @@ export default {
       }
       // Copy data from fileConverter store to general store
       this.setCareersData(this.temporaryData);
+      const careerData = await this.findCareerData(this.carrera);
       this.setCareer(this.carrera);
+      this.setCourses(careerData.ramos);
       this.$emit("stop");
     },
   },
