@@ -23,6 +23,7 @@
             clearable
             @click:clear="limpiarBusqueda"
           ></v-text-field>
+          <v-btn @click="showFiltros = true">filtros</v-btn>
           <curso
             v-for="curso in filtroCursos"
             :key="curso.seccion"
@@ -40,15 +41,24 @@
       >
         <cargar-archivo @done="wantUpload = false" />
       </v-dialog>
+      <v-dialog
+        persistent
+        v-model="showFiltros"
+        content-class="elevation-0"
+        max-width="700px"
+      >
+        <filtros-card @close="showFiltros = false"></filtros-card>
+      </v-dialog>
     </v-container>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapState } from "vuex";
 import Curso from "../components/curso/Curso.vue";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
-import { delay } from "../helpers/utilities";
+import FiltrosCard from "../components/filtros/FiltrosCard.vue";
+// import { delay } from "../helpers/utilities";
 
 export default {
   name: "Home",
@@ -56,21 +66,39 @@ export default {
   components: {
     Curso,
     CargarArchivo,
+    FiltrosCard,
   },
 
   computed: {
-    ...mapGetters(["careerCourses"]),
     ...mapState(["careersData", "career"]),
+    ...mapState("courses", ["courses", "filters"]),
 
     filtroCursos() {
-      delay(500);
-      if (!this.career) return [];
-      if (!this.busqueda) return this.careerCourses;
+      let filtered = this.courses;
+      // console.log("Sin filtrar", filtered);
+      //Filtro por semestres primero
+      if (this.filters.semesters.length > 0) {
+        // console.log(this.filters.semesters);
+        filtered = filtered.filter((c) =>
+          this.filters.semesters.includes(c.nivel)
+        );
+      }
+      // console.log("Filtro Semestres", filtered);
+      // Filtro por jornada
+      if (this.filters.times.length > 0) {
+        // console.log("jornadas", this.filters.times);
+        filtered = filtered.filter((c) =>
+          this.filters.times.includes(c.jornada)
+        );
+      }
+      // console.log("Filtro Jornadas", filtered);
+      // Hago la busqueda por input de la pagina.
+      if (!this.busqueda) return filtered;
       const buscar = this.busqueda.toUpperCase();
-      return this.careerCourses.filter(
-        (r) =>
-          r.seccion.toUpperCase().includes(buscar) ||
-          r.asignatura.toUpperCase().includes(buscar)
+      return filtered.filter(
+        (c) =>
+          c.seccion.toUpperCase().includes(buscar) ||
+          c.asignatura.toUpperCase().includes(buscar)
       );
     },
   },
@@ -79,6 +107,7 @@ export default {
     return {
       busqueda: null,
       wantUpload: !localStorage.isRemembered,
+      showFiltros: false,
     };
   },
 
@@ -86,6 +115,7 @@ export default {
     test() {
       console.log(this.careerCourses);
     },
+
     limpiarBusqueda() {
       this.busqueda = null;
       this.$vuetify.goTo("#inicio-listado");
