@@ -1,6 +1,8 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import fileUpload from "./fileUpload.js";
+// const courses = require("./courses.js");
+import courses from "./courses.js";
 
 Vue.use(Vuex);
 
@@ -12,7 +14,6 @@ const state = {
 const mutations = {
   setCareersData(state, data) {
     state.careersData = data;
-    console.log(data);
   },
 
   setCareer(state, career) {
@@ -54,10 +55,16 @@ const actions = {
   decreaseStep(state) {
     state.setp--;
   },
+
+  findCareerData({ state }, career) {
+    let index = state.careersData.findIndex((c) => c.carrera === career);
+    return state.careersData[index] || [];
+  },
 };
 
 const modules = {
   fileUpload,
+  courses,
 };
 
 export default new Vuex.Store({
