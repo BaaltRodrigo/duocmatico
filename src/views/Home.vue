@@ -23,15 +23,27 @@
             clearable
             @click:clear="limpiarBusqueda"
           ></v-text-field>
-          <v-btn @click="showFiltros = true">filtros</v-btn>
-          <curso
-            v-for="curso in filtroCursos"
-            :key="curso.seccion"
-            :curso="curso"
-            class="mb-3"
-          />
+        </v-col>
+        <v-col
+          cols="12"
+          md="9"
+          v-for="curso in filtroCursos"
+          :key="curso.seccion"
+        >
+          <curso :curso="curso"></curso>
         </v-col>
       </v-row>
+      <v-btn
+        fab
+        bottom
+        right
+        fixed
+        dark
+        color="purple"
+        @click="showFiltros = true"
+      >
+        <v-icon>mdi-filter-outline</v-icon>
+      </v-btn>
       <!-- Pop up para subir un nuevo archivo -->
       <v-dialog
         content-class="elevation-0"
