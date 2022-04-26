@@ -3,6 +3,7 @@
     <v-toolbar fixed dark color="purple" flat>
       <v-toolbar-title>Duocmatico</v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-btn @click="test">test</v-btn>
       <v-btn
         icon
         href="https://github.com/BaaltRodrigo/duocmatico"
@@ -12,7 +13,7 @@
       </v-btn>
     </v-toolbar>
     <v-container>
-      <v-row justify="center">
+      <v-row justify="center" dense>
         <v-col cols="12" md="9">
           <h2 id="inicio-listado">Listado de cursos</h2>
           <v-text-field
@@ -24,13 +25,13 @@
             @click:clear="limpiarBusqueda"
           ></v-text-field>
         </v-col>
-        <v-col
-          cols="12"
-          md="9"
-          v-for="curso in filtroCursos"
-          :key="curso.seccion"
-        >
-          <curso :curso="curso"></curso>
+        <v-col cols="12" md="9">
+          <v-divider></v-divider>
+          <cluster-course
+            v-for="cluster in clusters"
+            :key="`clouster-${cluster.asignatura}`"
+            :cluster="cluster"
+          ></cluster-course>
         </v-col>
       </v-row>
       <v-btn
@@ -67,17 +68,17 @@
 
 <script>
 import { mapState } from "vuex";
-import Curso from "../components/curso/Curso.vue";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
 import FiltrosCard from "../components/filtros/FiltrosCard.vue";
+import ClusterCourse from "../components/curso/ClusterCurso.vue";
 // import { delay } from "../helpers/utilities";
 
 export default {
   name: "Home",
 
   components: {
-    Curso,
     CargarArchivo,
+    ClusterCourse,
     FiltrosCard,
   },
 
@@ -113,6 +114,19 @@ export default {
           c.asignatura.toUpperCase().includes(buscar)
       );
     },
+
+    clusters() {
+      const coursesNames = [
+        ...new Set(this.filtroCursos.map((c) => c.asignatura)),
+      ];
+      const grouped = coursesNames.map((name) => {
+        return {
+          asignatura: name,
+          secciones: this.filtroCursos.filter((c) => c.asignatura === name),
+        };
+      });
+      return grouped;
+    },
   },
 
   data() {
@@ -125,7 +139,7 @@ export default {
 
   methods: {
     test() {
-      console.log(this.careerCourses);
+      console.log(this.clusters);
     },
 
     limpiarBusqueda() {
