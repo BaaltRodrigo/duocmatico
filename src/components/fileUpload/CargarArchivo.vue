@@ -2,6 +2,10 @@
   <v-card flat class="rounded-lg">
     <v-card-title class="font-weight-h4">
       {{ titles[step - 1] }}
+      <v-spacer></v-spacer>
+      <v-btn icon @click="terminar">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
     </v-card-title>
     <v-progress-linear
       :active="loading"
@@ -23,6 +27,10 @@
             >
             el que te corresponda.
           </v-alert>
+          <v-alert type="error" text dismissible v-model="failedAttempt">
+            Al parecer el archivo que subiste no es un excel con los ramos
+            disponibles
+          </v-alert>
           <drop-zone
             v-if="!attemptedFile"
             @uploadedFile="startFileConversion"
@@ -35,7 +43,7 @@
         <v-card-text>
           <career-selection
             @loading="loading = true"
-            @stop="$emit('done')"
+            @stop="terminar"
           ></career-selection>
         </v-card-text>
       </v-window-item>
@@ -70,6 +78,7 @@ export default {
   data() {
     return {
       loading: false,
+      failedAttempt: false,
       step: 1,
       titles: [
         "Sube tu excel con los ramos",
@@ -83,27 +92,32 @@ export default {
   methods: {
     ...mapMutations("fileUpload", ["setTemporaryData", "setAttemptedFile"]),
     async startFileConversion() {
-      try {
-        // console.log(this.attemptedFile);
-        const fileData = await mapFileContent(this.attemptedFile);
-        // console.log(fileData);
-        const dataBySections = groupBySections(fileData);
-        // console.log(dataBySections);
-        const dataByCareers = groupByCareer(dataBySections);
-        // console.log(dataByCareers);
+      // console.log(this.attemptedFile);
+      const fileData = await mapFileContent(this.attemptedFile);
+      // console.log(fileData);
+      const dataBySections = groupBySections(fileData);
+      // console.log(dataBySections);
+      const dataByCareers = groupByCareer(dataBySections);
+      // console.log(dataByCareers);
+      if (dataByCareers.length > 0) {
         this.setTemporaryData(dataByCareers);
         this.step = 2;
-      } catch (e) {
-        console.log(e);
-        console.log("Fallo la conversion");
+      } else {
+        this.failedAttempt = true;
         this.setAttemptedFile(null);
       }
+    },
+
+    terminar() {
+      this.step = 1;
+      this.failedAttempt = false;
+      this.setAttemptedFile(null);
+      this.$emit("done");
     },
   },
 
   created() {
     this.setAttemptedFile(null);
-    this.setTemporaryData(null);
   },
 };
 </script>

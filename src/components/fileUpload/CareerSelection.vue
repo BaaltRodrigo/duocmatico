@@ -53,7 +53,6 @@ export default {
     ...mapMutations("courses", ["setCareer", "setCourses"]),
     async showCourses() {
       // DISABLE BUTTON TO PREVENT EXECUTE THIS MULTIPLE TIMES
-      this.$emit("loading");
       this.disabledBtn = true;
       if (this.rememberFile) {
         localStorage.isRemembered = true;
@@ -65,6 +64,7 @@ export default {
       const careerData = await this.findCareerData(this.carrera);
       this.setCareer(this.carrera);
       this.setCourses(careerData.ramos);
+      this.disabledBtn = false;
       this.$emit("stop");
     },
   },

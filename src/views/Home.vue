@@ -3,7 +3,9 @@
     <v-toolbar fixed dark color="purple" flat>
       <v-toolbar-title>Duocmatico</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn @click="test">test</v-btn>
+      <v-btn icon @click="wantUpload = true">
+        <v-icon>mdi-cloud-upload</v-icon>
+      </v-btn>
       <v-btn
         icon
         href="https://github.com/BaaltRodrigo/duocmatico"
