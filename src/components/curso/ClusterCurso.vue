@@ -21,7 +21,7 @@
           v-for="curso in cluster.secciones"
           :key="`seccion-${curso.seccion}`"
           :curso="curso"
-          class="mb-2"
+          class="mb-4"
         ></curso>
       </v-card-text>
     </v-expand-transition>

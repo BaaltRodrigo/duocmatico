@@ -1,5 +1,5 @@
 <template>
-  <v-card outlined>
+  <v-card outlined class="rounded-lg">
     <curso-header :curso="curso"></curso-header>
     <v-divider></v-divider>
     <!-- Esto se muestra al hacer click en el ramo -->
@@ -13,9 +13,9 @@
         </v-col>
         <!-- Datos extras -->
         <v-col cols="12" md="6">
-          Modalidad: <v-chip small v-if="isPresencial">Presencial</v-chip>
-          <v-chip small v-if="isOnline">Online</v-chip>
-          <!-- Plan de estudios: {{curso.planes}} -->
+          <v-card outlined>
+            <curso-extra-info :curso="curso"></curso-extra-info>
+          </v-card>
         </v-col>
       </v-row>
     </v-container>
@@ -25,6 +25,7 @@
 <script>
 import CursoHeader from "./CursoHeader.vue";
 import CursoHorario from "./CursoHorario.vue";
+import CursoExtraInfo from "./CursoExtraInfo.vue";
 
 export default {
   name: "Curso",
@@ -32,34 +33,13 @@ export default {
   components: {
     CursoHeader,
     CursoHorario,
+    CursoExtraInfo,
   },
 
   props: {
     curso: {
       type: Object,
       required: true,
-    },
-  },
-
-  computed: {
-    diasCurso() {
-      return this.curso.horarios.map((h) => h.dia);
-    },
-
-    isOnline() {
-      return this.diasCurso.includes("En linea");
-    },
-
-    isPresencial() {
-      const semana = [
-        "Lunes",
-        "Martes",
-        "Miércoles",
-        "Jueves",
-        "Viernes",
-        "Sábado",
-      ];
-      return semana.some((d) => this.diasCurso.includes(d));
     },
   },
 
