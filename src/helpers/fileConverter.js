@@ -41,7 +41,6 @@ function groupBySections(rows) {
     delete first.horario;
     delete first.dia;
     delete first.sala;
-    console.log(uniqueSchedules(horarios));
     return {
       ...first,
       ...{ horarios: uniqueSchedules(horarios) },
