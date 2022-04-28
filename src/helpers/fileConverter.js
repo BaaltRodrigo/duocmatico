@@ -41,14 +41,14 @@ function groupBySections(rows) {
     delete first.horario;
     delete first.dia;
     delete first.sala;
+    console.log(uniqueSchedules(horarios));
     return {
       ...first,
-      horarios,
+      ...{ horarios: uniqueSchedules(horarios) },
       planes,
       nivel: first.nivel || null,
     };
   });
-  console.log("Secciones agrupadas:", sections.length);
   return sections;
 }
 
@@ -70,4 +70,21 @@ function groupByCareer(sections) {
   return careers;
 }
 
-export { mapFileContent, groupBySections, groupByCareer };
+/**
+ * Used to make sections schedules uniques.
+ * Sometimes there are sections with duplicated schedules. This make them uniques
+ *
+ * @param {Array} horarios
+ * @return {Array} Array with unique Schedules
+ */
+function uniqueSchedules(horarios) {
+  const noDuplicates = [...new Set(horarios.map((h) => h.horario))];
+  const schedules = noDuplicates.map((hours) => {
+    // Can do this because hours comes with the same array.
+    // There is 100% chance that I will find AT LEAST one match
+    return horarios.filter((h) => h.horario === hours)[0];
+  });
+  return schedules;
+}
+
+export { mapFileContent, groupBySections, groupByCareer, uniqueSchedules };
