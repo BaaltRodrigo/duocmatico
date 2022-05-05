@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import fileUpload from "./fileUpload.js";
 // const courses = require("./courses.js");
 import courses from "./courses.js";
+import schedule from "./schedule.js";
 
 Vue.use(Vuex);
 
@@ -58,8 +59,9 @@ const actions = {
 };
 
 const modules = {
-  fileUpload,
   courses,
+  fileUpload,
+  schedule,
 };
 
 export default new Vuex.Store({
