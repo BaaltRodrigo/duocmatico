@@ -89,3 +89,24 @@ Por ultimo, para no tener que mostrar todos los cursos disponibles de una sede j
   ]
 }
 ```
+
+## Que datos guardan?
+
+Actualmente los datos se guardan en tu propio buscador (Mozilla, Chrome, Edge, etc) y estos son exclusivamente para el funcionamiento de la aplicacion. No guardamos datos personales ni dejamos cookies en tu dispositivo.
+
+A continuacion podraas ver un listado de los datos guardados por parte de Duocmatico
+
+### Version de la app
+
+Este dato se guarda para saber cual fue la ultima version que usaste de la aplicacion. Debido a que aun estamos en construccion, es posible (muy posible) que realizemos cambios en _como_ transformamos los datos del excel con los cursos y necesitemos que lo subas otra vez para poder realizar otra vez la conversion del archivo.
+
+_Tecnicamente tambien podriamos usar los datos que ya habiamos guardado. Pero existen casos en los que necesitaremos influir nueva informacion. Por lo que los datos que ya estan guardados no servirian..._ 🤷🏻‍♂️
+
+### Datos del archivo cargado
+
+Estos datos se guardan _unicamente_ si tu lo deseas. Basicamente son para que no tengas que volver a subir un archivo con los cursos cada vez que accedes a la aplicacion.
+El formato en como se guardan los datos lo puedes encontrar [aqui](#transformacion-de-datos)
+
+### Carrera seleccionada
+
+Este dato se guarda _unicamente_ si tu lo deseas. En conjunto con los datos del archivo cargado, se usa para mostrar los ramos correspondiente a tu carrera cada vez que entres a Duocmatico
