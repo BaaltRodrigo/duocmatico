@@ -8,6 +8,8 @@
 
 <script>
 import { mapActions, mapMutations, mapState } from "vuex";
+import { version } from "../package";
+
 export default {
   name: "App",
 
@@ -27,13 +29,21 @@ export default {
 
   async mounted() {
     // Check LocalStorage for xlsxJsonData
-    if (localStorage.isRemembered) {
-      const savedCareer = localStorage.selectedCareer;
-      const savedData = JSON.parse(localStorage.xslxJsonData);
-      this.setCareersData(savedData);
-      const careerData = await this.findCareerData(savedCareer);
-      this.setCareer(savedCareer);
+    const { xslxJsonData, selectedCareer } = localStorage;
+    if (xslxJsonData && selectedCareer) {
+      this.setCareersData(JSON.parse(xslxJsonData));
+      const careerData = await this.findCareerData(selectedCareer);
+      this.setCareer(selectedCareer);
       this.setCourses(careerData.ramos);
+    }
+  },
+
+  created() {
+    // Celan the localStorage every time there is a major update
+    // By every time I mean, every time we do a change on how the
+    // xslx file is readed.
+    if (!(version == localStorage.lastVersion)) {
+      localStorage.clear();
     }
   },
 };
