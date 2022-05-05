@@ -16,7 +16,7 @@
     </v-toolbar>
     <v-container>
       <v-row justify="center" dense>
-        <v-col cols="12" md="9">
+        <v-col cols="12" md="10">
           <h2 id="inicio-listado">Listado de cursos</h2>
           <v-text-field
             outlined
@@ -27,7 +27,7 @@
             @click:clear="limpiarBusqueda"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" md="9">
+        <v-col cols="12" md="10">
           <v-divider></v-divider>
           <cluster-course
             v-for="cluster in clusters"
@@ -54,6 +54,13 @@
         max-width="700px"
         persistent
       >
+        <v-card flat class="rounded-lg">
+          <v-alert type="warning" outlined text>
+            Si ya usaste Duocmatico, puede que tengas que volver a subir el
+            archivo con los cursos. Hicimos un cambio en como leemos la
+            informacion en el excel!
+          </v-alert>
+        </v-card>
         <cargar-archivo @done="wantUpload = false" />
       </v-dialog>
       <v-dialog
@@ -73,7 +80,6 @@ import { mapState } from "vuex";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
 import FiltrosCard from "../components/filtros/FiltrosCard.vue";
 import ClusterCourse from "../components/curso/ClusterCurso.vue";
-// import { delay } from "../helpers/utilities";
 
 export default {
   name: "Home",
@@ -134,20 +140,23 @@ export default {
   data() {
     return {
       busqueda: null,
-      wantUpload: !localStorage.isRemembered,
+      wantUpload: false,
       showFiltros: false,
     };
   },
 
   methods: {
-    test() {
-      console.log(this.clusters);
-    },
-
     limpiarBusqueda() {
       this.busqueda = null;
       this.$vuetify.goTo("#inicio-listado");
     },
+  },
+
+  mounted() {
+    const { xslxJsonData } = localStorage;
+    if (!xslxJsonData) {
+      this.wantUpload = true;
+    }
   },
 };
 </script>

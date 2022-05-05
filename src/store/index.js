@@ -8,16 +8,11 @@ Vue.use(Vuex);
 
 const state = {
   careersData: [],
-  career: null,
 };
 
 const mutations = {
   setCareersData(state, data) {
     state.careersData = data;
-  },
-
-  setCareer(state, career) {
-    state.career = career;
   },
 };
 
