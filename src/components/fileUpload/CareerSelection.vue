@@ -30,6 +30,7 @@
 
 <script>
 import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
+import { version } from "../../../package";
 
 export default {
   name: "CareerSelection",
@@ -51,14 +52,17 @@ export default {
     ...mapMutations(["setCareersData"]),
     ...mapActions(["findCareerData"]),
     ...mapMutations("courses", ["setCareer", "setCourses"]),
+
+    setPersistentData() {
+      localStorage.lastVersion = version;
+      localStorage.xslxJsonData = JSON.stringify(this.temporaryData);
+      localStorage.selectedCareer = this.carrera;
+    },
+
     async showCourses() {
       // DISABLE BUTTON TO PREVENT EXECUTE THIS MULTIPLE TIMES
       this.disabledBtn = true;
-      if (this.rememberFile) {
-        localStorage.isRemembered = true;
-        localStorage.xslxJsonData = JSON.stringify(this.temporaryData);
-        localStorage.selectedCareer = this.carrera;
-      }
+      if (this.rememberFile) this.setPersistentData();
       // Copy data from fileConverter store to general store
       this.setCareersData(this.temporaryData);
       const careerData = await this.findCareerData(this.carrera);
