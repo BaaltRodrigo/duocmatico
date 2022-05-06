@@ -14,6 +14,13 @@
         <v-icon>{{ "mdi-github" }}</v-icon>
       </v-btn>
     </v-toolbar>
+
+    <v-container>
+      <v-card class="rounded-lg" height="24rem">
+        <calendario></calendario>
+      </v-card>
+    </v-container>
+
     <v-container>
       <v-row justify="center" dense>
         <v-col cols="12" md="10">
@@ -77,14 +84,16 @@
 
 <script>
 import { mapState } from "vuex";
+import Calendario from "../components/Calendario.vue";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
-import FiltrosCard from "../components/filtros/FiltrosCard.vue";
 import ClusterCourse from "../components/curso/ClusterCurso.vue";
+import FiltrosCard from "../components/filtros/FiltrosCard.vue";
 
 export default {
   name: "Home",
 
   components: {
+    Calendario,
     CargarArchivo,
     ClusterCourse,
     FiltrosCard,
