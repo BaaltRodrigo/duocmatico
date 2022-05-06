@@ -67,10 +67,6 @@ export default {
 
   methods: {
     ...mapMutations("schedule", ["addSection", "removeSection"]),
-    test() {
-      this.addSection(this.curso);
-      console.log(this.sections);
-    },
 
     handle() {
       if (this.isInSchedule) {
@@ -78,12 +74,6 @@ export default {
       } else {
         this.addSection(this.curso);
       }
-      console.log(this.sections);
-    },
-
-    remove() {
-      this.removeSection(this.curso);
-      console.log(this.sections);
     },
   },
 };
