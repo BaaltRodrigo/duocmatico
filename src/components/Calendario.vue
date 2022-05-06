@@ -24,12 +24,6 @@ export default {
     },
   },
 
-  watch: {
-    sections() {
-      console.log("Eventos:", this.events);
-    },
-  },
-
   data() {
     return {
       weekdays: [1, 2, 3, 4, 5, 6],
@@ -61,37 +55,35 @@ export default {
     },
 
     getTimes({ horario }) {
-      const mutableDate = new Date();
+      const mutableDate = new Date(); // Date on locale machine
       const eventWeekdayNumber = this.dayValues[horario.substring(0, 2)];
       const todayWeekdayNumber = mutableDate.getDay();
 
       // calculate correct day based on the actual week
       const differece = todayWeekdayNumber - eventWeekdayNumber;
-      const eventDay = mutableDate.getDate() - differece;
-      mutableDate.setDate(eventDay);
-      console.log("La fecha:", mutableDate.toString());
-      const yearMonthDay = mutableDate.toISOString().split("T")[0];
-      console.log("YYYY-MM-DD:", yearMonthDay);
+      mutableDate.setDate(mutableDate.getDate() - differece);
+      // mutableDate.setDate(eventDay);
+      console.log("La fecha de evento:", mutableDate.toLocaleString());
 
       const startEnd = horario.substring(3).split(" - ");
-      const startDate = new Date(`${yearMonthDay} ${startEnd[0]}`);
-      const endtDate = new Date(`${yearMonthDay} ${startEnd[1]}`);
-      console.log("Inicio:", startDate.toString());
 
       return {
-        start: `${yearMonthDay} ${startDate
-          .toString()
-          .split(" ")[4]
-          .substr(0, 5)}`,
-        end: `${yearMonthDay} ${endtDate
-          .toString()
-          .split(" ")[4]
-          .substr(0, 5)}`,
+        start: `${mutableDate
+          .toLocaleDateString()
+          .split("/")
+          .reverse()
+          .join("-")} ${startEnd[0]}`,
+        end: `${mutableDate
+          .toLocaleDateString()
+          .split("/")
+          .reverse()
+          .join("-")} ${startEnd[1]}`,
       };
     },
   },
 
   mounted() {
+    // Move calendar to 8:00 AM
     this.$refs.calendar.scrollToTime("08:00");
   },
 };
