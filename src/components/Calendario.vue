@@ -2,6 +2,9 @@
   <v-calendar
     ref="calendar"
     type="week"
+    :first-interval="8"
+    :interval-count="16"
+    :interval-height="90"
     :start="startISO"
     :end="endISO"
     :weekdays="weekdays"
