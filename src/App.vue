@@ -1,5 +1,6 @@
 <template>
   <v-app>
+    <the-header></the-header>
     <v-main>
       <router-view />
     </v-main>
@@ -9,9 +10,14 @@
 <script>
 import { mapActions, mapMutations, mapState } from "vuex";
 import { version } from "../package";
+import TheHeader from "./components/TheHeader.vue";
 
 export default {
   name: "App",
+
+  components: {
+    TheHeader,
+  },
 
   data: () => ({
     //
@@ -39,7 +45,7 @@ export default {
   },
 
   created() {
-    // Celan the localStorage every time there is a major update
+    // Clean the localStorage every time there is a major update
     // By every time I mean, every time we do a change on how the
     // xslx file is readed.
     if (!(version == localStorage.lastVersion)) {
@@ -48,3 +54,9 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+html {
+  overflow-y: auto;
+}
+</style>
