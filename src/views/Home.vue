@@ -40,11 +40,10 @@
             label="Buscar cursos"
             placeholder="Nombre del curso, seccion, sigla"
             prepend-icon="mdi-filter-outline"
-            v-model="busquedaTMP"
+            v-model="busqueda"
             hint="Para ver mas filtros puedes hacer click en el icono"
             persistent-hint
             @click:prepend="showFilters = true"
-            @keypress.enter="changeBusqueda"
           ></v-text-field>
         </v-card-title>
         <v-card-text style="height: calc(80vh - 102px)">
@@ -152,16 +151,11 @@ export default {
   data: () => ({
     showClasses: false,
     busqueda: null,
-    busquedaTMP: null,
     showFilters: false,
   }),
 
   methods: {
     ...mapMutations("fileUpload", ["setShowModal"]),
-
-    changeBusqueda() {
-      this.busqueda = this.busquedaTMP;
-    },
   },
 
   mounted() {
