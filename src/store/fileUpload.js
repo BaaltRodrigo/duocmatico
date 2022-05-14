@@ -1,6 +1,7 @@
 const state = {
   attemptedFile: null,
   temporaryData: null,
+  showModal: false,
 };
 
 const getters = {
@@ -16,6 +17,10 @@ const mutations = {
 
   setTemporaryData(state, data) {
     state.temporaryData = data;
+  },
+
+  setShowModal(state, show) {
+    state.showModal = show;
   },
 };
 
