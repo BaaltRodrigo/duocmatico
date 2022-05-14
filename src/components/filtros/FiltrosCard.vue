@@ -1,5 +1,5 @@
 <template>
-  <v-card class="rounded-lg">
+  <v-card class="rounded-xl">
     <v-card-title>
       Filtros disponibles
       <v-spacer></v-spacer>
