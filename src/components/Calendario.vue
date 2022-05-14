@@ -2,8 +2,11 @@
   <v-calendar
     ref="calendar"
     type="week"
-    :start="calendarStart"
-    :end="calendarEnd"
+    :first-interval="7"
+    :interval-count="17"
+    :interval-height="90"
+    :start="startISO"
+    :end="endISO"
     :weekdays="weekdays"
     :events="events"
     locale="es"
@@ -17,6 +20,12 @@ export default {
 
   computed: {
     ...mapState("schedule", ["sections"]),
+    startISO() {
+      return this.calendarStart.toISOString().split("T")[0];
+    },
+    endISO() {
+      return this.calendarEnd.toISOString().split("T")[0];
+    },
     events() {
       const allEvents = [];
       this.sections.forEach((section) => {
@@ -44,24 +53,6 @@ export default {
   },
 
   methods: {
-    /**
-     * This function helps to calculate the start and end date
-     * of the weekly calendar.
-     *
-     * @param {string} calendarDate Data attribute that we want to change
-     * @param {number} weekDay Day number of the week. See data -> dayValues
-     *
-     * @return {string} Date string formated YYYY-M-D or YYYT-MM-DD. I think it's the first one...
-     */
-    setupDates(calendarDate, weekDay) {
-      const today = new Date();
-      const dayDiff = today.getDay() - weekDay;
-
-      today.setDate(today.getDate() - dayDiff);
-
-      this[calendarDate] = today.toISOString().split("T")[0];
-    },
-
     sectionToEvents(section) {
       const timeBlocks = [];
       section.horarios.forEach((bloque) => {
@@ -76,22 +67,35 @@ export default {
       return timeBlocks;
     },
 
+    getFirstDayOfTheWeek() {
+      const today = new Date();
+      today.setDate(today.getDate() - today.getDay() + 1); // Always to monday
+      if (today.getDay() > 1) {
+        console.log("No era nada lunes");
+        // Be aware that because of timezone this "MONDAY" may no be YOUR MONDAY
+        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+      }
+      const fecha = today.toLocaleString().split(", ")[0];
+      // console.log("Fecha", fecha.split("/").reverse().join("-"));
+      const monday = new Date(fecha.split("/").reverse().join("-"));
+      return monday;
+    },
+
+    /**
+     * Used to get the start and end date of an event
+     */
     getTimes({ horario }) {
-      const eventDate = new Date(); // Date on locale machine
-      const eventWeekdayNumber = this.dayValues[horario.substring(0, 2)];
-      const todayWeekdayNumber = eventDate.getDay();
-
-      // calculate correct day based on the actual week
-      const differece = todayWeekdayNumber - eventWeekdayNumber;
-      eventDate.setDate(eventDate.getDate() - differece);
-      // eventDate.setDate(eventDay);
-      console.log("La fecha de evento:", eventDate.toISOString().split("T")[0]);
-
+      const monday = this.getFirstDayOfTheWeek();
+      const horarioDay = this.dayValues[horario.substring(0, 2)];
+      const dayMinutes = 24 * 60;
+      // get the real date of the event
+      monday.setMinutes(dayMinutes * (horarioDay - 1));
+      const eventDate = new Date(monday).toISOString().split("T")[0]; // Not actually monday
       const startEnd = horario.substring(3).split(" - ");
 
       return {
-        start: `${eventDate.toISOString().split("T")[0]} ${startEnd[0]}`,
-        end: `${eventDate.toISOString().split("T")[0]} ${startEnd[1]}`,
+        start: `${eventDate} ${startEnd[0]}`,
+        end: `${eventDate} ${startEnd[1]}`,
       };
     },
   },
@@ -102,8 +106,11 @@ export default {
   },
 
   created() {
-    this.setupDates("calendarStart", this.dayValues.Lu);
-    this.setupDates("calendarEnd", this.dayValues.Sa);
+    this.calendarStart = this.getFirstDayOfTheWeek();
+    // Add minutes equivalent to 5 days to get saturday
+    this.calendarEnd = new Date(
+      this.getFirstDayOfTheWeek().setMinutes(60 * 24 * 5)
+    );
   },
 };
 </script>
