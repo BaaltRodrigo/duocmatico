@@ -1,106 +1,109 @@
 <template>
-  <div>
-    <v-toolbar fixed dark color="purple" flat>
-      <v-toolbar-title>Duocmatico</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-btn icon @click="wantUpload = true">
-        <v-icon>mdi-cloud-upload</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        href="https://github.com/BaaltRodrigo/duocmatico"
-        target="none"
-      >
-        <v-icon>{{ "mdi-github" }}</v-icon>
-      </v-btn>
-    </v-toolbar>
-
-    <v-container>
-      <v-card class="rounded-lg" height="24rem">
-        <calendario></calendario>
-      </v-card>
-    </v-container>
-
-    <v-container>
-      <v-row justify="center" dense>
-        <v-col cols="12" md="10">
-          <h2 id="inicio-listado">Listado de cursos</h2>
+  <div style="height: calc(100vh - 64px)">
+    <v-card class="rounded-lg" height="100%">
+      <calendario></calendario>
+      <v-tooltip right>
+        <template #activator="{ on, attr }">
+          <v-btn
+            @click="showClasses = true"
+            class="my-12"
+            small
+            fab
+            absolute
+            top
+            left
+            dark
+            color="purple"
+            v-on="on"
+            v-bind="attr"
+          >
+            <v-icon>mdi-plus</v-icon>
+          </v-btn>
+        </template>
+        <span>Agregar un curso al calendario</span>
+      </v-tooltip>
+    </v-card>
+    <!-- Dialog to included classes -->
+    <v-dialog v-model="showClasses" scrollable content-class="elevation-0">
+      <v-card class="rounded-xl">
+        <v-card-title>
+          Cursos disponibles para agregar
+          <v-spacer></v-spacer>
+          <v-btn icon @click="showClasses = false">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-card-title>
+        <v-card-title>
           <v-text-field
-            outlined
             dense
-            prepend-inner-icon="mdi-magnify"
-            v-model="busqueda"
-            clearable
-            @click:clear="limpiarBusqueda"
+            outlined
+            label="Buscar cursos"
+            placeholder="Nombre del curso, seccion, sigla"
+            prepend-icon="mdi-filter-outline"
+            v-model="busquedaTMP"
+            hint="Para ver mas filtros puedes hacer click en el icono"
+            persistent-hint
+            @click:prepend="showFilters = true"
+            @keypress.enter="changeBusqueda"
           ></v-text-field>
-        </v-col>
-        <v-col cols="12" md="10">
-          <v-divider></v-divider>
-          <cluster-course
+        </v-card-title>
+        <v-card-text style="height: calc(80vh - 102px)">
+          <cluster-curso
             v-for="cluster in clusters"
             :key="`clouster-${cluster.asignatura}`"
             :cluster="cluster"
-          ></cluster-course>
-        </v-col>
-      </v-row>
-      <v-btn
-        fab
-        bottom
-        right
-        fixed
-        dark
-        color="purple"
-        @click="showFiltros = true"
-      >
-        <v-icon>mdi-filter-outline</v-icon>
-      </v-btn>
-      <!-- Pop up para subir un nuevo archivo -->
-      <v-dialog
-        content-class="elevation-0"
-        v-model="wantUpload"
-        max-width="700px"
-        persistent
-      >
-        <v-card flat class="rounded-lg">
-          <v-alert type="warning" outlined text>
-            Si ya usaste Duocmatico, puede que tengas que volver a subir el
-            archivo con los cursos. Hicimos un cambio en como leemos la
-            informacion en el excel!
-          </v-alert>
-        </v-card>
-        <cargar-archivo @done="wantUpload = false" />
-      </v-dialog>
-      <v-dialog
-        persistent
-        v-model="showFiltros"
-        content-class="elevation-0"
-        max-width="700px"
-      >
-        <filtros-card @close="showFiltros = false"></filtros-card>
-      </v-dialog>
-    </v-container>
+          ></cluster-curso>
+        </v-card-text>
+        <!-- <v-container>
+          <v-text-field
+            dense
+            outlined
+            label="Buscar cursos"
+            placeholder="Nombre del curso, seccion, sigla"
+            prepend-icon="mdi-filter-outline"
+          ></v-text-field>
+        </v-container> -->
+      </v-card>
+    </v-dialog>
+    <!-- Dialogo con filtros -->
+    <v-dialog
+      persistent
+      v-model="showFilters"
+      content-class="elevation-0"
+      max-width="700px"
+    >
+      <filtros-card @close="showFilters = false"></filtros-card>
+    </v-dialog>
+    <!-- Dialog para subir archivo -->
+    <v-dialog
+      :value="showModal"
+      content-class="elevation-0"
+      persistent
+      max-width="700px"
+    >
+      <cargar-archivo @done="setShowModal(false)" />
+    </v-dialog>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import Calendario from "../components/Calendario.vue";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
-import ClusterCourse from "../components/curso/ClusterCurso.vue";
+import ClusterCurso from "../components/curso/ClusterCurso.vue";
 import FiltrosCard from "../components/filtros/FiltrosCard.vue";
 
 export default {
-  name: "Home",
-
+  name: "About",
   components: {
     Calendario,
     CargarArchivo,
-    ClusterCourse,
+    ClusterCurso,
     FiltrosCard,
   },
 
   computed: {
-    ...mapState(["careersData", "career"]),
+    ...mapState("fileUpload", ["showModal"]),
     ...mapState("courses", ["courses", "filters"]),
 
     filtroCursos() {
@@ -146,25 +149,25 @@ export default {
     },
   },
 
-  data() {
-    return {
-      busqueda: null,
-      wantUpload: false,
-      showFiltros: false,
-    };
-  },
+  data: () => ({
+    showClasses: false,
+    busqueda: null,
+    busquedaTMP: null,
+    showFilters: false,
+  }),
 
   methods: {
-    limpiarBusqueda() {
-      this.busqueda = null;
-      this.$vuetify.goTo("#inicio-listado");
+    ...mapMutations("fileUpload", ["setShowModal"]),
+
+    changeBusqueda() {
+      this.busqueda = this.busquedaTMP;
     },
   },
 
   mounted() {
     const { xslxJsonData } = localStorage;
     if (!xslxJsonData) {
-      this.wantUpload = true;
+      this.setShowModal(true);
     }
   },
 };
