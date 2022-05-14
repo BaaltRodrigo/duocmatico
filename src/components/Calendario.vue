@@ -2,8 +2,8 @@
   <v-calendar
     ref="calendar"
     type="week"
-    :first-interval="8"
-    :interval-count="16"
+    :first-interval="7"
+    :interval-count="17"
     :interval-height="90"
     :start="startISO"
     :end="endISO"
