@@ -41,7 +41,7 @@
 <script>
 import CursoHorario from "./CursoHorario.vue";
 import CursoExtraInfo from "./CursoExtraInfo.vue";
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "Curso",
@@ -66,12 +66,11 @@ export default {
   },
 
   methods: {
-    ...mapMutations("schedule", ["removeSection"]),
-    ...mapActions("schedule", ["addSection"]),
+    ...mapActions("schedule", ["addSection", "removeSection"]),
 
     async handle() {
       if (this.isInSchedule) {
-        this.removeSection(this.curso);
+        await this.removeSection(this.curso);
       } else {
         await this.addSection(this.curso);
       }

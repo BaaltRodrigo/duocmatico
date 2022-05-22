@@ -31,6 +31,14 @@ export default {
     ...mapMutations(["setCareersData"]),
     ...mapActions(["findCareerData"]),
     ...mapMutations("courses", ["setCareer", "setCourses"]),
+    ...mapMutations("schedule", ["setSections"]),
+
+    loadSavedSchedule() {
+      const schedule = localStorage.schedule;
+      if (!schedule) return;
+
+      this.setSections(JSON.parse(schedule));
+    },
   },
 
   async mounted() {
@@ -51,6 +59,7 @@ export default {
     if (!(version == localStorage.lastVersion)) {
       localStorage.clear();
     }
+    this.loadSavedSchedule();
   },
 };
 </script>

@@ -26,6 +26,10 @@ const state = {
 };
 
 const mutations = {
+  setSections(state, sections) {
+    state.sections = sections;
+  },
+
   addSection(state, section) {
     state.sections.push(section);
   },
@@ -59,6 +63,14 @@ const actions = {
       unusedColors[Math.floor(Math.random() * unusedColors.length)];
 
     commit("addSection", { ...section, color: randomColor });
+    localStorage.schedule = JSON.stringify(sections);
+    return sections;
+  },
+
+  removeSection({ state, commit }, section) {
+    commit("removeSection", section);
+    const { sections } = state;
+    localStorage.schedule = JSON.stringify(sections);
     return sections;
   },
 };
