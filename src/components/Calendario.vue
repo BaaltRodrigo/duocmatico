@@ -67,18 +67,18 @@ export default {
       return timeBlocks;
     },
 
+    /**
+     * @returns {Date}
+     */
     getFirstDayOfTheWeek() {
       const today = new Date();
-      today.setDate(today.getDate() - today.getDay() + 1); // Always to monday
-      if (today.getDay() > 1) {
-        console.log("No era nada lunes");
-        // Be aware that because of timezone this "MONDAY" may no be YOUR MONDAY
-        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-      }
-      const fecha = today.toLocaleString().split(", ")[0];
-      // console.log("Fecha", fecha.split("/").reverse().join("-"));
-      const monday = new Date(fecha.split("/").reverse().join("-"));
-      return monday;
+      // console.log("Today", today.toISOString().split("T"));
+      const today00 = new Date(today.toISOString().split("T")[0]);
+      // console.log("Today No minutes", today00.toISOString().split("T"));
+      const dayMinutes = 24 * 60;
+      today00.setMinutes(-dayMinutes * (today00.getUTCDay() - 1));
+      // console.log("Monday?", today00.toISOString().split("T"));
+      return today00;
     },
 
     /**
@@ -91,7 +91,7 @@ export default {
       // get the real date of the event
       monday.setMinutes(dayMinutes * (horarioDay - 1));
       const eventDate = new Date(monday).toISOString().split("T")[0]; // Not actually monday
-      const startEnd = horario.substring(3).split(" - ");
+      const startEnd = horario.substring(3).split(" - "); // indicates start and end hours of the event
 
       return {
         start: `${eventDate} ${startEnd[0]}`,
@@ -107,7 +107,6 @@ export default {
 
   created() {
     this.calendarStart = this.getFirstDayOfTheWeek();
-    // Add minutes equivalent to 5 days to get saturday
     this.calendarEnd = new Date(
       this.getFirstDayOfTheWeek().setMinutes(60 * 24 * 5)
     );
