@@ -1,16 +1,22 @@
 <template>
-  <v-calendar
-    ref="calendar"
-    type="week"
-    :first-interval="7"
-    :interval-count="17"
-    :interval-height="90"
-    :start="startISO"
-    :end="endISO"
-    :weekdays="weekdays"
-    :events="events"
-    locale="es"
-  ></v-calendar>
+  <div>
+    <v-calendar
+      ref="calendar"
+      type="week"
+      :first-interval="7"
+      :interval-count="17"
+      :interval-height="90"
+      :start="startISO"
+      :end="endISO"
+      :weekdays="weekdays"
+      :events="events"
+      locale="es"
+      @click:date="test"
+    ></v-calendar>
+    <v-snackbar :value="eventsOverlap" timeout="-1" color="pink">
+      <v-icon>mdi-alert</v-icon> <b>Tienes tope de horario!</b>
+    </v-snackbar>
+  </div>
 </template>
 
 <script>
@@ -20,12 +26,27 @@ export default {
 
   computed: {
     ...mapState("schedule", ["sections"]),
+
+    eventsOverlap() {
+      // let overlap = false;
+      const allEvents = this.events.map((e) => {
+        return {
+          start: new Date(e.start),
+          end: new Date(e.end),
+          // day: new Date(e.end).getDay(),
+        };
+      });
+      return this.isBetweenTwoDates(allEvents);
+    },
+
     startISO() {
       return this.calendarStart.toISOString().split("T")[0];
     },
+
     endISO() {
       return this.calendarEnd.toISOString().split("T")[0];
     },
+
     events() {
       const allEvents = [];
       this.sections.forEach((section) => {
@@ -53,6 +74,22 @@ export default {
   },
 
   methods: {
+    test() {
+      console.log(this.eventsOverlap);
+    },
+
+    isBetweenTwoDates(eventsArray) {
+      if (eventsArray.length == 0) return false; // No more events to compare. No overlapping
+      const { start, end } = eventsArray[0];
+      for (let i = 1; i < eventsArray.length; i++) {
+        let comparison = eventsArray[i];
+        if (start >= comparison.start && start <= comparison.end) return true;
+        if (end >= comparison.start && end <= comparison.end) return true;
+      }
+
+      return this.isBetweenTwoDates(eventsArray.slice(1));
+    },
+
     sectionToEvents(section) {
       const timeBlocks = [];
       section.horarios.forEach((bloque) => {
@@ -63,7 +100,6 @@ export default {
           ...this.getTimes(bloque),
         });
       });
-      console.log("Bloques:", timeBlocks);
       return timeBlocks;
     },
 
