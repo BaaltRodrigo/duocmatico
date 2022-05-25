@@ -11,18 +11,38 @@
       :weekdays="weekdays"
       :events="events"
       locale="es"
-      @click:date="test"
+      @click:event="test"
     ></v-calendar>
+    <!-- Alert -->
     <v-snackbar :value="eventsOverlap" timeout="-1" color="pink">
       <v-icon>mdi-alert</v-icon> <b>Tienes tope de horario!</b>
     </v-snackbar>
+    <!-- Dialog -->
+    <v-dialog
+      v-model="showSection"
+      max-width="700px"
+      content-class="elevation-0"
+    >
+      <v-card class="rounded-xl">
+        <v-card-title>Seccion seleccionada</v-card-title>
+        <v-card-text v-if="clickedSection">
+          <curso :curso="clickedSection"></curso>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import Curso from "../components/curso/Curso.vue";
+
 export default {
   name: "Calendario",
+
+  components: {
+    Curso,
+  },
 
   computed: {
     ...mapState("schedule", ["sections"]),
@@ -70,12 +90,17 @@ export default {
       }, // Spanish
       calendarStart: null,
       calendarEnd: null,
+      showSection: false,
+      clickedSection: null,
     };
   },
 
   methods: {
-    test() {
-      console.log(this.eventsOverlap);
+    test({ event }) {
+      this.clickedSection = this.sections.find(
+        (s) => s.seccion == event.section
+      );
+      this.showSection = true;
     },
 
     isBetweenTwoDates(eventsArray) {
@@ -95,6 +120,7 @@ export default {
       section.horarios.forEach((bloque) => {
         if (bloque.horario == "0:00:00 - 0:00:00") return;
         timeBlocks.push({
+          section: section.seccion,
           name: section.asignatura,
           color: section.color,
           ...this.getTimes(bloque),
