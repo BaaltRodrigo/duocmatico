@@ -1,4 +1,4 @@
-const Timetable = require("./timetable");
+import Schedule from "./schedule";
 
 /**
  * Class used to represent the section of a class dictated on DuocUC.
@@ -10,7 +10,21 @@ const Timetable = require("./timetable");
  * @param {Number} level Semester related to this section.
  */
 class Section {
-  constructor(name, section, schoolName, teacher, level) {
+  name: string;
+  section: string;
+  schoolName: string;
+  teacher: string;
+  level: number;
+  plans: number[];
+  schedules: Schedule[];
+
+  constructor(
+    name: string,
+    section: string,
+    schoolName: string,
+    teacher: string,
+    level: number
+  ) {
     this.name = name;
     this.section = section;
     this.schoolName = schoolName;
@@ -18,7 +32,7 @@ class Section {
     this.level = level;
     // Attributes who will be added later.
     this.plans = [];
-    this.timetables = [];
+    this.schedules = [];
   }
 
   /**
@@ -29,7 +43,7 @@ class Section {
    * @param {Number} plan
    * @returns {Section}
    */
-  addPlans(plan) {
+  addPlans(plan: number): Section {
     if (this.plans.includes(plan)) return this;
     this.plans.push(plan);
     return this;
@@ -41,9 +55,8 @@ class Section {
    * @param {Timetable} timetable
    * @return {Section}
    */
-  addTimetable(timetable) {
-    if (!timetable instanceof Timetable) throw new Error("Invalid argument");
-    this.timetables.push(timetable);
+  addSchedule(schedule: Schedule): Section {
+    this.schedules.push(schedule);
     return this;
   }
 }

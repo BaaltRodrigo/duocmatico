@@ -6,8 +6,13 @@
  * @param {String} day WeekDay for this timetable
  * @param {String} classroom Where we do this timetable.
  */
-class Timetable {
-  constructor(start, end, day, classroom) {
+class Schedule {
+  start: string;
+  end: string;
+  day: string;
+  classroom: string;
+
+  constructor(start: string, end: string, day: string, classroom: string) {
     this.start = start;
     this.end = end;
     this.day = day;
@@ -15,4 +20,4 @@ class Timetable {
   }
 }
 
-export default Timetable;
+export default Schedule;
