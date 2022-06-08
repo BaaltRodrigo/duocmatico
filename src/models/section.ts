@@ -1,38 +1,36 @@
+import { ExcelFileRow } from "@/helpers/fileConverter";
 import Schedule from "./schedule";
 
 /**
  * Class used to represent the section of a class dictated on DuocUC.
+ * Uses a full row to simplify write all the attributes.
  *
- * @param {String} name The name of the Subject.
- * @param {String} section Composed by Subject identifier, section number and daytime.
- * @param {String} schoolName School in charge of that subject.
- * @param {String} teacher Name of the teacher who dictates a section.
- * @param {Number} level Semester related to this section.
+ * @param {ExcelFileRow} row A row from xlsx file
  */
 class Section {
-  name: string;
+  abbreviation: string;
+  subject: string;
   section: string;
-  schoolName: string;
+  school: string;
   teacher: string;
   level: number;
-  plans: number[];
-  schedules: Schedule[];
+  plans: number[] = [];
+  schedules: Schedule[] = [];
 
-  constructor(
-    name: string,
-    section: string,
-    schoolName: string,
-    teacher: string,
-    level: number
-  ) {
-    this.name = name;
+  constructor({
+    abbreviation,
+    section,
+    subject,
+    school,
+    teacher,
+    level,
+  }: ExcelFileRow) {
+    this.abbreviation = abbreviation;
+    this.subject = subject;
     this.section = section;
-    this.schoolName = schoolName;
+    this.school = school;
     this.teacher = teacher;
     this.level = level;
-    // Attributes who will be added later.
-    this.plans = [];
-    this.schedules = [];
   }
 
   /**
@@ -43,20 +41,22 @@ class Section {
    * @param {Number} plan
    * @returns {Section}
    */
-  addPlans(plan: number): Section {
-    if (this.plans.includes(plan)) return this;
-    this.plans.push(plan);
+  addPlan(plan: number): Section {
+    if (!this.plans.includes(plan)) this.plans.push(plan);
     return this;
   }
 
   /**
-   * Adds a timetable to the section. If timetable already exists, it wont be added.
+   * Adds a schedule to the section. If schedule already exists, it wont be added.
    *
-   * @param {Timetable} timetable
+   * @param {Schedule} schedule
    * @return {Section}
    */
   addSchedule(schedule: Schedule): Section {
-    this.schedules.push(schedule);
+    const index = this.schedules.findIndex((s: Schedule) => {
+      schedule.equals(s);
+    });
+    if (index < 0) this.schedules.push(schedule);
     return this;
   }
 }
