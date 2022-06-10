@@ -52,35 +52,6 @@ function mapFileContent(file: File) {
   return readXlsxFile(file, { map });
 }
 
-/**
- * Used to convert data inside xlsx to an array of Sections
- *
- * @param {object[]} rows All rows from xlsx file provided by DuocUC
- * @returns {Section[]} Array with mapped information
- */
-function excelRowsToSections(rows: ExcelFileRow[]): Section[] {
-  const sections: Section[] = [];
-  // Read line
-  rows.forEach((row: ExcelFileRow) => {
-    // Get information to create Schedule class
-    const { day, scheduleString, classroom } = row; // Schedule information
-    const schedule = new Schedule(scheduleString, day, classroom);
-    // If Section does not exist, create it. else, find it
-    const sectionIndex = sections.findIndex(
-      (s: Section) => s.section === row.section
-    );
-    const section =
-      sectionIndex >= 0 ? sections[sectionIndex] : new Section(row);
-    // Add schedule to that section
-    section.addSchedule(schedule);
-    section.addPlan(row.plan);
-
-    if (sectionIndex === -1) sections.push(section);
-  });
-
-  return sections;
-}
-
 function groupBySections(rows: object[]) {
   const uniqueNames = [...new Set(rows.map((row) => row.seccion))];
   const sections = uniqueNames.map((sectionName) => {
@@ -140,10 +111,4 @@ function uniqueSchedules(horarios) {
   return schedules;
 }
 
-export {
-  mapFileContent,
-  groupBySections,
-  groupByCareer,
-  uniqueSchedules,
-  excelRowsToSections,
-};
+export { mapFileContent, groupBySections, groupByCareer, uniqueSchedules };

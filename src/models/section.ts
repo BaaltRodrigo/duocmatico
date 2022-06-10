@@ -14,6 +14,7 @@ class Section {
   school: string;
   teacher: string;
   level: number;
+  career: string;
   plans: number[] = [];
   schedules: Schedule[] = [];
 
@@ -24,6 +25,7 @@ class Section {
     school,
     teacher,
     level,
+    career,
   }: ExcelFileRow) {
     this.abbreviation = abbreviation;
     this.subject = subject;
@@ -31,6 +33,7 @@ class Section {
     this.school = school;
     this.teacher = teacher;
     this.level = level;
+    this.career = career;
   }
 
   /**
@@ -58,6 +61,35 @@ class Section {
     });
     if (index < 0) this.schedules.push(schedule);
     return this;
+  }
+
+  /**
+   * Used to convert data inside xlsx to an array of Sections
+   *
+   * @param {ExcelFileRow[]} rows All rows from xlsx file provided by DuocUC
+   * @returns {Section[]} Array with mapped information
+   */
+  static mapFromExcelRows(rows: ExcelFileRow[]): Section[] {
+    const sections: Section[] = [];
+    // Read line
+    rows.forEach((row: ExcelFileRow) => {
+      // Get information to create Schedule class
+      const { day, scheduleString, classroom } = row; // Schedule information
+      const schedule = new Schedule(scheduleString, day, classroom);
+      // If Section does not exist, create it. else, find it
+      const sectionIndex = sections.findIndex(
+        (s: Section) => s.section === row.section
+      );
+      const section =
+        sectionIndex >= 0 ? sections[sectionIndex] : new Section(row);
+      // Add schedule to that section
+      section.addSchedule(schedule);
+      section.addPlan(row.plan);
+
+      if (sectionIndex === -1) sections.push(section);
+    });
+
+    return sections;
   }
 }
 
