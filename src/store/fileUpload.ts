@@ -1,25 +1,31 @@
-const state = {
+export interface UploadFileState {
+  attemptedFile: File | null;
+  temporaryData: any[];
+  showModal: Boolean;
+}
+
+const state: UploadFileState = {
   attemptedFile: null,
-  temporaryData: null,
+  temporaryData: [],
   showModal: false,
 };
 
 const getters = {
-  careers(state) {
+  careers(state: UploadFileState) {
     return [...new Set(state.temporaryData.map((data) => data.carrera))];
   },
 };
 
 const mutations = {
-  setAttemptedFile(state, file) {
+  setAttemptedFile(state: UploadFileState, file: File) {
     state.attemptedFile = file;
   },
 
-  setTemporaryData(state, data) {
+  setTemporaryData(state: UploadFileState, data: any[]) {
     state.temporaryData = data;
   },
 
-  setShowModal(state, show) {
+  setShowModal(state: UploadFileState, show: Boolean) {
     state.showModal = show;
   },
 };

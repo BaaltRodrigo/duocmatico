@@ -16,7 +16,7 @@ const getters = {
    * @returns {array} Semestres disponibles en los cursos sin repetirlos
    */
   getSemesters(state) {
-    let allSemesters = state.courses.map((c) => c.nivel || null);
+    const allSemesters = state.courses.map((c) => c.nivel || null);
     return [...new Set(allSemesters)].sort((a, b) => a > b);
   },
 

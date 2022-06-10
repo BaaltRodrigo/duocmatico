@@ -1,41 +1,47 @@
 import Vue from "vue";
 import Vuex from "vuex";
-import fileUpload from "./fileUpload.js";
-// const courses = require("./courses.js");
-import courses from "./courses.js";
-import schedule from "./schedule.js";
+import fileUpload from "./fileUpload";
+import sections from "./sections";
+import courses from "./courses";
+import schedule from "./schedule";
 
 Vue.use(Vuex);
 
-const state = {
+export interface RootState {
+  careersData: any[];
+  career: string | null;
+}
+
+const state: RootState = {
   careersData: [],
+  career: null,
 };
 
 const mutations = {
-  setCareersData(state, data) {
+  setCareersData(state: RootState, data: any) {
     state.careersData = data;
   },
 };
 
 const getters = {
-  careerCourses(state) {
+  careerCourses(state: RootState) {
     const index = state.careersData.findIndex(
       (c) => c.carrera === state.career
     );
-    console.log(index);
+    // console.log(index);
     if (index < 0) return [];
     return state.careersData[index].ramos;
   },
 
-  careers(state) {
+  careers(state: RootState) {
     return [...new Set(state.careersData.map((data) => data.carrera))];
   },
 
-  semesters(state, getters) {
-    let allSemesters = getters.careerCourses.map(
+  semesters(state: RootState, getters: any) {
+    const allSemesters = getters.careerCourses.map(
       (course) => course.nivel || null
     );
-    return [...new Set(allSemesters)].sort((a, b) => a > b);
+    return [...new Set(allSemesters)];
   },
 
   times(state, getters) {
@@ -53,15 +59,16 @@ const actions = {
   },
 
   findCareerData({ state }, career) {
-    let index = state.careersData.findIndex((c) => c.carrera === career);
+    const index = state.careersData.findIndex((c) => c.carrera === career);
     return state.careersData[index] || [];
   },
 };
 
 const modules = {
-  courses,
   fileUpload,
+  sections,
   schedule,
+  courses,
 };
 
 export default new Vuex.Store({
