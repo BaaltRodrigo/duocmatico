@@ -17,6 +17,7 @@ class Section {
   career: string;
   plans: number[] = [];
   schedules: Schedule[] = [];
+  color: string | null = null; // Color used to generate calendar event
 
   constructor({
     abbreviation,
@@ -60,6 +61,17 @@ class Section {
       schedule.equals(s);
     });
     if (index < 0) this.schedules.push(schedule);
+    return this;
+  }
+
+  /**
+   * Changes calendar events color
+   *
+   * @param {string} color
+   * @returns {Section}
+   */
+  setColor(color: string): Section {
+    this.color = color;
     return this;
   }
 
