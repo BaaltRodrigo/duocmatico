@@ -2,65 +2,34 @@ import Vue from "vue";
 import Vuex from "vuex";
 import fileUpload from "./fileUpload";
 import sections from "./sections";
-import courses from "./courses";
 import schedule from "./schedule";
+import { ExcelFileRow } from "@/helpers/fileConverter";
+import Section from "@/models/section";
 
 Vue.use(Vuex);
 
 export interface RootState {
-  careersData: any[];
-  career: string | null;
+  xslxRows: ExcelFileRow[];
 }
 
 const state: RootState = {
-  careersData: [],
-  career: null,
+  xslxRows: [],
 };
 
 const mutations = {
-  setCareersData(state: RootState, data: any) {
-    state.careersData = data;
-  },
-};
-
-const getters = {
-  careerCourses(state: RootState) {
-    const index = state.careersData.findIndex(
-      (c) => c.carrera === state.career
-    );
-    // console.log(index);
-    if (index < 0) return [];
-    return state.careersData[index].ramos;
-  },
-
-  careers(state: RootState) {
-    return [...new Set(state.careersData.map((data) => data.carrera))];
-  },
-
-  semesters(state: RootState, getters: any) {
-    const allSemesters = getters.careerCourses.map(
-      (course) => course.nivel || null
-    );
-    return [...new Set(allSemesters)];
-  },
-
-  times(state, getters) {
-    return [...new Set(getters.careerCourses.map((c) => c.jornada))];
+  setXslxRows(state: RootState, rows: ExcelFileRow[]) {
+    state.xslxRows = rows;
   },
 };
 
 const actions = {
-  increaseStep(state) {
-    state.step++;
-  },
-
-  decreaseStep(state) {
-    state.setp--;
-  },
-
-  findCareerData({ state }, career) {
-    const index = state.careersData.findIndex((c) => c.carrera === career);
-    return state.careersData[index] || [];
+  sectionRows(
+    { state }: { state: RootState },
+    section: Section
+  ): ExcelFileRow[] {
+    return state.xslxRows.filter(
+      (row: ExcelFileRow) => row.section === section.section
+    );
   },
 };
 
@@ -68,13 +37,11 @@ const modules = {
   fileUpload,
   sections,
   schedule,
-  courses,
 };
 
 export default new Vuex.Store({
   state,
   mutations,
-  getters,
   actions,
   modules,
 });
