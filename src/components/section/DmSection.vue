@@ -3,7 +3,7 @@
     <v-list-item>
       <v-list-item-content>
         <v-list-item-title>
-          {{ curso.seccion }}
+          {{ section.section }}
         </v-list-item-title>
       </v-list-item-content>
       <v-list-item-action>
@@ -21,16 +21,18 @@
     <!-- Esto se muestra al hacer click en el ramo -->
     <v-container>
       <v-row>
-        <!-- Horarios -->
+        <!-- Schedules -->
         <v-col cols="12" md="6">
           <v-card outlined>
-            <curso-horario :horarios="curso.horarios"></curso-horario>
+            <dm-section-timetable
+              :schedules="section.schedules"
+            ></dm-section-timetable>
           </v-card>
         </v-col>
-        <!-- Datos extras -->
+        <!-- Extra Data -->
         <v-col cols="12" md="6">
           <v-card outlined>
-            <curso-extra-info :curso="curso"></curso-extra-info>
+            <dm-section-information :section="section"></dm-section-information>
           </v-card>
         </v-col>
       </v-row>
@@ -38,22 +40,25 @@
   </v-card>
 </template>
 
-<script>
-import CursoHorario from "./CursoHorario.vue";
-import CursoExtraInfo from "./CursoExtraInfo.vue";
-import { mapActions, mapState } from "vuex";
+<script lang="ts">
+import Vue from "vue";
+import Section from "@/models/section";
+import DmSectionTimetable from "./DmSectionTimetable.vue";
+import DmSectionInformation from "./DmSectionInformation.vue";
+import { mapState } from "vuex";
 
-export default {
-  name: "Curso",
+export default Vue.extend({
+  name: "DmSection",
 
   components: {
-    CursoHorario,
-    CursoExtraInfo,
+    DmSectionInformation,
+    DmSectionTimetable,
+    // CursoExtraInfo,
   },
 
   props: {
-    curso: {
-      type: Object,
+    section: {
+      type: Object as () => Section,
       required: true,
     },
   },
@@ -61,20 +66,20 @@ export default {
   computed: {
     ...mapState("schedule", ["sections"]),
     isInSchedule() {
-      return this.sections.find((s) => s.seccion === this.curso.seccion);
+      return this.sections.find(
+        (s: Section) => s.section === this.section.section
+      );
     },
   },
 
   methods: {
-    ...mapActions("schedule", ["addSection", "removeSection"]),
-
     async handle() {
       if (this.isInSchedule) {
-        await this.removeSection(this.curso);
+        await this.$store.dispatch("schedule/addSection", this.section);
       } else {
-        await this.addSection(this.curso);
+        await this.$store.dispatch("schedule/removeSection", this.section);
       }
     },
   },
-};
+});
 </script>

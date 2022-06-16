@@ -8,12 +8,12 @@
           <th class="text-left">Sala</th>
         </tr>
       </thead>
-      <!-- Datos -->
+      <!-- Data -->
       <tbody>
-        <tr v-for="horario in horariosValidos" :key="horario.id">
-          <td>{{ horario.horario }}</td>
-          <td v-if="salaOnline(horario)">
-            {{ horario.sala }}
+        <tr v-for="schedule in schedules" :key="schedule.id">
+          <td>{{ schedule.baseString }}</td>
+          <td v-if="schedule.isEmptySchedule()">
+            {{ schedule.classroom }}
           </td>
           <td v-else>
             <v-icon>mdi-remote-desktop</v-icon>
@@ -25,27 +25,18 @@
   </v-simple-table>
 </template>
 
-<script>
-export default {
-  name: "CrusoHorario",
+<script lang="ts">
+import Schedule from "@/models/schedule";
+import Vue from "vue";
+
+export default Vue.extend({
+  name: "DmSectionTimetable",
 
   props: {
-    horarios: {
-      type: Array,
+    schedules: {
+      type: Array as () => Schedule[],
       required: true,
     },
   },
-
-  computed: {
-    horariosValidos() {
-      return this.horarios.filter((h) => h.horario != "0:00:00 - 0:00:00");
-    },
-  },
-
-  methods: {
-    salaOnline(horario) {
-      return !!horario.sala;
-    },
-  },
-};
+});
 </script>
