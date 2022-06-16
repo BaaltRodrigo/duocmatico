@@ -8,13 +8,14 @@ import Schedule from "./schedule";
  * @param {ExcelFileRow} row A row from xlsx file
  */
 class Section {
-  abbreviation: string;
-  subject: string;
-  section: string;
+  abbreviation: string; // A short way to indicate the name of a subject
+  subject: string; // Full name of the subject
+  section: string; // Combination between abbreviation, section number and daytime
   school: string;
   teacher: string;
   level: number;
   career: string;
+  daytime: string; // Indicates if a sections is given by day or night time
   plans: number[] = [];
   schedules: Schedule[] = [];
   color: string | null = null; // Color used to generate calendar event
@@ -27,6 +28,7 @@ class Section {
     teacher,
     level,
     career,
+    daytime,
   }: ExcelFileRow) {
     this.abbreviation = abbreviation;
     this.subject = subject;
@@ -35,6 +37,7 @@ class Section {
     this.teacher = teacher;
     this.level = level;
     this.career = career;
+    this.daytime = daytime;
   }
 
   /**
