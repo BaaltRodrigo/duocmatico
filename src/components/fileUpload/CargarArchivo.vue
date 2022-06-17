@@ -3,7 +3,7 @@
     <v-card-title class="font-weight-h4">
       {{ titles[step - 1] }}
       <v-spacer></v-spacer>
-      <v-btn icon @click="terminar">
+      <v-btn icon @click="endUpload">
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-card-title>
@@ -17,7 +17,6 @@
     <v-window v-model="step">
       <v-window-item :value="1">
         <v-card-text>
-          <!-- Alerta en caso de no saber donde encontrar los archivos con los ramos -->
           <v-alert type="info" text>
             No sabes donde encontrar este archivo? Descarga
             <a
@@ -43,7 +42,7 @@
         <v-card-text>
           <career-selection
             @loading="loading = true"
-            @stop="terminar"
+            @stop="endUpload"
           ></career-selection>
         </v-card-text>
       </v-window-item>
@@ -51,18 +50,16 @@
   </v-card>
 </template>
 
-<script>
+<script lang="ts">
+import Section from "@/models/section";
+import Vue from "vue";
 import { mapMutations, mapState } from "vuex";
-import {
-  mapFileContent,
-  groupBySections,
-  groupByCareer,
-} from "../../helpers/fileConverter";
+import { mapFileContent, ExcelFileRow } from "../../helpers/fileConverter";
 import CareerSelection from "./CareerSelection.vue";
 import DropZone from "./DropZone.vue";
 import LoadingFile from "./LoadingFile.vue";
 
-export default {
+export default Vue.extend({
   name: "CargarArchivo",
 
   components: {
@@ -91,24 +88,31 @@ export default {
 
   methods: {
     ...mapMutations("fileUpload", ["setTemporaryData", "setAttemptedFile"]),
+    ...mapMutations("sections", ["setSections"]),
+    ...mapMutations(["setXslxRows"]),
+
     async startFileConversion() {
-      // console.log(this.attemptedFile);
+      // Extract file data
       const fileData = await mapFileContent(this.attemptedFile);
-      // console.log(fileData);
-      const dataBySections = groupBySections(fileData);
-      // console.log(dataBySections);
-      const dataByCareers = groupByCareer(dataBySections);
-      // console.log(dataByCareers);
-      if (dataByCareers.length > 0) {
-        this.setTemporaryData(dataByCareers);
-        this.step = 2;
-      } else {
+      // Check fileData errors
+      if (fileData.errors.length != 0) {
         this.failedAttempt = true;
-        this.setAttemptedFile(null);
+        return;
       }
+      // If ok, save it to localStorage,
+
+      localStorage.excelRows = JSON.stringify(fileData.rows);
+
+      const sections = Section.mapFromExcelRows(
+        fileData.rows as ExcelFileRow[]
+      );
+
+      this.setSections(sections);
+      this.setXslxRows(fileData.rows);
+      this.step = 2;
     },
 
-    terminar() {
+    endUpload() {
       this.step = 1;
       this.failedAttempt = false;
       this.setAttemptedFile(null);
@@ -119,5 +123,5 @@ export default {
   created() {
     this.setAttemptedFile(null);
   },
-};
+});
 </script>
