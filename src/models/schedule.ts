@@ -37,7 +37,7 @@ class Schedule {
    *
    * @returns {void}
    */
-  _calculateTimeBlock(): void {
+  private _calculateTimeBlock(): void {
     if (this.isEmptySchedule()) return; // Keep null values
     const timesArray = this.baseString.split(" - ");
     this.end = timesArray[1];
