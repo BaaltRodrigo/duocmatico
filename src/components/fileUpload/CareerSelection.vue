@@ -12,7 +12,7 @@
       v-model="carrera"
       label="Tu carrera"
       placeholder="Buscar entre las carreras"
-      :items="careers"
+      :items="getCareers"
       item-text="carrera"
       hint="Podras podras cambiar la carrera si lo deseas mas adelante"
     ></v-autocomplete>
@@ -29,14 +29,14 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapMutations, mapActions } from "vuex";
+import { mapState, mapGetters, mapMutations } from "vuex";
 import { version } from "../../../package";
 
 export default {
   name: "CareerSelection",
 
   computed: {
-    ...mapGetters("fileUpload", ["careers"]),
+    ...mapGetters("sections", ["getCareers"]),
     ...mapState("fileUpload", ["attemptedFile", "temporaryData"]),
   },
 
@@ -50,12 +50,10 @@ export default {
 
   methods: {
     ...mapMutations(["setCareersData"]),
-    ...mapActions(["findCareerData"]),
-    ...mapMutations("courses", ["setCareer", "setCourses"]),
+    ...mapMutations("sections", ["setCareer"]),
 
     setPersistentData() {
       localStorage.lastVersion = version;
-      localStorage.xslxJsonData = JSON.stringify(this.temporaryData);
       localStorage.selectedCareer = this.carrera;
     },
 
@@ -64,13 +62,13 @@ export default {
       this.disabledBtn = true;
       if (this.rememberFile) this.setPersistentData();
       // Copy data from fileConverter store to general store
-      this.setCareersData(this.temporaryData);
-      const careerData = await this.findCareerData(this.carrera);
       this.setCareer(this.carrera);
-      this.setCourses(careerData.ramos);
       this.disabledBtn = false;
       this.$emit("stop");
     },
+  },
+  mounted() {
+    console.log(this.getCareers);
   },
 };
 </script>
