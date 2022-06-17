@@ -19,6 +19,7 @@ class Section {
   plans: number[] = [];
   schedules: Schedule[] = [];
   color: string | null = null; // Color used to generate calendar event
+  excelRows: ExcelFileRow[] = []; // To store base information of the whole class
 
   constructor({
     abbreviation,
@@ -38,6 +39,22 @@ class Section {
     this.level = level;
     this.career = career;
     this.daytime = daytime;
+  }
+
+  /**
+   * Keep rows used to built the whole class inside itself.
+   *
+   * @param {ExcelFileRow} newRow
+   * @returns {Section}
+   */
+  addExcelRow(newRow: ExcelFileRow): Section {
+    const hasRow = this.excelRows.some(
+      (row: ExcelFileRow) =>
+        row.section === newRow.section &&
+        row.scheduleString === newRow.scheduleString
+    );
+    if (!hasRow) this.excelRows.push(newRow);
+    return this;
   }
 
   /**
@@ -132,8 +149,7 @@ class Section {
       const section =
         sectionIndex >= 0 ? sections[sectionIndex] : new Section(row);
       // Add schedule to that section
-      section.addSchedule(schedule);
-      section.addPlan(row.plan);
+      section.addSchedule(schedule).addPlan(row.plan).addExcelRow(row);
 
       if (sectionIndex === -1) sections.push(section);
     });
