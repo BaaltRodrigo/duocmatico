@@ -79,6 +79,40 @@ class Section {
   }
 
   /**
+   * Tells if a section is given by online platforms
+   * this is non-exclusive between online and presencial classes
+   *
+   * @returns {Boolean}
+   */
+  isOnline(): Boolean {
+    const scheduleDays = this.schedules.map((s: Schedule) =>
+      s.day.toUpperCase()
+    );
+    return scheduleDays.includes("EN LINEA");
+  }
+
+  /**
+   * Tells if a student has to go physically to DuocUC
+   * This is non-exclusive between online and presencial classes
+   *
+   * @returns {Boolean}
+   */
+  isPresencial(): Boolean {
+    const weekDays = [
+      "LUNES",
+      "MARTES",
+      "MIÉRCOLES",
+      "JUEVES",
+      "VIERNES",
+      "SÁBADO",
+    ];
+    const scheduleDays = this.schedules.map((s: Schedule) =>
+      s.day.toUpperCase()
+    );
+    return scheduleDays.some((d: string) => weekDays.includes(d));
+  }
+
+  /**
    * Used to convert data inside xlsx to an array of Sections
    *
    * @param {ExcelFileRow[]} rows All rows from xlsx file provided by DuocUC
