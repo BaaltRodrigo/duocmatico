@@ -32,7 +32,7 @@ const getters = {
   // Uses SectionFilters
   filteredSections({ filters }: SectionState, getters: any): Section[] {
     const { levels, daytimes } = filters;
-    let filtered = getters.getCareerSections;
+    let filtered = getters.sectionsByCareer;
     console.log("All sections", filtered);
     // Filter by levels
     if (levels.length > 0) {
@@ -42,10 +42,10 @@ const getters = {
       console.log("After levels", filtered);
     }
 
-    // if (daytimes.length > 0) {
-    //   filtered = filtered.filter((s: Section) => includes(s.daytime));
-    //   console.log("After daytimes ", filtered);
-    // }
+    if (daytimes.length > 0) {
+      filtered = filtered.filter((s: Section) => daytimes.includes(s.daytime));
+      console.log("After daytimes ", filtered);
+    }
 
     return filtered;
   },
