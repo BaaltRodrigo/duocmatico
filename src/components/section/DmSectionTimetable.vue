@@ -12,12 +12,8 @@
       <tbody>
         <tr v-for="schedule in schedules" :key="schedule.id">
           <td>{{ schedule.baseString }}</td>
-          <td v-if="schedule.isEmptySchedule()">
+          <td>
             {{ schedule.classroom }}
-          </td>
-          <td v-else>
-            <v-icon>mdi-remote-desktop</v-icon>
-            <v-icon>mdi-information</v-icon>
           </td>
         </tr>
       </tbody>
