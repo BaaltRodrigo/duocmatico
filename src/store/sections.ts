@@ -33,16 +33,13 @@ const getters = {
   filteredSections({ filters }: SectionState, getters: any): Section[] {
     const { levels, daytimes } = filters;
     let filtered = getters.sectionsByCareer;
-    console.log("All sections", filtered);
     // Filter by levels
     if (levels.length > 0) {
       filtered = filtered.filter((s: Section) => levels.includes(s.level));
-      console.log("After levels", filtered);
     }
 
     if (daytimes.length > 0) {
       filtered = filtered.filter((s: Section) => daytimes.includes(s.daytime));
-      console.log("After daytimes ", filtered);
     }
 
     return filtered;
@@ -72,7 +69,6 @@ const mutations = {
   setCareer(state: SectionState, career: string) {
     state.career = career;
     localStorage.selectedCareer = career; // May move this in the future
-    console.log("[Sections Store] Change career to:", career);
   },
 
   setFilters(state: SectionState, filters: SectionFilters) {
