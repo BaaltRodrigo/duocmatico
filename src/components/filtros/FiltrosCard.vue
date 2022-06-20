@@ -12,38 +12,32 @@
         outlined
         dense
         return-object
-        v-model="carrera"
+        v-model="selectedCareer"
         label="Tu carrera"
         placeholder="Buscar entre las carreras"
-        :items="careers"
+        :items="getCareers"
         item-text="carrera"
         hint="Podras podras cambiar la carrera si lo deseas mas adelante"
       ></v-autocomplete>
-      <v-checkbox
-        v-model="rememberCareer"
-        label="Usar esta carrera cuando ingreses otra vez a Duocmatico?"
-        dense
-      >
-      </v-checkbox>
       <v-divider class="my-4"></v-divider>
       <h2 class="text-h6 mb-2">Semestre</h2>
-      <v-chip-group column multiple v-model="semestres">
+      <v-chip-group column multiple v-model="selectedLevels">
         <v-chip
-          v-for="semestre in getSemesters"
-          :key="`semestre-${semestre}`"
+          v-for="level in levelsBySections"
+          :key="`level-${level}`"
           filter
           outlined
-          :value="semestre"
+          :value="level"
         >
-          {{ semestre ? `Semestre ${semestre}` : "Optativo" }}
+          {{ level ? `Semestre ${level}` : "Optativo" }}
         </v-chip>
       </v-chip-group>
       <v-divider class="my-4"></v-divider>
 
       <h2 class="text-h6 mb-2">Jornada</h2>
-      <v-chip-group column multiple v-model="jornadas">
+      <v-chip-group column multiple v-model="selectedDaytimes">
         <v-chip
-          v-for="time in getTimes"
+          v-for="time in daytimeBySections"
           :key="`jornada-${time}`"
           filter
           outlined
@@ -58,74 +52,67 @@
         block
         color="purple"
       >
-        Aplicar
+        Aplicar Filtros
       </v-btn>
     </v-card-text>
   </v-card>
 </template>
 
-<script>
-import { mapActions, mapGetters, mapMutations, mapState } from "vuex";
-export default {
+<script lang="ts">
+import { SectionFilters } from "@/store/sections";
+import { mapGetters, mapMutations, mapState } from "vuex";
+import Vue from "vue";
+
+export default Vue.extend({
   name: "FiltrosCard",
 
   computed: {
-    ...mapGetters(["careers"]),
-    ...mapState("courses", ["courses", "career"]),
-    ...mapGetters("courses", ["getSemesters", "getTimes"]),
+    ...mapGetters("sections", [
+      "daytimeBySections",
+      "getCareers",
+      "levelsBySections",
+    ]),
+    ...mapState("sections", ["career", "filters"]),
 
-    filters() {
+    filters(): SectionFilters {
       return {
-        semesters: this.semestres,
-        times: this.jornadas,
+        levels: this.selectedLevels,
+        daytimes: this.selectedDaytimes,
       };
     },
   },
 
   watch: {
-    // Si cambia la carrera, se recaluclan los filtros.
-    async carrera() {
-      if (!this.carrera) return;
-      const careerData = await this.findCareerData(this.carrera);
-      this.cleanFilters();
-      this.setCareer(careerData.carrera);
-      this.setCourses(careerData.ramos);
+    selectedCareer() {
+      this.setCareer(this.selectedCareer);
     },
   },
 
   data() {
     return {
-      rememberCareer: false,
-      loading: false,
-      carrera: this.career,
-      semestres: [],
-      jornadas: [],
+      selectedCareer: "",
+      selectedLevels: [],
+      selectedDaytimes: [],
+    } as {
+      selectedCareer: string;
+      selectedLevels: number[];
+      selectedDaytimes: string[];
     };
   },
 
   methods: {
-    ...mapActions(["findCareerData"]),
-    ...mapMutations("courses", ["setCareer", "setCourses", "setFilters"]),
-
-    cleanFilters() {
-      this.semestres = [];
-      this.jornadas = [];
-    },
+    ...mapMutations("sections", ["setCareer", "setFilters"]),
 
     applyFilters() {
-      this.setFilters({
-        semesters: this.semestres,
-        times: this.jornadas,
-      });
-      if (this.rememberCareer) {
-        localStorage.selectedCareer = this.carrera;
-      }
+      this.setFilters(this.filters);
       this.$emit("close");
     },
   },
 
   mounted() {
-    this.carrera = this.career;
+    this.selectedCareer = this.career;
+    this.selectedLevels = this.filters.levels;
+    this.selectedDaytimes = this.filters.daytimes;
   },
-};
+});
 </script>
