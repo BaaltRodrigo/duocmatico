@@ -36,7 +36,7 @@ class Section {
     this.section = section;
     this.school = school;
     this.teacher = teacher;
-    this.level = level;
+    this.level = level || 0; // level can be undefined
     this.career = career;
     this.daytime = daytime;
   }
