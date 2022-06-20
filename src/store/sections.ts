@@ -1,7 +1,7 @@
 import Section from "@/models/section";
 
 export interface SectionFilters {
-  levels: string[];
+  levels: number[];
   daytimes: string[];
 }
 
@@ -36,9 +36,7 @@ const getters = {
     console.log("All sections", filtered);
     // Filter by levels
     if (levels.length > 0) {
-      filtered = filtered.filter((s: Section) =>
-        levels.includes(String(s.level))
-      );
+      filtered = filtered.filter((s: Section) => levels.includes(s.level));
       console.log("After levels", filtered);
     }
 
@@ -51,12 +49,18 @@ const getters = {
   },
 
   // No use for state, but needed to call
-  levelsBySections(state: SectionState, getters: any): string[] {
-    return getters.getCareerSections.map((s: Section) => String(s.level));
+  levelsBySections(state: SectionState, getters: any): number[] {
+    const allSections: number[] = getters.sectionsByCareer.map(
+      (s: Section) => s.level
+    );
+    return [...new Set(allSections)].sort();
   },
 
   daytimeBySections(state: SectionState, getters: any): string[] {
-    return getters.getCareerSections.map((s: Section) => s.daytime);
+    const allDaytimes: string[] = getters.sectionsByCareer.map(
+      (s: Section) => s.daytime
+    );
+    return [...new Set(allDaytimes)];
   },
 };
 
@@ -68,6 +72,7 @@ const mutations = {
   setCareer(state: SectionState, career: string) {
     state.career = career;
     localStorage.selectedCareer = career; // May move this in the future
+    console.log("[Sections Store] Change career to:", career);
   },
 
   setFilters(state: SectionState, filters: SectionFilters) {
