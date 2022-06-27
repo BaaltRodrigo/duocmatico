@@ -1,3 +1,4 @@
+import { CalendarEventInterface } from "@/helpers/calendarEventInterface";
 import { ExcelFileRow } from "@/helpers/fileConverter";
 import Schedule from "./schedule";
 
@@ -18,7 +19,7 @@ class Section {
   daytime: string; // Indicates if a sections is given by day or night time
   plans: number[] = [];
   schedules: Schedule[] = [];
-  color: string | null = null; // Color used to generate calendar event
+  color: string = ""; // Color used to generate calendar event
   excelRows: ExcelFileRow[] = []; // To store base information of the whole class
 
   constructor({
@@ -30,6 +31,7 @@ class Section {
     level,
     career,
     daytime,
+    color,
   }: ExcelFileRow) {
     this.abbreviation = abbreviation;
     this.subject = subject;
@@ -39,6 +41,7 @@ class Section {
     this.level = level || 0; // level can be undefined
     this.career = career;
     this.daytime = daytime;
+    this.color = color ?? "";
   }
 
   /**
@@ -92,6 +95,8 @@ class Section {
    */
   setColor(color: string): Section {
     this.color = color;
+    // Add the color to every row used to built this section
+    this.excelRows.forEach((e: ExcelFileRow) => (e.color = color));
     return this;
   }
 
@@ -156,6 +161,25 @@ class Section {
 
     return sections;
   }
+
+  /**
+   * Convert schedules into CalendarEventInterface to use inside
+   * vuetify calendar.
+   *
+   */
+  // toCalendarEvents(startDay: string): CalendarEventInterface[] {
+  //   return this.schedules.map((s: Schedule) => {
+  //     const { color, subject, section } = this;
+  //     const { start, end } = s.toEventTimes(startDay);
+  //     return {
+  //       start,
+  //       end,
+  //       color,
+  //       section,
+  //       name: subject,
+  //     };
+  //   });
+  // }
 }
 
 export default Section;
