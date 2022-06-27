@@ -17,6 +17,7 @@ export interface ExcelFileRow {
   subject: string;
   teacher: string;
   year: number;
+  color?: string;
 }
 
 /**
