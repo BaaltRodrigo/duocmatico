@@ -74,7 +74,7 @@ export default Vue.extend({
 
   methods: {
     async handle() {
-      if (this.isInSchedule) {
+      if (!this.isInSchedule) {
         await this.$store.dispatch("schedule/addSection", this.section);
       } else {
         await this.$store.dispatch("schedule/removeSection", this.section);
