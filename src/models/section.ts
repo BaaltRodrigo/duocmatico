@@ -1,4 +1,3 @@
-import { CalendarEventInterface } from "@/helpers/calendarEventInterface";
 import { ExcelFileRow } from "@/helpers/fileConverter";
 import Schedule from "./schedule";
 
