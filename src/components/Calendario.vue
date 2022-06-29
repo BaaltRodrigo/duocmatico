@@ -1,18 +1,21 @@
 <template>
   <div>
-    <v-calendar
-      ref="calendar"
-      type="week"
-      :first-interval="7"
-      :interval-count="17"
-      :interval-height="90"
-      :start="startISO"
-      :end="endISO"
-      :weekdays="weekdays"
-      :events="events"
-      locale="es"
-      @click:event="test"
-    ></v-calendar>
+    <v-card class="rounded-xl" height="600px">
+      <v-calendar
+        ref="calendar"
+        type="week"
+        :first-interval="7"
+        :interval-count="17"
+        :interval-height="56"
+        :start="startISO"
+        :end="endISO"
+        :weekdays="weekdays"
+        :events="events"
+        locale="es"
+        @click:event="test"
+      ></v-calendar>
+    </v-card>
+
     <!-- Alert -->
     <v-snackbar :value="eventsOverlap" timeout="-1" color="pink">
       <v-icon>mdi-alert</v-icon> <b>Tienes tope de horario!</b>
@@ -26,7 +29,7 @@
       <v-card class="rounded-xl">
         <v-card-title>Seccion seleccionada</v-card-title>
         <v-card-text v-if="clickedSection">
-          <curso :curso="clickedSection"></curso>
+          <dm-section :section="clickedSection"></dm-section>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -35,13 +38,13 @@
 
 <script>
 import { mapState } from "vuex";
-import Curso from "../components/curso/Curso.vue";
+import DmSection from "./section/DmSection.vue";
 
 export default {
   name: "Calendario",
 
   components: {
-    Curso,
+    DmSection,
   },
 
   computed: {
@@ -117,13 +120,13 @@ export default {
 
     sectionToEvents(section) {
       const timeBlocks = [];
-      section.horarios.forEach((bloque) => {
-        if (bloque.horario == "0:00:00 - 0:00:00") return;
+      section.schedules.forEach((schedule) => {
+        if (schedule.isEmptySchedule()) return;
         timeBlocks.push({
           section: section.seccion,
           name: section.asignatura,
           color: section.color,
-          ...this.getTimes(bloque),
+          ...this.getTimes(schedule),
         });
       });
       return timeBlocks;
