@@ -1,3 +1,5 @@
+import Section from "./section";
+
 /**
  * Class used to represent the block of time of a real class.
  *
@@ -30,6 +32,13 @@ class Schedule {
       this.end === other.end &&
       this.day === other.day
     );
+  }
+
+  toEventTimes(eventDay: string): { start: string; end: string } {
+    return {
+      start: `${eventDay} ${this.start}`,
+      end: `${eventDay} ${this.end}`,
+    };
   }
 
   /**
