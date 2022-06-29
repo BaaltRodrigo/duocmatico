@@ -1,8 +1,51 @@
 <template>
-  <div style="height: calc(100vh - 64px)">
-    <v-card class="rounded-lg" height="100%">
-      <calendario></calendario>
-      <v-tooltip right>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="12" md="6">
+        <v-card height="600px" class="mb-4">
+          <dm-calendar></dm-calendar>
+        </v-card>
+        <v-card>
+          <v-card-text>
+            <v-btn outlined class="rounded-pill">
+              Borrar todos los cursos
+              <v-icon color="error">mdi-delete</v-icon>
+            </v-btn>
+            <v-btn class="ml-3 rounded-pill" outlined>
+              Exportar calendario
+              <v-icon>mdi-export</v-icon>
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
+      <v-col cols="12" md="6" class="order-md-first">
+        <v-card outlined class="rounded-xl" min-height="600px">
+          <v-card-title> Cursos disponibles para agregar </v-card-title>
+          <v-card-title>
+            <v-text-field
+              dense
+              outlined
+              label="Buscar cursos"
+              placeholder="Nombre del curso, seccion, sigla"
+              prepend-icon="mdi-filter-outline"
+              v-model="search"
+              hint="Para ver mas filtros puedes hacer click en el icono"
+              persistent-hint
+              @click:prepend="showFilters = true"
+            ></v-text-field>
+          </v-card-title>
+          <v-card-text v-if="subjects.length > 0">
+            <dm-subject
+              v-for="s in subjects"
+              :key="`cluster-${s.subject}`"
+              :subject-name="s.subject"
+              :sections="s.sections"
+            ></dm-subject>
+          </v-card-text>
+        </v-card>
+      </v-col>
+    </v-row>
+    <!-- <v-tooltip right>
         <template #activator="{ on, attr }">
           <v-btn
             @click="showClasses = true"
@@ -21,59 +64,17 @@
           </v-btn>
         </template>
         <span>Agregar un curso al calendario</span>
-      </v-tooltip>
-    </v-card>
-    <!-- Dialog to included classes -->
-    <v-dialog v-model="showClasses" scrollable content-class="elevation-0">
-      <v-card class="rounded-xl">
-        <v-card-title>
-          Cursos disponibles para agregar
-          <v-spacer></v-spacer>
-          <v-btn icon @click="showClasses = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-        </v-card-title>
-        <v-card-title>
-          <v-text-field
-            dense
-            outlined
-            label="Buscar cursos"
-            placeholder="Nombre del curso, seccion, sigla"
-            prepend-icon="mdi-filter-outline"
-            v-model="busqueda"
-            hint="Para ver mas filtros puedes hacer click en el icono"
-            persistent-hint
-            @click:prepend="showFilters = true"
-          ></v-text-field>
-        </v-card-title>
-        <v-card-text style="height: calc(80vh - 102px)">
-          <cluster-curso
-            v-for="cluster in clusters"
-            :key="`clouster-${cluster.asignatura}`"
-            :cluster="cluster"
-          ></cluster-curso>
-        </v-card-text>
-        <!-- <v-container>
-          <v-text-field
-            dense
-            outlined
-            label="Buscar cursos"
-            placeholder="Nombre del curso, seccion, sigla"
-            prepend-icon="mdi-filter-outline"
-          ></v-text-field>
-        </v-container> -->
-      </v-card>
-    </v-dialog>
-    <!-- Dialogo con filtros -->
+      </v-tooltip> -->
+    <!-- Filter dialog -->
     <v-dialog
       persistent
       v-model="showFilters"
       content-class="elevation-0"
       max-width="700px"
     >
-      <filtros-card @close="showFilters = false"></filtros-card>
+      <dm-filters @close="showFilters = false"></dm-filters>
     </v-dialog>
-    <!-- Dialog para subir archivo -->
+    <!-- Upload file dialog -->
     <v-dialog
       :value="showModal"
       content-class="elevation-0"
@@ -82,66 +83,62 @@
     >
       <cargar-archivo @done="setShowModal(false)" />
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
-<script>
-import { mapMutations, mapState } from "vuex";
-import Calendario from "../components/Calendario.vue";
+<script lang="ts">
+import Vue from "vue";
+import { mapGetters, mapMutations, mapState } from "vuex";
 import CargarArchivo from "../components/fileUpload/CargarArchivo.vue";
-import ClusterCurso from "../components/curso/ClusterCurso.vue";
-import FiltrosCard from "../components/filtros/FiltrosCard.vue";
+import DmCalendar from "@/components/calendar/DmCalendar.vue";
+import DmSubject from "@/components/section/DmSubject.vue";
+import DmFilters from "../components/filter/DmFilters.vue";
+import Section from "@/models/section";
 
-export default {
-  name: "About",
+export default Vue.extend({
+  name: "Home",
   components: {
-    Calendario,
     CargarArchivo,
-    ClusterCurso,
-    FiltrosCard,
+    DmCalendar,
+    DmSubject,
+    DmFilters,
   },
 
   computed: {
     ...mapState("fileUpload", ["showModal"]),
-    ...mapState("courses", ["courses", "filters"]),
+    ...mapState("sections", ["sections", "filters"]),
+    ...mapGetters("sections", ["sectionsByCareer", "filteredSections"]),
 
-    filtroCursos() {
-      let filtered = this.courses;
-      // console.log("Sin filtrar", filtered);
-      //Filtro por semestres primero
-      if (this.filters.semesters.length > 0) {
-        // console.log(this.filters.semesters);
-        filtered = filtered.filter((c) =>
-          this.filters.semesters.includes(c.nivel)
-        );
-      }
-      // console.log("Filtro Semestres", filtered);
-      // Filtro por jornada
-      if (this.filters.times.length > 0) {
-        // console.log("jornadas", this.filters.times);
-        filtered = filtered.filter((c) =>
-          this.filters.times.includes(c.jornada)
-        );
-      }
-      // console.log("Filtro Jornadas", filtered);
-      // Hago la busqueda por input de la pagina.
-      if (!this.busqueda) return filtered;
-      const buscar = this.busqueda.toUpperCase();
-      return filtered.filter(
-        (c) =>
-          c.seccion.toUpperCase().includes(buscar) ||
-          c.asignatura.toUpperCase().includes(buscar)
+    /**
+     * Adds the search filter into the filtered sections from the store
+     *
+     * @return {Section[]}
+     */
+    inputFiltered(): Section[] {
+      if (!this.search) return this.filteredSections;
+      const upperSearch = this.search.toUpperCase();
+      return this.filteredSections.filter(
+        (s: Section) =>
+          s.section.toUpperCase().includes(upperSearch) ||
+          s.subject.toUpperCase().includes(upperSearch)
       );
     },
 
-    clusters() {
-      const coursesNames = [
-        ...new Set(this.filtroCursos.map((c) => c.asignatura)),
+    /**
+     * Groups filtered sections into subjects
+     *
+     * @return {Array} with subject and sections
+     */
+    subjects(): Array<any> {
+      // Without next line, `this.inputFiltered` raises "Object is of type unknown" error
+      let filtered = this.inputFiltered as Section[];
+      const subjectsNames = [
+        ...new Set(filtered.map((s: Section) => s.subject)),
       ];
-      const grouped = coursesNames.map((name) => {
+      const grouped = subjectsNames.map((name) => {
         return {
-          asignatura: name,
-          secciones: this.filtroCursos.filter((c) => c.asignatura === name),
+          subject: name,
+          sections: filtered.filter((s: Section) => s.subject === name),
         };
       });
       return grouped;
@@ -149,9 +146,9 @@ export default {
   },
 
   data: () => ({
-    showClasses: false,
     busqueda: null,
     showFilters: false,
+    search: "",
   }),
 
   methods: {
@@ -159,10 +156,11 @@ export default {
   },
 
   mounted() {
-    const { xslxJsonData } = localStorage;
-    if (!xslxJsonData) {
+    const { excelRows } = localStorage;
+    if (!excelRows) {
+      // No saved data. Force to upload it
       this.setShowModal(true);
     }
   },
-};
+});
 </script>
