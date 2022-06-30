@@ -1,6 +1,7 @@
 <template>
   <div>
     <v-calendar
+      id="dm-calendar"
       ref="calendar"
       type="week"
       :first-interval="7"
@@ -12,7 +13,8 @@
       :events="events"
       locale="es"
       @click:event="test"
-    ></v-calendar>
+    >
+    </v-calendar>
     <!-- Alert -->
     <v-snackbar :value="eventsOverlap" timeout="-1" color="pink">
       <v-icon>mdi-alert</v-icon> <b>Tienes tope de horario!</b>
@@ -30,11 +32,16 @@
         </v-card-text>
       </v-card>
     </v-dialog>
+    <!-- Button to share -->
+    <v-btn fab dark bottom right fixed @click="takeScreenshot">
+      <v-icon>mdi-download-box-outline</v-icon>
+    </v-btn>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import html2Canvas from "html2canvas";
 import Curso from "../components/curso/Curso.vue";
 
 export default {
@@ -159,6 +166,17 @@ export default {
         start: `${eventDate} ${startEnd[0]}`,
         end: `${eventDate} ${startEnd[1]}`,
       };
+    },
+
+    async takeScreenshot() {
+      const element = document.getElementById("dm-calendar");
+      const canvas = await html2Canvas(element);
+
+      // create link to download image;
+      const link = document.createElement("a");
+      link.download = "Mi-Horario.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
     },
   },
 
