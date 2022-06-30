@@ -4,8 +4,8 @@
       id="dm-calendar"
       ref="calendar"
       type="week"
-      :first-interval="7"
-      :interval-count="17"
+      :first-interval="firstInterval"
+      :interval-count="intervals"
       :interval-height="90"
       :start="startISO"
       :end="endISO"
@@ -14,6 +14,16 @@
       locale="es"
       @click:event="test"
     >
+      <template #event="{ event }">
+        <div class="mx-1">
+          <strong>{{ event.name }}</strong>
+          <p>
+            {{ event.section }} - Sala: {{ event.sala }}
+            <br />
+            {{ event.times.start }} - {{ event.times.end }}
+          </p>
+        </div>
+      </template>
     </v-calendar>
     <!-- Alert -->
     <v-snackbar :value="eventsOverlap" timeout="-1" color="pink">
@@ -95,6 +105,8 @@ export default {
         Vi: 5,
         Sa: 6,
       }, // Spanish
+      firstInterval: 7,
+      intervals: 17,
       calendarStart: null,
       calendarEnd: null,
       showSection: false,
@@ -126,10 +138,21 @@ export default {
       const timeBlocks = [];
       section.horarios.forEach((bloque) => {
         if (bloque.horario == "0:00:00 - 0:00:00") return;
+        const times = bloque.horario.substring(3).split(" - ");
+        let start = times[0].split(":");
+        start.pop();
+        let end = times[1].split(":");
+        end.pop();
+
         timeBlocks.push({
           section: section.seccion,
-          name: section.asignatura,
+          name: `${section.asignatura}`,
           color: section.color,
+          sala: bloque.sala,
+          times: {
+            start: start.join(":"),
+            end: end.join(":"),
+          },
           ...this.getTimes(bloque),
         });
       });
@@ -168,15 +191,52 @@ export default {
       };
     },
 
-    async takeScreenshot() {
-      const element = document.getElementById("dm-calendar");
-      const canvas = await html2Canvas(element);
+    focusCalendar() {
+      const mapHours = this.events
+        .map((e) => {
+          return [
+            Number(e.times.start.split(":")[0]),
+            Number(e.times.end.split(":")[0]),
+          ];
+        })
+        .flat();
+      const uniqueHours = [...new Set(mapHours)];
+      const max = Math.max(...uniqueHours);
+      const min = Math.min(...uniqueHours);
+      console.log(uniqueHours);
+      console.log("max:", max, "min:", min);
+      this.firstInterval = min - 1;
+      this.intervals = max - this.firstInterval + 1;
+    },
 
-      // create link to download image;
-      const link = document.createElement("a");
-      link.download = "Mi-Horario.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+    unFocusCalendar() {
+      this.firstInterval = 7;
+      this.intervals = 17;
+    },
+
+    takeScreenshot() {
+      this.focusCalendar();
+      console.log("Espera 1");
+      setTimeout(async () => {
+        console.log("despues de 1 seg");
+        const element = document.getElementById("dm-calendar");
+        const canvas = await html2Canvas(element);
+        const link = document.createElement("a");
+        link.download = "Mi-Horario.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        this.unFocusCalendar();
+      }, 1000);
+
+      // const element = document.getElementById("dm-calendar");
+      // const canvas = await html2Canvas(element);
+
+      // // create link to download image;
+      // const link = document.createElement("a");
+      // link.download = "Mi-Horario.png";
+      // link.href = canvas.toDataURL("image/png");
+      // link.click();
+      // this.unFocusCalendar();
     },
   },
 
