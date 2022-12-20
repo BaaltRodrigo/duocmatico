@@ -19,6 +19,16 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
   },
+  {
+    path: "/c",
+    name: "calendar.index",
+    component: () => import("../views/CalendarIndex.vue"),
+  },
+  {
+    path: "/c/0",
+    name: "calendar.show",
+    component: () => import("../views/CalendarShow.vue"),
+  },
 ];
 
 const router = new VueRouter({
