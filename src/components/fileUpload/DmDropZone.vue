@@ -8,7 +8,7 @@
     @dragenter.prevent="toggleActive"
     @dragleave.prevent="toggleActive"
     @dragover.prevent=""
-    @drop.prevent="droppedFile"
+    @drop.prevent="droppedFiles"
     @click="$refs.fileInput.click()"
   >
     <v-container class="text-center">
@@ -18,7 +18,8 @@
       </h3>
     </v-container>
     <input
-      @change="selectedFile"
+      @change="selectedFiles"
+      multiple
       ref="fileInput"
       type="file"
       accept=".xlsx"
@@ -28,9 +29,9 @@
 </template>
 
 <script>
-import { mapMutations } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 export default {
-  name: "DropZone",
+  name: "DmDropZone",
 
   data() {
     return {
@@ -39,21 +40,24 @@ export default {
   },
 
   methods: {
-    ...mapMutations("fileUpload", ["setAttemptedFile"]),
+    ...mapMutations("fileUpload", ["addFilesToConvert"]),
+    ...mapActions("fileUpload", ["startFileConversion"]),
 
     toggleActive() {
       this.active = !this.active;
     },
 
-    selectedFile() {
-      this.setAttemptedFile(this.$refs.fileInput.files[0]);
+    selectedFiles() {
+      console.log(this.$refs.fileInput.files);
+      this.startFileConversion([...this.$refs.fileInput.files]);
       this.$emit("uploadedFile");
       // console.log("Selected file");
       this.active = false;
     },
 
-    droppedFile(e) {
-      this.setAttemptedFile(e.dataTransfer.files[0]);
+    droppedFiles(e) {
+      // console.log(e.dataTransfer.files);
+      this.startFileConversion([...e.dataTransfer.files]);
       this.$emit("uploadedFile");
       // console.log("Dropped file");
       this.active = false;
