@@ -20,6 +20,11 @@ const routes = [
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
   },
   {
+    path: "/f",
+    name: "file.converter",
+    component: () => import("../views/FileConversion.vue"),
+  },
+  {
     path: "/c",
     name: "calendar.index",
     component: () => import("../views/CalendarIndex.vue"),
