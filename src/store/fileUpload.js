@@ -1,4 +1,11 @@
+import {
+  mapFileContent,
+  groupBySections,
+  groupByCareer,
+} from "../helpers/fileConverter.js";
+
 const state = {
+  all: [],
   attemptedFile: null,
   temporaryData: null,
   showModal: false,
@@ -11,6 +18,15 @@ const getters = {
 };
 
 const mutations = {
+  addFilesToConvert(state, files) {
+    let filesWhitFlags = files.map((file) => {
+      console.log(file);
+      return { fileData: file, error: false, conversion: null };
+    });
+    state.all = [...state.all, ...filesWhitFlags];
+    console.log(state.all);
+  },
+
   setAttemptedFile(state, file) {
     state.attemptedFile = file;
   },
@@ -24,7 +40,23 @@ const mutations = {
   },
 };
 
-const actions = {};
+const actions = {
+  startFileConversion({ state, commit }, filesToConvert) {
+    commit("addFilesToConvert", filesToConvert);
+
+    state.all.forEach(async (file) => {
+      let fileContent = await mapFileContent(file.fileData);
+      let dataBySections = groupBySections(fileContent);
+      let dataByCareer = groupByCareer(dataBySections);
+
+      // updated data
+      file.error = false;
+      file.conversion = dataByCareer;
+      console.log(file.fileData.name, dataByCareer);
+    });
+    console.log("All Done");
+  },
+};
 
 export default {
   namespaced: true,
