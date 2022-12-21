@@ -34,6 +34,7 @@
 
 <script>
 import { mapState } from "vuex";
+import download from "downloadjs";
 
 export default {
   name: "DmUploadedFiles",
@@ -44,7 +45,9 @@ export default {
 
   methods: {
     downloadJson(file) {
-      console.log(file.conversion);
+      const data = JSON.stringify({ carreras: file.conversion });
+      const filename = file.fileData.name.split(".")[0]; // Name without Extension
+      download(data, `${filename}.json`, "text/json;charset=utf-8");
     },
   },
 };
