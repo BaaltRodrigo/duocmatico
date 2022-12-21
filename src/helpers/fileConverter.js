@@ -32,15 +32,22 @@ function groupBySections(rows) {
   const sections = uniqueNames.map((sectionName) => {
     let sameSection = rows.filter((row) => row.seccion === sectionName);
     let horarios = sameSection.map(({ horario, dia, sala }) => {
-      return { horario, dia, sala };
+      return { horario, dia: normalize(dia), sala };
     });
     let planes = [...new Set(sameSection.map((s) => s.plan))];
     let first = sameSection[0];
-    // Clean unnecesary data
+    // Clean unnecessary data
     delete first.plan;
     delete first.horario;
     delete first.dia;
     delete first.sala;
+
+    // Some text normalizations
+    first.carrera = normalize(first.carrera);
+    first.escuela = normalize(first.escuela);
+    first.tipoAsignatura = normalize(first.tipoAsignatura);
+    first.asignatura = normalize(first.asignatura);
+
     return {
       ...first,
       ...{ horarios: uniqueSchedules(horarios) },
@@ -84,6 +91,10 @@ function uniqueSchedules(horarios) {
     return horarios.filter((h) => h.horario === hours)[0];
   });
   return schedules;
+}
+
+function normalize(string) {
+  return string.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 export { mapFileContent, groupBySections, groupByCareer, uniqueSchedules };
