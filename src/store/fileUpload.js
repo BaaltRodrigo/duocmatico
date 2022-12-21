@@ -44,7 +44,11 @@ const actions = {
   startFileConversion({ state, commit }, filesToConvert) {
     commit("addFilesToConvert", filesToConvert);
 
-    state.all.forEach(async (file) => {
+    const notConverted = state.all.filter(
+      (file) => !file.conversion || file.error
+    );
+
+    notConverted.forEach(async (file) => {
       let fileContent = await mapFileContent(file.fileData);
       let dataBySections = groupBySections(fileContent);
       let dataByCareer = groupByCareer(dataBySections);
@@ -54,7 +58,6 @@ const actions = {
       file.conversion = dataByCareer;
       console.log(file.fileData.name, dataByCareer);
     });
-    console.log("All Done");
   },
 };
 
