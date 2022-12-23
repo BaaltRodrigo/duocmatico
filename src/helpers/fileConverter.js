@@ -47,6 +47,7 @@ function groupBySections(rows) {
     first.escuela = normalize(first.escuela);
     first.tipoAsignatura = normalize(first.tipoAsignatura);
     first.asignatura = normalize(first.asignatura);
+    first.docente = normalize(first.docente);
 
     return {
       ...first,
@@ -63,7 +64,6 @@ function groupByCareer(sections) {
   const careers = uniqueNames.map((career) => {
     let sameCareer = sections.filter((s) => s.carrera === career);
     sameCareer = sameCareer.map((c) => {
-      delete c.carrera;
       return c;
     });
     return {
