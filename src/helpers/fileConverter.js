@@ -15,6 +15,7 @@ async function mapFileContent(file) {
     Jornada: "jornada",
     Nivel: "nivel",
     "Tipo Asignatura": "tipoAsignatura",
+    "Tipo Plan de Estudios": "tipoPlanEstudios",
     Sigla: "sigla",
     Asignatura: "asignatura",
     Sección: "seccion",
@@ -43,11 +44,13 @@ function groupBySections(rows) {
     delete first.sala;
 
     // Some text normalizations
-    first.carrera = normalize(first.carrera);
+    first.carrera = normalize(first.carrera).replaceAll("/", "-");
     first.escuela = normalize(first.escuela);
     first.tipoAsignatura = normalize(first.tipoAsignatura);
     first.asignatura = normalize(first.asignatura);
-    first.docente = normalize(first.docente);
+    if (first.docente) {
+      first.docente = normalize(first.docente);
+    }
 
     return {
       ...first,
