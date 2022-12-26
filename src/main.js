@@ -4,6 +4,9 @@ import router from "./router";
 import store from "./store";
 import vuetify from "./plugins/vuetify";
 
+import * as dotenv from "dotenv";
+dotenv.config();
+
 Vue.config.productionTip = false;
 
 new Vue({
