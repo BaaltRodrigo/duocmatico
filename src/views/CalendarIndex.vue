@@ -1,17 +1,78 @@
 <template>
   <v-container>
-    <h3>Calendarios disponibles</h3>
+    <h3 class="mb-2">Calendarios disponibles</h3>
     <v-row>
+      <v-col>
+        <v-card
+          @click="newCalendar"
+          outlined
+          height="16vh"
+          class="rounded-lg"
+          style="border: 4px dashed lightgray; background-color: transparent"
+        >
+          <v-container class="text-center">
+            <v-icon size="7vh">mdi-plus</v-icon>
+            <h3>Nuevo calendario</h3>
+          </v-container>
+        </v-card>
+      </v-col>
       <v-col
-        v-for="i in [1, 2, 3, 4, 5]"
-        :key="`calendar-${i}`"
+        v-for="(c, index) in all"
+        :key="`calendar-${index}`"
         cols="12"
         md="4"
       >
-        <v-sheet height="15vh" color="grey" rounded="lg"></v-sheet>
+        <dm-calendar-card
+          :calendar="c"
+          @showCalendar="showCalendar(index)"
+          @deleteMe="test(index)"
+        ></dm-calendar-card>
       </v-col>
     </v-row>
+    <v-dialog v-model="showCalendarForm" max-width="70vh">
+      <dm-calendar-form></dm-calendar-form>
+    </v-dialog>
   </v-container>
 </template>
 
-<script></script>
+<script>
+import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
+import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
+import { mapState } from "vuex";
+
+export default {
+  name: "DmCalendarIndex",
+
+  components: {
+    DmCalendarForm,
+    DmCalendarCard,
+  },
+
+  computed: {
+    ...mapState("calendars", ["all"]),
+  },
+
+  data: () => ({
+    showCalendarForm: false,
+  }),
+
+  methods: {
+    newCalendar() {
+      this.showCalendarForm = true;
+    },
+
+    showCalendar(index) {
+      this.$router.push({
+        name: "calendar.show",
+        params: {
+          id: index,
+        },
+      });
+    },
+
+    test(index) {
+      console.log("delete calendar:", index);
+    },
+  },
+};
+</script>
