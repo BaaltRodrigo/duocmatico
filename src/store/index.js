@@ -3,7 +3,9 @@ import Vuex from "vuex";
 import fileUpload from "./fileUpload.js";
 // const courses = require("./courses.js");
 import courses from "./courses.js";
+import calendars from "./calendars.js";
 import schedule from "./schedule.js";
+import firebase from "./firebase.js";
 
 Vue.use(Vuex);
 
@@ -59,7 +61,9 @@ const actions = {
 };
 
 const modules = {
+  calendars,
   courses,
+  firebase,
   fileUpload,
   schedule,
 };
