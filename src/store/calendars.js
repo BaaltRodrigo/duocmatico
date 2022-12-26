@@ -23,6 +23,10 @@ const mutations = {
     localStorage.calendars = JSON.stringify(state.all);
   },
 
+  setSelected(state, index) {
+    state.selected = state.all[index];
+  },
+
   deleteCalendar(state, index) {
     state.all.splice(index, 1);
     localStorage.calendars = JSON.stringify(state.all);
@@ -47,6 +51,11 @@ const actions = {
     if (calendars) {
       commit("setCalendars", JSON.parse(calendars));
     }
+  },
+
+  setCalendarByIndex({ state, commit }, index) {
+    if (index > state.all.length) return;
+    commit("setSelected", index);
   },
 };
 
