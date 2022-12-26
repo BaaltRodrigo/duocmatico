@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "core-js": "^3.22.0",
+    "dotenv": "^16.0.3",
     "downloadjs": "^1.4.7",
+    "file-system": "^2.2.2",
+    "firebase": "^9.15.0",
     "js-cookie": "^3.0.1",
     "read-excel-file": "^5.2.28",
     "vue": "^2.6.11",
