@@ -45,7 +45,11 @@ export default {
 
   methods: {
     downloadJson(file) {
-      const data = JSON.stringify({ carreras: file.conversion });
+      console.log(file);
+      const data = JSON.stringify({
+        carga: file.fileData.name.split(".")[0],
+        carreras: file.conversion,
+      });
       const filename = file.fileData.name.split(".")[0]; // Name without Extension
       download(data, `${filename}.json`, "text/json;charset=utf-8");
     },
