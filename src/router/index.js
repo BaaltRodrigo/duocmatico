@@ -30,7 +30,7 @@ const routes = [
     component: () => import("../views/CalendarIndex.vue"),
   },
   {
-    path: "/c/0",
+    path: "/c/:id",
     name: "calendar.show",
     component: () => import("../views/CalendarShow.vue"),
   },
