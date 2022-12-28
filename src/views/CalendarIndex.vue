@@ -2,7 +2,7 @@
   <v-container>
     <h3 class="mb-2">Calendarios disponibles</h3>
     <v-row>
-      <v-col>
+      <v-col cols="12" md="4">
         <v-card
           @click="newCalendar"
           outlined
@@ -25,7 +25,7 @@
         <dm-calendar-card
           :calendar="c"
           @showCalendar="showCalendar(index)"
-          @deleteMe="test(index)"
+          @deleteMe="deleteMe(index)"
         ></dm-calendar-card>
       </v-col>
     </v-row>
@@ -38,7 +38,7 @@
 <script>
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 
 export default {
   name: "DmCalendarIndex",
@@ -57,6 +57,7 @@ export default {
   }),
 
   methods: {
+    ...mapMutations("calendars", ["deleteCalendar"]),
     newCalendar() {
       this.showCalendarForm = true;
     },
@@ -70,8 +71,8 @@ export default {
       });
     },
 
-    test(index) {
-      console.log("delete calendar:", index);
+    deleteMe(index) {
+      this.deleteCalendar(index);
     },
   },
 };
