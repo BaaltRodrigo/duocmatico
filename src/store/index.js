@@ -11,11 +11,18 @@ Vue.use(Vuex);
 
 const state = {
   careersData: [],
+  eventLog: [],
 };
 
 const mutations = {
   setCareersData(state, data) {
     state.careersData = data;
+  },
+
+  addLogEvent(state, event) {
+    const eventDate = new Date();
+    state.eventLog.push(`[${eventDate.toISOString()}] ${event}`);
+    console.log(state.eventLog);
   },
 };
 
