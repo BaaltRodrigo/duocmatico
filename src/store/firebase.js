@@ -1,5 +1,16 @@
 import { db } from "@/helpers/firebase.js";
-import { collection, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 
 const state = {
   rootCollection: "cargas-academicas",
@@ -10,7 +21,27 @@ const state = {
   secciones: [],
 };
 
+const getters = {
+  sectionsGroupedByCourse({ secciones }) {
+    const courses = [...new Set(secciones.map((s) => s.asignatura))];
+    return courses.map((name) => {
+      return {
+        name: name,
+        sections: secciones.filter((s) => s.asignatura === name),
+      };
+    });
+  },
+};
+
 const mutations = {
+  clearState(state) {
+    state.cargasAcademicas = [];
+    state.carga = null;
+    state.carreras = [];
+    state.carrera = null;
+    state.secciones = [];
+  },
+
   setCargasAcademicas(state, cargas) {
     state.cargasAcademicas = cargas;
   },
@@ -27,51 +58,79 @@ const mutations = {
     state.carrera = carrera;
   },
 
+  setSecciones(state, secciones) {
+    state.secciones = secciones;
+  },
+
   clearSections(state) {
-    state.sections = [];
+    state.secciones = [];
   },
 
   addSection(state, section) {
-    state.sections.push(section);
+    state.secciones.push(section);
   },
 };
 
 const actions = {
-  async getCargasFromFirebase({ state, commit }) {
-    const cargasCol = await getDocs(collection(db, state.rootCollection));
-    const cargasID = cargasCol.docs.map((doc) => {
-      return doc.id;
+  async getCargasFromFirebase({ commit }) {
+    const cargasRef = doc(db, "opciones", "cargas-disponibles");
+    const cargasDoc = await getDoc(cargasRef);
+    console.log("Cargas disponibles:", cargasDoc.data());
+    commit("setCargasAcademicas", cargasDoc.data().cargas);
+    commit("addLogEvent", `Cargas academicas cargadas desde firebase`, {
+      root: true,
     });
-    commit("setCargasAcademicas", cargasID);
   },
 
   async setCargaAcademica({ state, commit }, carga) {
+    if (state.carga === carga) return;
     commit("setCarga", carga);
-    // Obtengo las carreras disponibles de la carga seleccionada
-    // const cargaRef = collection(db, `${state.rootCollection}`).doc(carga);
-    const cargaRef = doc(db, state.rootCollection, carga);
-    const docSnap = await getDoc(cargaRef);
-    if (docSnap.exists()) {
-      commit("setCarreras", docSnap.data().careers);
-      console.log("docSnap.data() ", docSnap.data().careers);
-    } else {
-      console.log("Not Found");
+    commit("addLogEvent", `Carga academica cambiada a ${carga}`, {
+      root: true,
+    });
+
+    // Get document for a specific academic data
+    const { rootCollection } = state;
+    const cargasRef = collection(db, rootCollection);
+    const q = query(cargasRef, where("carga", "==", carga));
+    const document = await getDocs(q);
+
+    // There are chances thar the document is empty.
+    if (document.empty) {
+      commit("setCarreras", []);
+      commit(
+        "addLogEvent",
+        `El documento ${carga} no existe en la base de datos`,
+        { root: true }
+      );
+      return;
     }
+
+    const { carreras } = document.docs[0].data(); // There will be always 1 or 0 documents with
+    commit("setCarreras", carreras);
+    commit("addLogEvent", `Se agregaron ${carreras.length} carreras`, {
+      root: true,
+    });
   },
 
-  async setCarrera({ state, commit }, carrera) {
+  async setCarrera({ commit }, carrera) {
     commit("setCarrera", carrera);
     commit("clearSections");
-    const { rootCollection, carga } = state;
-    const url = `${rootCollection}/${carga}/${carrera}`;
-    console.log("String de la coleccion:", url);
-    const seccionCol = await getDocs(collection(db, url));
-    console.log(seccionCol);
-    seccionCol.forEach((sec) => {
-      // console.log(sec.id, "=>", sec.data());
-      commit("addSection", sec.data());
+  },
+
+  async getSectionsFromFirebase({ state, commit }) {
+    const { carga, carrera, rootCollection } = state;
+    if (!carga || !carrera) return; // Early exit
+
+    const url = `${rootCollection}/${carga}/carreras`;
+    const careerRef = doc(db, url, carrera);
+    const careerDoc = await getDoc(careerRef);
+    const { secciones } = careerDoc.data();
+
+    commit("setSecciones", secciones);
+    commit("addLogEvent", `${secciones.length} secciones cargadas`, {
+      root: true,
     });
-    console.log("Secciones Disponibles", state.sections);
   },
 
   async uploadCargaAcademica({ state }, payload) {
@@ -108,11 +167,55 @@ const actions = {
       console.log(e);
     }
   },
+
+  async uploadCargaAcademica2({ state }, payload) {
+    try {
+      const { rootCollection } = state;
+      // carga is the ID for the new document.
+      const { carreras, carga } = payload;
+      // First, create the document for academic options
+      const carrerasDisponibles = payload.carreras.map((c) => c.carrera);
+      await setDoc(doc(db, rootCollection, carga), {
+        carga: carga,
+        carreras: carrerasDisponibles,
+        createdAt: serverTimestamp(),
+      });
+
+      console.log("Creada la carga academica con id:", carga);
+
+      // Update cargas-disponibles document from options collection
+      const disponiblesRef = doc(db, "opciones", "cargas-disponibles");
+      await updateDoc(disponiblesRef, {
+        cargas: arrayUnion(carga),
+        updatedAt: serverTimestamp(),
+      });
+
+      console.log("Actualizado el documento con las cargas disponibles");
+
+      // Then we create a subcollection call "carreras" and add all careers as a document
+      const uploadRequests = [];
+      carreras.forEach((c) => {
+        const subCollectionURL = `${rootCollection}/${carga}/carreras/`;
+        uploadRequests.push(
+          setDoc(doc(db, subCollectionURL, c.carrera), {
+            carga: carga,
+            carrera: c.carrera,
+            secciones: c.ramos,
+            createdAt: serverTimestamp(),
+          })
+        );
+      });
+      await Promise.all(uploadRequests);
+    } catch (error) {
+      console.log(error);
+    }
+  },
 };
 
 export default {
   namespaced: true,
   state,
+  getters,
   actions,
   mutations,
 };
