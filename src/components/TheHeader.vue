@@ -1,7 +1,7 @@
 <template>
   <v-app-bar app fixed dark color="purple" flat>
     <v-container class="py-0 fill-height">
-      <v-app-bar-title>Duocmatico</v-app-bar-title>
+      <v-toolbar-title>DuocMatico</v-toolbar-title>
       <v-btn text @click="$router.push({ name: 'calendar.index' })">
         Mis Calendarios
       </v-btn>
@@ -20,9 +20,5 @@
 <script>
 export default {
   name: "TheHeader",
-
-  data: () => ({
-    buttonOptions: [{ title: "Mis calendarios", page: "calendar.index" }],
-  }),
 };
 </script>
