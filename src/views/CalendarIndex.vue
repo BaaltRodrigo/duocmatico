@@ -30,7 +30,9 @@
       </v-col>
     </v-row>
     <v-dialog v-model="showCalendarForm" max-width="70vh">
-      <dm-calendar-form></dm-calendar-form>
+      <dm-calendar-form
+        @created="showCalendar(all.length - 1)"
+      ></dm-calendar-form>
     </v-dialog>
   </v-container>
 </template>
