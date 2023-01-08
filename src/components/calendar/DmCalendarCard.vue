@@ -1,5 +1,5 @@
 <template>
-  <v-card @click="$emit('showCalendar')" height="16vh" rounded="lg">
+  <v-card @click="$emit('showCalendar')" rounded="lg">
     <v-list>
       <v-list-item>
         <v-list-item-content>
