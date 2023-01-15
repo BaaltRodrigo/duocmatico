@@ -58,11 +58,7 @@ const mutations = {
     state.selected.sections.push(section);
   },
 
-  deleteSection({ selected }, section) {
-    const index = selected.sections.findIndex(
-      (s) => s.seccion === section.seccion
-    );
-    if (index < 0) return;
+  deleteCalendarSection({ selected }, index) {
     selected.sections.splice(index, 1);
   },
 };
@@ -77,8 +73,10 @@ const actions = {
   },
 
   addSectionToSelectedCalendar({ commit, dispatch }, section) {
-    commit("addSectionToSelected", section);
-    commit("addLogEvent", `Added ${section.seccion} to calendar`);
+    commit("addSectionToSelectedCalendar", section);
+    commit("addLogEvent", `Added ${section.seccion} to calendar`, {
+      root: true,
+    });
     dispatch("saveCalendarsToLocalStorage");
   },
 
@@ -96,10 +94,23 @@ const actions = {
       });
       return;
     }
-
     const { name } = state.all[index];
     commit("deleteCalendar", index);
     commit("addLogEvent", `Deleted calendar ${name}`, { root: true });
+    dispatch("saveCalendarsToLocalStorage");
+  },
+
+  deleteSectionToSelectedCalendar({ state, commit, dispatch }, section) {
+    const { selected } = state;
+    const index = selected.sections.findIndex(
+      (s) => s.seccion === section.seccion
+    );
+    if (index < 0) return;
+
+    commit("deleteCalendarSection", index);
+    commit("addLogEvent", `Deleted section ${section.seccion} from calendar`, {
+      root: true,
+    });
     dispatch("saveCalendarsToLocalStorage");
   },
 
