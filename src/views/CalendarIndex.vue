@@ -40,7 +40,7 @@
 <script>
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
-import { mapMutations, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "DmCalendarIndex",
@@ -59,7 +59,7 @@ export default {
   }),
 
   methods: {
-    ...mapMutations("calendars", ["deleteCalendar"]),
+    ...mapActions("calendars", ["deleteCalendarAction"]),
     newCalendar() {
       this.showCalendarForm = true;
     },
@@ -74,7 +74,7 @@ export default {
     },
 
     deleteMe(index) {
-      this.deleteCalendar(index);
+      this.deleteCalendarAction(index);
     },
   },
 };

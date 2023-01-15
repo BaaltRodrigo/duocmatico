@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 
 export default {
   name: "DmCalendarForm",
@@ -62,7 +62,7 @@ export default {
       "getCargasFromFirebase",
       "setCarrera",
     ]),
-    ...mapMutations("calendars", ["addCalendar"]),
+    ...mapActions("calendars", ["addCalendarAction"]),
 
     async changeCargaAcademica() {
       this.careerForm = null; // Esto ocurre siempre que cambia la carga academica
@@ -74,8 +74,8 @@ export default {
       await this.setCarrera(this.careerForm);
     },
 
-    createCalendar() {
-      this.addCalendar({
+    async createCalendar() {
+      await this.addCalendarAction({
         name: this.name,
         carga: this.cargaForm,
         carrera: this.careerForm,
