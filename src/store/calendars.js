@@ -54,7 +54,7 @@ const mutations = {
     state.all.splice(index, 1);
   },
 
-  addSection(state, section) {
+  addSectionToSelectedCalendar(state, section) {
     state.selected.sections.push(section);
   },
 
@@ -68,18 +68,28 @@ const mutations = {
 };
 
 const actions = {
-  addCalendarAction({ state, commit }, calendar) {
+  addCalendarAction({ commit, dispatch }, calendar) {
     commit("addCalendar", calendar);
-    commit("addLogEvent", `Created calendar ${calendar.nombre}`, {
+    commit("addLogEvent", `Created calendar ${calendar.name}`, {
       root: true,
     });
+    dispatch("saveCalendarsToLocalStorage");
+  },
+
+  addSectionToSelectedCalendar({ commit, dispatch }, section) {
+    commit("addSectionToSelected", section);
+    commit("addLogEvent", `Added ${section.seccion} to calendar`);
+    dispatch("saveCalendarsToLocalStorage");
+  },
+
+  saveCalendarsToLocalStorage({ commit }) {
     localStorage.calendars = JSON.stringify(state.all);
     commit("addLogEvent", `Updated localStorage calendars`, {
       root: true,
     });
   },
 
-  deleteCalendarAction({ state, commit }, index) {
+  deleteCalendarAction({ state, commit, dispatch }, index) {
     if (state.all.length < index || index < 0) {
       commit("addLogEvent", `Calendar index to delete out of range`, {
         root: true,
@@ -90,10 +100,7 @@ const actions = {
     const { name } = state.all[index];
     commit("deleteCalendar", index);
     commit("addLogEvent", `Deleted calendar ${name}`, { root: true });
-    localStorage.calendars = JSON.stringify(state.all);
-    commit("addLogEvent", `Updated localStorage calendars`, {
-      root: true,
-    });
+    dispatch("saveCalendarsToLocalStorage");
   },
 
   loadCalendarsFromLocalStorage({ state, commit }) {
@@ -108,7 +115,7 @@ const actions = {
     }
   },
 
-  saveCalendarsToLocalStorage({ state }) {
+  saveCalendarsToLocalStorageTest({ state }) {
     const { calendars } = state;
     const calendarsSimplified = calendars.map((calendar) => {
       let sections = calendar.sections.map((section) => section.seccion);
