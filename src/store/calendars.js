@@ -38,6 +38,10 @@ const getters = {
 };
 
 const mutations = {
+  updateSelectedName(state, name) {
+    state.selected.name = name;
+  },
+
   setCalendars(state, calendars) {
     state.all = calendars;
   },
@@ -72,9 +76,34 @@ const actions = {
     dispatch("saveCalendarsToLocalStorage");
   },
 
-  addSectionToSelectedCalendar({ commit, dispatch }, section) {
+  addSectionToSelectedCalendar(
+    { state, commit, dispatch, rootState },
+    section
+  ) {
+    // Add color to the section object
+    if (!section.color) {
+      const { selected } = state;
+      const { colors } = rootState;
+      const usedColors = selected.sections.map((s) => s.color);
+      const unusedColors = colors.filter((c) => !usedColors.includes(c));
+      const randomColor =
+        unusedColors[Math.floor(Math.random() * unusedColors.length)];
+      section.color = randomColor;
+    }
     commit("addSectionToSelectedCalendar", section);
     commit("addLogEvent", `Added ${section.seccion} to calendar`, {
+      root: true,
+    });
+    dispatch("saveCalendarsToLocalStorage");
+  },
+
+  updateCalendarName({ state, commit, dispatch }, name) {
+    const { selected } = state;
+    if (selected.name === name) return;
+
+    commit("updateSelectedName", name);
+
+    commit("addLogEvent", `Updated calendar name to: ${name}`, {
       root: true,
     });
     dispatch("saveCalendarsToLocalStorage");
@@ -139,11 +168,21 @@ const actions = {
     console.log(calendarsSimplified);
   },
 
-  setCalendarByIndex({ state, commit }, index) {
+  setCalendarByIndex({ state, commit, rootState }, index) {
     if (index > state.all.length) return;
     commit("setSelected", index);
     commit("addLogEvent", `Selected calendar number: ${index}`, { root: true });
     const { carrera, carga } = state.selected;
+    // Clear firebase sections if carga && carrera have to change
+    if (
+      rootState.firebase.carga != carga ||
+      rootState.firebase.carrera != carrera
+    ) {
+      console.log("CARGAS O CARRERA DISTINTA, LIMPIO SECCIONES");
+      commit("firebase/setSecciones", [], { root: true });
+      commit("addLogEvent", `Firebase sections cleared`, { root: true });
+    }
+
     // Change the state of firebase module in case user wants to add sections to their calendars
     commit("firebase/setCarga", carga, { root: true });
     commit("addLogEvent", `Carga set to: ${carga}`, { root: true });

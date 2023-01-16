@@ -1,16 +1,18 @@
 <template>
   <v-app>
     <the-header></the-header>
-    <v-main>
+    <v-main class="background">
       <router-view />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from "vuex";
+import { mapActions, mapMutations } from "vuex";
 import { version } from "../package";
 import TheHeader from "./components/TheHeader.vue";
+
+// import cargaAcademica from "../public/cargas-academicas/2023-1 SAN-JOAQUIN.json";
 
 export default {
   name: "App",
@@ -23,14 +25,11 @@ export default {
     //
   }),
 
-  computed: {
-    ...mapState(["careersData"]),
-  },
-
   methods: {
-    ...mapMutations(["setCareersData"]),
+    ...mapMutations(["addLogEvent"]),
     ...mapActions(["findCareerData"]),
-    ...mapMutations("courses", ["setCareer", "setCourses"]),
+    ...mapActions("calendars", ["loadCalendarsFromLocalStorage"]),
+    ...mapActions("firebase", ["uploadCargaAcademica2"]),
     ...mapMutations("schedule", ["setSections"]),
 
     loadSavedSchedule() {
@@ -43,29 +42,20 @@ export default {
 
   async mounted() {
     // Check LocalStorage for xlsxJsonData
-    const { xslxJsonData, selectedCareer } = localStorage;
-    if (xslxJsonData && selectedCareer) {
-      this.setCareersData(JSON.parse(xslxJsonData));
-      const careerData = await this.findCareerData(selectedCareer);
-      this.setCareer(selectedCareer);
-      this.setCourses(careerData.ramos);
-    }
+    // console.log(cargaAcademica);
+    // await this.uploadCargaAcademica2(cargaAcademica);
   },
 
   created() {
+    this.addLogEvent("Creating application");
     // Clean the localStorage every time there is a major update
     // By every time I mean, every time we do a change on how the
     // xslx file is readed.
     if (!(version == localStorage.lastVersion)) {
       localStorage.clear();
     }
-    this.loadSavedSchedule();
+    // this.loadSavedSchedule();
+    this.loadCalendarsFromLocalStorage();
   },
 };
 </script>
-
-<style scoped>
-html {
-  overflow-y: auto;
-}
-</style>

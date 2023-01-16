@@ -5,6 +5,7 @@
     :time-step="30"
     :hide-weekdays="[7]"
     :events="calendarEvents"
+    :disable-views="['year', 'day']"
     hide-view-selector
     hide-title-bar
     locale="es"
@@ -85,11 +86,15 @@ export default {
           schedule: h.horario,
           ...this.addStartAndEndDateToSchedule(h.horario, h.dia),
           day: h.dia,
-          class: "text-capitalize",
+          class: `text-capitalize ${section.color} grey--text text--lighten-3 text-caption rounded-lg`,
         };
       });
       return events;
     },
+
+    // htmlTemplate(section) {
+    //   return `Sala: ${h.sala}`;
+    // },
 
     // This transform the "horario" string to an object with start and end date
     addStartAndEndDateToSchedule(horario, dia) {
@@ -108,3 +113,14 @@ export default {
   },
 };
 </script>
+
+<style>
+.vuecal__event {
+  cursor: pointer;
+}
+
+.vuecal__event-title {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+</style>

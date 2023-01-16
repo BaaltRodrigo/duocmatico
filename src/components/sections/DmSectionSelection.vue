@@ -36,7 +36,9 @@
     </v-window>
     <v-divider></v-divider>
     <v-card-actions>
-      <v-btn block rounded depressed outlined>Finalizar</v-btn>
+      <v-btn block rounded depressed outlined @click="$emit('done')">
+        Finalizar
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>

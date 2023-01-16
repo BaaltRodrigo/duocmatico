@@ -2,13 +2,27 @@ import Vue from "vue";
 import Vuex from "vuex";
 import fileUpload from "./fileUpload.js";
 import calendars from "./calendars.js";
-import schedule from "./schedule.js";
 import firebase from "./firebase.js";
 
 Vue.use(Vuex);
 
 const state = {
   eventLog: [],
+  colors: [
+    "blue accent-1",
+    "blue-grey lighten-3",
+    "brown lighten-3",
+    "deep-orange",
+    "green",
+    "teal",
+    "teal accent-4",
+    "indigo accent-1",
+    "deep-purple accent-1",
+    "pink",
+    "light-blue",
+    "lime darken-3",
+    "grey",
+  ],
 };
 
 const mutations = {
@@ -23,7 +37,6 @@ const modules = {
   calendars,
   firebase,
   fileUpload,
-  schedule,
 };
 
 export default new Vuex.Store({

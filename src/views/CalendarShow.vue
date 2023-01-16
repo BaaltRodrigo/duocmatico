@@ -2,39 +2,47 @@
   <v-container :fluid="showSections">
     <v-row>
       <v-col v-show="showSections" cols="4">
-        <dm-section-selection></dm-section-selection>
+        <dm-section-selection
+          @done="showSections = false"
+        ></dm-section-selection>
       </v-col>
       <v-col :cols="showSections ? '8' : '12'">
-        <div style="position: sticky">
-          <v-card class="elevation-0" height="70vh" rounded="lg">
-            <v-card-title>{{ selected.name }}</v-card-title>
-            <dm-calendar :sections="selected.sections"></dm-calendar>
-            <v-btn
-              block
-              color="purple"
-              class="mt-4"
-              dark
-              depressed
-              @click="agregarRamos"
-            >
-              Agregar ramos
-            </v-btn>
-          </v-card>
-        </div>
+        <v-card
+          class="elevation-0"
+          color="background"
+          height="70vh"
+          rounded="lg"
+        >
+          <v-text-field
+            v-model="inputName"
+            class="my-2 custom text-h6"
+            hint="Puedes editar el nombre de tu calendario"
+            persistent-hint
+            dense
+            @click:append="inputName = selected.name"
+            @click:prepend="updateCalendarName(inputName)"
+            :append-icon="sameName ? '' : 'mdi-close-circle'"
+            :prepend-icon="sameName ? 'mdi-calendar' : 'mdi-content-save'"
+          >
+          </v-text-field>
+          <dm-calendar :sections="selected.sections"></dm-calendar>
+          <v-row v-if="!showSections">
+            <v-col cols="4">
+              <v-btn
+                block
+                color="purple"
+                class="mt-4"
+                dark
+                depressed
+                @click="agregarRamos"
+              >
+                Agregar ramos
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card>
       </v-col>
     </v-row>
-    <!-- <v-dialog v-model="showSections" max-width="70vh" scrollable>
-      <v-card rounded="lg">
-        <v-card-title>Cursos disponibles</v-card-title>
-        <v-card-text style="height: calc(80vh - 102px)">
-          <dm-section-group
-            v-for="course in groups"
-            :key="`clouster-${course.name}`"
-            :course="course"
-          ></dm-section-group>
-        </v-card-text>
-      </v-card>
-    </v-dialog> -->
   </v-container>
 </template>
 
@@ -55,15 +63,20 @@ export default {
     ...mapState("calendars", ["selected"]),
     ...mapState("firebase", ["carga", "carrera", "secciones"]),
     ...mapGetters("firebase", { groups: "sectionsGroupedByCourse" }),
+
+    sameName() {
+      return this.selected.name == this.inputName;
+    },
   },
 
   data: () => ({
+    inputName: "",
     showSections: false,
   }),
 
   methods: {
     ...mapMutations(["addLogEvent"]),
-    ...mapActions("calendars", ["setCalendarByIndex"]),
+    ...mapActions("calendars", ["setCalendarByIndex", "updateCalendarName"]),
     ...mapActions("firebase", ["getSectionsFromFirebase"]),
 
     async agregarRamos() {
@@ -74,6 +87,15 @@ export default {
       // Mostrar popup con secciones disponibles
       this.showSections = true;
     },
+
+    restoreCalendarName() {
+      this.inputName = this.selected.name;
+    },
+  },
+
+  mounted() {
+    this.inputName = this.selected.name;
+    // check if have to clear firebase sections
   },
 
   async created() {
@@ -81,3 +103,13 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.v-text-field >>> .v-input__slot::before {
+  border-style: none !important;
+}
+
+.v-text-field >>> .v-input__slot::after {
+  border-style: none !important;
+}
+</style>
