@@ -110,3 +110,112 @@ El formato en como se guardan los datos lo puedes encontrar [aqui](#transformaci
 ### Carrera seleccionada
 
 Este dato se guarda _unicamente_ si tu lo deseas. En conjunto con los datos del archivo cargado, se usa para mostrar los ramos correspondiente a tu carrera cada vez que entres a Duocmatico
+
+# Estructura en Firebase
+
+Dentro de firebase, tenemos varias opciones a organizar los datos. En bases no relacionales, suelen preferirse _big collections and small documents_.
+
+En este caso particular, se prefirio un hibrido que si tiene documentos "_grandes_".
+
+Para contextualizar un poco mas esta decision, vamos a tomar como ejemplo la carga academica `2022-2 SAN-JOAQUIN`. Esta consta con **21 carreras distintas** y en el caso de la carrera de _Ingenieria en Informatica_, esta cuenta con **185 secciones disponibles**. Lo que se traduce en 185 documentos distintos con la informacion de cada una de las secciones.
+
+Teniendo una estructura similar a la siguiente:
+
+```
+cargas-academicas/
+├─2022-2 SAN-JOAQUIN
+│ ├─INGENIERIA EN INFORMATICA/
+│ │ ├─Seccion 1
+│ │ ├─Seccion 2
+...
+│ │ └─Seccion 185
+│ │
+│ └─Carrera 2/
+│   ├─Seccion 1
+│   ├─Seccion 2
+...
+│   └-Seccion N
+├─2022-2 PUENTE-ALTO
+│ ├─Carrera 1/
+...
+```
+
+Dejando cadad uno de los documentos de secciones con el siguiente formato
+
+```json
+{
+  "asignatura": "Nombre Asignatura",
+  "carrera": "Carrera",
+  "escuela": "Escuela",
+  "horarios": [
+    {
+      "dia": "Dia"
+      "sala": "Sala"
+      "horario": "Di 00:00:00 - 00:00:00"
+    },
+    ...
+  ],
+  "jornada": "Jornada",
+  "nivel": 1,
+  "planes": [1234, 5678, ...],
+  "seccion": "Seccion",
+  "tipoAsignatura": "Tipo Asignatura",
+  "tipoPlanEstudios": "Presencial u Online"
+
+}
+```
+
+Si usaramos la buena practica de _big collections and small documents_ a rajatabla, comenzar a armar un horario tendria esta cantidad de **lecturas** en Firebase.
+
+- 1 Lectura para ver la carga academica a usar
+- 1 Lectura para obtener la carrera a utilizar
+- 185 Lecturas para obtener la informacion de todas las secciones disponibles.
+
+Esto deja la opcion de que aproximadamente 270 alumnos de ingenieria en informatica quieran utilizar la App para consumir la cantidad de lecturas gratuitas diarias.
+
+Ahora, existe la opcione de tener _not so small documents_ y generar documentos con las carreras que tengan **todas las secciones como un atributo**. dejando asi la misma estructura anterior, pero eliminando las secciones como documento.
+
+```
+cargas-academicas/
+├─2022-2 SAN-JOAQUIN
+│ └─carreras/
+│   ├─Carrera 1
+│   ├─Carrera 2
+...
+│   └─Carrera N
+│
+└─2022-2 PUENTE-ALTO
+```
+
+Estructura de los documentos de carreras
+
+```JSON
+{
+  "carrera": "Nombre Carrera",
+  "carga-academica": "Carga academica",
+  "secciones": [
+    {
+      "asignatura": "Nombre Asignatura",
+      "carrera": "Carrera",
+      "escuela": "Escuela",
+      "horarios": [
+        {
+          "dia": "Dia"
+          "sala": "Sala"
+          "horario": "Di 00:00:00 - 00:00:00"
+        },
+        ...
+      ],
+      "jornada": "Jornada",
+      "nivel": 1,
+      "planes": [1234, 5678, ...],
+      "seccion": "Seccion",
+      "tipoAsignatura": "Tipo Asignatura",
+      "tipoPlanEstudios": "Presencial u Online"
+    },
+    ...
+  ]
+}
+```
+
+Es importante destacar que esta implementacion hace la transferencia de datos un poco mas costosa. Ya que todas las secciones de una carrera se almacenan dentro de un mismo documento.
