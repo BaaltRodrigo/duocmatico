@@ -1,13 +1,17 @@
 <template>
-  <v-card @click="$emit('showCalendar')" rounded="lg">
+  <v-card
+    @click="$emit('showCalendar')"
+    @contextmenu="$emit('showMenu', $event)"
+    rounded="lg"
+  >
     <v-list>
       <v-list-item>
         <v-list-item-content>
           <v-list-item-title v-text="calendar.name"></v-list-item-title>
         </v-list-item-content>
         <v-list-item-action>
-          <v-btn icon @click.stop="$emit('deleteMe')">
-            <v-icon>mdi-delete</v-icon>
+          <v-btn icon @click.stop="$emit('showMenu', $event)">
+            <v-icon>mdi-dots-vertical</v-icon>
           </v-btn>
         </v-list-item-action>
       </v-list-item>
@@ -44,5 +48,9 @@ export default {
       required: true,
     },
   },
+
+  data: () => ({
+    //
+  }),
 };
 </script>

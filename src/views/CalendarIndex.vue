@@ -25,10 +25,26 @@
         <dm-calendar-card
           :calendar="c"
           @showCalendar="showCalendar(index)"
-          @deleteMe="deleteMe(index)"
+          @showMenu="showMenu($event, index)"
         ></dm-calendar-card>
       </v-col>
     </v-row>
+    <!-- Remove menu min-width when more options are added -->
+    <v-menu
+      v-model="menu"
+      :position-x="menuX"
+      :position-y="menuY"
+      absolute
+      min-width="250px"
+    >
+      <dm-calendar-menu
+        @delete="deleteCalendar()"
+        @copy="copyCalendar()"
+        @rename="test('rename')"
+        @share="test('share')"
+      ></dm-calendar-menu>
+    </v-menu>
+
     <v-dialog v-model="showCalendarForm" max-width="70vh">
       <dm-calendar-form
         @created="showCalendar(all.length - 1)"
@@ -40,14 +56,16 @@
 <script>
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
+import DmCalendarMenu from "../components/calendar/DmCalendarMenu.vue";
 import { mapActions, mapState } from "vuex";
 
 export default {
   name: "DmCalendarIndex",
 
   components: {
-    DmCalendarForm,
     DmCalendarCard,
+    DmCalendarForm,
+    DmCalendarMenu,
   },
 
   computed: {
@@ -56,12 +74,54 @@ export default {
 
   data: () => ({
     showCalendarForm: false,
+    menu: false,
+    menuX: null,
+    menuY: null,
+    menuCalendarIndex: -1,
   }),
 
   methods: {
-    ...mapActions("calendars", ["deleteCalendarAction"]),
+    ...mapActions("calendars", ["deleteCalendarAction", "addCalendarAction"]),
     newCalendar() {
       this.showCalendarForm = true;
+    },
+
+    showMenu(e, index) {
+      e.preventDefault();
+      this.menu = false;
+      this.menuX = e.clientX;
+      this.menuY = e.clientY;
+      this.menuCalendarIndex = index;
+      this.$nextTick(() => {
+        this.menu = true;
+      });
+    },
+
+    test(message) {
+      console.log("event:", this.menuCalendarIndex, message);
+    },
+
+    copyCalendar() {
+      const selected = this.all[this.menuCalendarIndex];
+      const sameNameCount = this.all.filter((c) =>
+        c.name.includes(selected.name)
+      ).length;
+      this.addCalendarAction({
+        ...selected,
+        name: `${selected.name} (${sameNameCount})`,
+      });
+    },
+
+    renameCalendar() {
+      console.log("rename", this.menuCalendarIndex);
+    },
+
+    shareCalendar() {
+      console.log("share", this.menuCalendarIndex);
+    },
+
+    deleteCalendar() {
+      this.deleteCalendarAction(this.menuCalendarIndex);
     },
 
     showCalendar(index) {
@@ -71,10 +131,6 @@ export default {
           id: index,
         },
       });
-    },
-
-    deleteMe(index) {
-      this.deleteCalendarAction(index);
     },
   },
 };
