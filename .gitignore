@@ -25,4 +25,4 @@ pnpm-debug.log*
 .firebase
 
 # Distribution directory
-.dist
+dist
