@@ -40,7 +40,7 @@
       <dm-calendar-menu
         @delete="deleteCalendar()"
         @copy="copyCalendar()"
-        @rename="test('rename')"
+        @rename="renameCalendar()"
         @share="test('share')"
       ></dm-calendar-menu>
     </v-menu>
@@ -50,6 +50,13 @@
         @created="showCalendar(all.length - 1)"
       ></dm-calendar-form>
     </v-dialog>
+
+    <v-dialog v-model="renameForm" max-width="70vh">
+      <dm-calendar-rename
+        :index="menuCalendarIndex"
+        @update="updateName"
+      ></dm-calendar-rename>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -57,7 +64,8 @@
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarMenu from "../components/calendar/DmCalendarMenu.vue";
-import { mapActions, mapState } from "vuex";
+import DmCalendarRename from "../components/calendar/DmCalendarRename.vue";
+import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
   name: "DmCalendarIndex",
@@ -66,6 +74,7 @@ export default {
     DmCalendarCard,
     DmCalendarForm,
     DmCalendarMenu,
+    DmCalendarRename,
   },
 
   computed: {
@@ -74,6 +83,7 @@ export default {
 
   data: () => ({
     showCalendarForm: false,
+    renameForm: false,
     menu: false,
     menuX: null,
     menuY: null,
@@ -81,7 +91,12 @@ export default {
   }),
 
   methods: {
-    ...mapActions("calendars", ["deleteCalendarAction", "addCalendarAction"]),
+    ...mapActions("calendars", [
+      "deleteCalendarAction",
+      "addCalendarAction",
+      "updateCalendarName",
+    ]),
+    ...mapMutations("calendars", ["setSelected"]),
     newCalendar() {
       this.showCalendarForm = true;
     },
@@ -114,6 +129,16 @@ export default {
 
     renameCalendar() {
       console.log("rename", this.menuCalendarIndex);
+      this.renameForm = true;
+    },
+
+    async updateName(newName) {
+      // set selected calendar
+      this.setSelected(this.menuCalendarIndex);
+      // update name
+      await this.updateCalendarName(newName);
+
+      this.renameForm = false;
     },
 
     shareCalendar() {
