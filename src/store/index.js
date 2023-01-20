@@ -7,7 +7,6 @@ import firebase from "./firebase.js";
 Vue.use(Vuex);
 
 const state = {
-  eventLog: [],
   colors: [
     "blue accent-1",
     "blue-grey lighten-3",
@@ -23,13 +22,19 @@ const state = {
     "lime darken-3",
     "grey",
   ],
+  display404: false,
+  eventLog: [],
 };
 
 const mutations = {
   addLogEvent(state, event) {
     const eventDate = new Date();
     state.eventLog.push(`[${eventDate.toISOString()}] ${event}`);
-    console.log(state.eventLog);
+    // console.log(state.eventLog);
+  },
+
+  setDisplay404(state, value) {
+    state.display404 = value;
   },
 };
 
