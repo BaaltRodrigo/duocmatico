@@ -3,7 +3,7 @@
     <v-card rounded="lg" outlined>
       <v-container>
         <v-row>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" sm="6" align-self="center">
             <v-img src="../../public/images/undraw_page_not_found.svg"></v-img>
           </v-col>
           <v-col cols="12" sm="6">
