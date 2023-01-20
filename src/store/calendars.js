@@ -10,7 +10,7 @@
 
 const state = {
   all: [],
-  selected: null,
+  selected: {},
 };
 
 const getters = {
@@ -169,7 +169,10 @@ const actions = {
   },
 
   setCalendarByIndex({ state, commit, rootState }, index) {
-    if (index > state.all.length) return;
+    if (index > state.all.length - 1 || index < 0) {
+      commit("setDisplay404", true, { root: true });
+      return;
+    }
     commit("setSelected", index);
     commit("addLogEvent", `Selected calendar number: ${index}`, { root: true });
     const { carrera, carga } = state.selected;
