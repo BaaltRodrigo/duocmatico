@@ -19,13 +19,13 @@
             hint="Puedes editar el nombre de tu calendario"
             persistent-hint
             dense
-            @click:append="inputName = selected.name"
+            @click:append="inputName = selected.name || ''"
             @click:prepend="updateCalendarName(inputName)"
             :append-icon="sameName ? '' : 'mdi-close-circle'"
             :prepend-icon="sameName ? 'mdi-calendar' : 'mdi-content-save'"
           >
           </v-text-field>
-          <dm-calendar :sections="selected.sections"></dm-calendar>
+          <dm-calendar :sections="selected.sections || []"></dm-calendar>
           <v-row v-if="!showSections">
             <v-col cols="4">
               <v-btn
@@ -52,7 +52,7 @@ import DmSectionSelection from "../components/sections/DmSectionSelection.vue";
 import DmCalendar from "../components/calendar/DmCalendar.vue";
 
 export default {
-  name: "test",
+  name: "DmCalendarShow",
 
   components: {
     DmCalendar,
@@ -65,7 +65,7 @@ export default {
     ...mapGetters("firebase", { groups: "sectionsGroupedByCourse" }),
 
     sameName() {
-      return this.selected.name == this.inputName;
+      return this.selected?.name == this.inputName;
     },
   },
 
@@ -84,7 +84,6 @@ export default {
         // Cargar secciones desde firebase
         await this.getSectionsFromFirebase();
       }
-      // Mostrar popup con secciones disponibles
       this.showSections = true;
     },
 
@@ -95,10 +94,10 @@ export default {
 
   mounted() {
     this.inputName = this.selected.name;
-    // check if have to clear firebase sections
   },
 
   async created() {
+    // setCalendarByIndex can commit setDisplay404
     await this.setCalendarByIndex(Number(this.$route.params.id));
   },
 };
