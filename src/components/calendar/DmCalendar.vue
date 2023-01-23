@@ -28,7 +28,9 @@ export default {
   props: {
     sections: {
       type: Array,
-      required: true,
+      default: () => {
+        [];
+      },
     },
   },
 

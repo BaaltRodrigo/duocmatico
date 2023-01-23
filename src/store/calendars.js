@@ -11,6 +11,7 @@
 const state = {
   all: [],
   selected: {},
+  shared: {},
 };
 
 const getters = {
@@ -50,8 +51,12 @@ const mutations = {
     state.all.push(calendar);
   },
 
-  setSelected(state, index) {
+  setSelectedByIndex(state, index) {
     state.selected = state.all[index];
+  },
+
+  setShared(state, calendar) {
+    state.shared = calendar;
   },
 
   deleteCalendar(state, index) {
@@ -60,6 +65,10 @@ const mutations = {
 
   addSectionToSelectedCalendar(state, section) {
     state.selected.sections.push(section);
+  },
+
+  addSectionToSharedCalendar(state, section) {
+    state.shared.sections.push(section);
   },
 
   deleteCalendarSection({ selected }, index) {
@@ -173,7 +182,7 @@ const actions = {
       commit("setDisplay404", true, { root: true });
       return;
     }
-    commit("setSelected", index);
+    commit("setSelectedByIndex", index);
     commit("addLogEvent", `Selected calendar number: ${index}`, { root: true });
     const { carrera, carga } = state.selected;
     // Clear firebase sections if carga && carrera have to change
@@ -181,7 +190,6 @@ const actions = {
       rootState.firebase.carga != carga ||
       rootState.firebase.carrera != carrera
     ) {
-      console.log("CARGAS O CARRERA DISTINTA, LIMPIO SECCIONES");
       commit("firebase/setSecciones", [], { root: true });
       commit("addLogEvent", `Firebase sections cleared`, { root: true });
     }
@@ -192,6 +200,43 @@ const actions = {
 
     commit("firebase/setCarrera", carrera, { root: true });
     commit("addLogEvent", `Carrera set to: ${carrera}`, { root: true });
+  },
+
+  setSharedCalendar({ commit, rootState }, calendar) {
+    const { carga, carrera } = calendar;
+    commit("setShared", { ...calendar, sections: [] });
+    commit("addLogEvent", `Selected calendar to shared`, { root: true });
+
+    if (
+      rootState.firebase.carga != carga ||
+      rootState.firebase.carrera != carrera
+    ) {
+      console.log("CARGAS O CARRERA DISTINTA, LIMPIO SECCIONES");
+      commit("firebase/setSecciones", [], { root: true });
+      commit("addLogEvent", `Firebase sections cleared`, { root: true });
+    }
+
+    commit("firebase/setCarga", carga, { root: true });
+    commit("addLogEvent", `Carga set to: ${carga}`, { root: true });
+
+    commit("firebase/setCarrera", carrera, { root: true });
+    commit("addLogEvent", `Carrera set to: ${carrera}`, { root: true });
+  },
+
+  addSectionToSharedCalendar({ state, commit, rootState }, section) {
+    const { shared } = state;
+    // add color to new section
+    const { colors } = rootState;
+    const color = colors[shared.sections.length];
+    section.color = color;
+
+    // add section to calendar
+    commit("addSectionToSharedCalendar", section);
+    commit(
+      "addLogEvent",
+      `Added section ${section.seccion} to shared calendar`,
+      { root: true }
+    );
   },
 };
 

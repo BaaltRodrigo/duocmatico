@@ -41,7 +41,7 @@
         @delete="deleteCalendar()"
         @copy="copyCalendar()"
         @rename="renameCalendar()"
-        @share="test('share')"
+        @share="shareCalendar()"
       ></dm-calendar-menu>
     </v-menu>
 
@@ -57,6 +57,10 @@
         @update="updateName"
       ></dm-calendar-rename>
     </v-dialog>
+
+    <v-dialog v-model="showShareOptions" max-width="70vh">
+      <dm-share-menu :calendar="all[menuCalendarIndex]"></dm-share-menu>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -65,6 +69,7 @@ import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarMenu from "../components/calendar/DmCalendarMenu.vue";
 import DmCalendarRename from "../components/calendar/DmCalendarRename.vue";
+import DmShareMenu from "../components/calendar/DmShareMenu.vue";
 import { mapActions, mapMutations, mapState } from "vuex";
 
 export default {
@@ -75,6 +80,7 @@ export default {
     DmCalendarForm,
     DmCalendarMenu,
     DmCalendarRename,
+    DmShareMenu,
   },
 
   computed: {
@@ -83,6 +89,7 @@ export default {
 
   data: () => ({
     showCalendarForm: false,
+    showShareOptions: false,
     renameForm: false,
     menu: false,
     menuX: null,
@@ -142,7 +149,8 @@ export default {
     },
 
     shareCalendar() {
-      console.log("share", this.menuCalendarIndex);
+      this.showShareOptions = true;
+      console.log(this.all[this.menuCalendarIndex]);
     },
 
     deleteCalendar() {

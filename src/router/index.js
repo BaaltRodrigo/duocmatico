@@ -26,6 +26,11 @@ const routes = [
     component: () => import("../views/FileConversion.vue"),
   },
   {
+    path: "/s",
+    name: "shared",
+    component: () => import("../views/SharedCalendar.vue"),
+  },
+  {
     path: "/c",
     name: "calendar.index",
     component: () => import("../views/CalendarIndex.vue"),
