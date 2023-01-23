@@ -56,7 +56,8 @@ export default {
   methods: {
     generateLinkURL({ name, carga, carrera, sections }) {
       const sectionNames = sections.map((s) => s.seccion).join(",");
-      return `localhost:8080/s?carrera=${carrera}&carga=${carga}&nombre=${name}&sections=${sectionNames}`;
+      const host = window.location.host;
+      return `${host}/s?carrera=${carrera}&carga=${carga}&nombre=${name}&sections=${sectionNames}`;
     },
 
     copyToClipboard() {
