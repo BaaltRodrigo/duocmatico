@@ -182,7 +182,7 @@ const actions = {
       commit("setDisplay404", true, { root: true });
       return;
     }
-    commit("setSelectedByIndex", index);
+    commit("setSelected", index);
     commit("addLogEvent", `Selected calendar number: ${index}`, { root: true });
     const { carrera, carga } = state.selected;
     // Clear firebase sections if carga && carrera have to change
