@@ -23,11 +23,11 @@ export default {
     menuItems: [
       { title: "Copiar", icon: "mdi-content-copy", emit: "copy" },
       { title: "Cambiar nombre", icon: "mdi-rename-outline", emit: "rename" },
-      // {
-      //   title: "Compartir calendario",
-      //   icon: "mdi-share-variant",
-      //   emit: "share",
-      // },
+      {
+        title: "Compartir calendario",
+        icon: "mdi-share-variant",
+        emit: "share",
+      },
       {}, // used to create a divider
       { title: "Borrar", icon: "mdi-trash-can-outline", emit: "delete" },
     ],
