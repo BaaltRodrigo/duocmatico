@@ -51,7 +51,7 @@ const mutations = {
     state.all.push(calendar);
   },
 
-  setSelectedByIndex(state, index) {
+  setSelected(state, index) {
     state.selected = state.all[index];
   },
 
