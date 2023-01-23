@@ -57,7 +57,8 @@ export default {
     generateLinkURL({ name, carga, carrera, sections }) {
       const sectionNames = sections.map((s) => s.seccion).join(",");
       const host = window.location.host;
-      return `${host}/s?carrera=${carrera}&carga=${carga}&nombre=${name}&sections=${sectionNames}`;
+      const link = `${host}/s?carrera=${carrera}&carga=${carga}&nombre=${name}&sections=${sectionNames}`;
+      return link.replaceAll(" ", "%20"); // Replace white spaces whit URL whitespace encoding
     },
 
     copyToClipboard() {
