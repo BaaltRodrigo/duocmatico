@@ -40,7 +40,7 @@ const mutations = {
 
 const actions = {
   async getLocalCalendars({ commit }) {
-    const calendars = localStorage.getItem("calendars");
+    const calendars = JSON.parse(localStorage.getItem("calendars")) ?? [];
     commit("setLocalCalendars", calendars);
   },
 
