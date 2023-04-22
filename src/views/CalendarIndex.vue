@@ -1,6 +1,6 @@
 <template>
-  <v-container fluid>
-    <h3 class="text-h4 mb-2">Calendarios en este dispositivo</h3>
+  <v-container>
+    <h4 class="text-h4 mb-2">Mis calendarios</h4>
     <v-row>
       <v-col cols="12" md="4">
         <v-card
@@ -19,16 +19,23 @@
     </v-row>
     <!-- Get calendars from store and create a card for every one -->
     <v-row>
-      <v-col cols="12" md="4" v-for="calendar in calendars" :key="calendar.id">
+      <v-col
+        cols="12"
+        md="4"
+        v-for="(calendar, index) in localCalendars"
+        :key="`calendar-${index}`"
+      >
         <v-card
-          variant="flat"
           height="16vh"
-          class="rounded-lg"
-          style="background-color: #f5f5f5"
+          class="rounded-xl elevation-3"
+          @click="
+            $router.push({ name: 'calendars.show', params: { id: index } })
+          "
         >
-          <v-container class="text-center">
-            <h3>{{ calendar.name }}</h3>
-          </v-container>
+          <v-card-title class="ml-2">{{ calendar.name }}</v-card-title>
+          <v-card-subtitle class="ml-2 my-n2 text-capitalize">
+            {{ `${calendar.carrera} - ${calendar.carga}`.toLowerCase() }}
+          </v-card-subtitle>
         </v-card>
       </v-col>
     </v-row>
@@ -39,11 +46,12 @@
     content-class="elevation-0"
     hide-overlay
   >
-    <dm-calendar-form></dm-calendar-form>
+    <dm-calendar-form @created="newCalendarForm = false"></dm-calendar-form>
   </v-dialog>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 
 export default {
@@ -53,14 +61,12 @@ export default {
     DmCalendarForm,
   },
 
+  computed: {
+    ...mapState("calendars", ["localCalendars"]),
+  },
+
   data: () => ({
     newCalendarForm: false,
-    calendars: [
-      { name: "calendario1" },
-      { name: "calendario2" },
-      { name: "calendario3" },
-      { name: "calendario4" },
-    ],
   }),
 };
 </script>
