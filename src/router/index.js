@@ -3,6 +3,7 @@ import HomeView from "../views/Home.vue";
 import AboutView from "../views/About.vue";
 import CalendarIndex from "../views/CalendarIndex.vue";
 import LoginView from "../views/Login.vue";
+import checkIfCalendarIndexExists from "./middlewares/checkCalendarExists";
 
 const routes = [
   {
@@ -14,6 +15,12 @@ const routes = [
     path: "/c",
     name: "calendars.index",
     component: CalendarIndex,
+  },
+  {
+    path: "/c/:id",
+    name: "calendars.show",
+    component: () => import("../views/CalendarShow.vue"),
+    beforeEnter: [checkIfCalendarIndexExists],
   },
   {
     path: "/about",
