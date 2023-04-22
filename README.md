@@ -4,11 +4,13 @@ Hola! Este repo es una especie de app para ayudar a planear tu horario para los 
 
 Ojo! la idea de esto no es que la app tome ramos por ti. Solamente ayudamos a organizar mejor tu horario para que puedas ver como va quedando con los ramos que seleccionas.
 
+Este proyecto es un desarrollo de alumnos. No es parte de la institucion.
+
 ## ⚠️ Importante
 
-Este proyecto esta siendo actualmente desarrollado por alumnos y no es algo que sea parte de la institucion.
+Actualmente este proyecto esta en una trancision desde vue2 hacia vue3. Por lo que cualquier bug no sera atendido de manera inmediata. De igual manera pueden sugerir _features / funcionalidades_ que encuentren interesantes que podria tener la app, para tenerlas en consideracion para la transicion hacia vue3. 
 
-**Si estas usando esta aplicacion actualmente, puede ser que tengas que volver a subir el archivo de los cursos entre las releases**. Esto debido a que aun estamos mejorando la conversion de los datos y quizas necesitemos leer otra vez la informacion del excel con los cursos disponibles.
+<sup>Espero no demorarme mucho con la migracion</sup>
 
 # Documentacion
 
