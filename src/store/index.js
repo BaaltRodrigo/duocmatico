@@ -1,5 +1,6 @@
 import { createStore } from "vuex";
 import academicChargesModule from "./academicCharges";
+import calendarModule from "./calendars";
 
 const state = {
   eventLog: [],
@@ -17,6 +18,7 @@ const actions = {};
 
 const modules = {
   academicCharges: academicChargesModule,
+  calendars: calendarModule,
 };
 
 const store = createStore({ state, mutations, actions, modules });
