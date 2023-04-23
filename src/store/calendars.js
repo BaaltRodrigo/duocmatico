@@ -64,8 +64,27 @@ const actions = {
     dispatch("saveLocalCalendars");
   },
 
-  async selectCalendar({ commit }, calendar) {
+  async selectCalendarByIndex({ state, commit }, index) {
+    const calendar = state.localCalendars[index];
     commit("setSelectedCalendar", calendar);
+  },
+
+  /**
+   * The following set of actions are used only to
+   * add or remove sections in the calendar editor.
+   * They are not used anywhere else.
+   */
+
+  async addSection({ state, dispatch }, section) {
+    const calendar = state.selectedCalendar;
+    calendar.sections.push(section);
+    dispatch("updateCalendar", calendar);
+  },
+
+  async removeSection({ state, dispatch }, section) {
+    const calendar = state.selectedCalendar;
+    calendar.sections = calendar.sections.filter((s) => s.id !== section.id);
+    dispatch("updateCalendar", calendar);
   },
 };
 
