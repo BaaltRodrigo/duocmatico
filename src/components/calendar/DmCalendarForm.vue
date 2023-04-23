@@ -68,7 +68,7 @@ export default {
       "getCargasFromFirebase",
       "setCarrera",
     ]),
-    // ...mapActions("calendars", ["addCalendarAction"]),
+    ...mapActions("calendars", ["addCalendar"]),
 
     async changeCargaAcademica() {
       this.careerForm = null; // Esto ocurre siempre que cambia la carga academica
@@ -81,7 +81,7 @@ export default {
     },
 
     async createCalendar() {
-      await this.addCalendarAction({
+      await this.addCalendar({
         name: this.name,
         carga: this.cargaForm,
         carrera: this.careerForm,
