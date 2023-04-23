@@ -27,7 +27,8 @@
       >
         <v-card
           height="16vh"
-          class="rounded-xl elevation-3"
+          variant="outlined"
+          class="rounded-xl elevation-4"
           @click="
             $router.push({ name: 'calendars.show', params: { id: index } })
           "
