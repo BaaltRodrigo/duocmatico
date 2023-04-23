@@ -23,5 +23,10 @@ export default {
   data: () => ({
     //
   }),
+
+  async mounted() {
+    // get load saved local calendars
+    await this.$store.dispatch("calendars/getLocalCalendars");
+  },
 };
 </script>
