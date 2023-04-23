@@ -1,5 +1,10 @@
 <template>
-  <v-card class="rounded-lg" title="Nuevo Calendario">
+  <v-card
+    class="rounded-xl"
+    variant="outlined"
+    style="background-color: #f5f5f5"
+    title="Nuevo Calendario"
+  >
     <v-card-text>
       <v-form ref="form">
         <v-text-field
@@ -26,7 +31,8 @@
           :disabled="isDisabled"
           block
           color="purple"
-          class="text--white"
+          variant="outlined"
+          class="rounded-pill"
           @click="createCalendar"
         >
           Empieza a armar tu horario!
