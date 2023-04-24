@@ -10,10 +10,15 @@
 
 const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
+  sectionsSidebar: false, // Used to toggle the sections sidebar in the calendar editor
   selectedCalendar: null,
 };
 
 const mutations = {
+  setSectionsSidebar(state, value) {
+    state.sectionsSidebar = value;
+  },
+
   setLocalCalendars(state, calendars) {
     state.localCalendars = calendars;
   },
@@ -49,6 +54,15 @@ const actions = {
     localStorage.setItem("calendars", JSON.stringify(state.localCalendars));
   },
 
+  async toggleSectionsSidebar({ commit, state }) {
+    commit("setSectionsSidebar", !state.sectionsSidebar);
+  },
+
+  // There are cases when the sections sidebar needs to be closed by default
+  async setSectionsSidebar({ commit }, value) {
+    commit("setSectionsSidebar", value);
+  },
+
   async addCalendar({ commit, dispatch }, calendar) {
     commit("addCalendar", calendar);
     dispatch("saveLocalCalendars");
@@ -64,9 +78,22 @@ const actions = {
     dispatch("saveLocalCalendars");
   },
 
-  async selectCalendarByIndex({ state, commit }, index) {
+  async selectCalendarByIndex({ state, commit, rootState }, index) {
     const calendar = state.localCalendars[index];
     commit("setSelectedCalendar", calendar);
+    // check if sections needs to be cleaned
+    const { carga, carrera } = calendar;
+    const academicChargeState = rootState.academicCharges;
+    if (
+      carga != academicChargeState.carga ||
+      carrera != academicChargeState.carrera
+    ) {
+      // Null needs to be passed as a second argument on a mutation without arguments
+      console.log("sections cleaned");
+      commit("academicCharges/clearSections", null, { root: true });
+    }
+    commit("academicCharges/setCarga", calendar.carga, { root: true });
+    commit("academicCharges/setCarrera", calendar.carrera, { root: true });
   },
 
   /**
