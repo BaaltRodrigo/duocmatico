@@ -25,9 +25,11 @@ const getters = {
   sectionsGroupedByCourse({ secciones }) {
     const courses = [...new Set(secciones.map((s) => s.asignatura))];
     return courses.map((name) => {
+      const sections = secciones.filter((s) => s.asignatura === name);
       return {
         name: name,
-        sections: secciones.filter((s) => s.asignatura === name),
+        initials: sections[0].sigla,
+        sections,
       };
     });
   },
