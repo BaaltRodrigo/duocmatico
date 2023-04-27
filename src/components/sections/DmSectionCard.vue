@@ -1,8 +1,18 @@
 <template>
   <v-card variant="outlined" class="rounded-xl">
-    <v-card-title>
-      {{ section.seccion }}
-    </v-card-title>
+    <v-list-item class="mt-2">
+      <v-list-item-title>{{ section.seccion }}</v-list-item-title>
+      <template #append>
+        <v-btn
+          variant="outlined"
+          class="rounded-pill text-capitalize"
+          size="small"
+          @click="!isAdded ? addSection(section) : removeSection(section)"
+        >
+          {{ !isAdded ? "Agregar" : "Quitar" }}
+        </v-btn>
+      </template>
+    </v-list-item>
     <v-card-text>
       <v-table density="compact">
         <thead>
@@ -26,6 +36,8 @@
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex";
+
 export default {
   name: "DmSectionCard",
 
@@ -37,15 +49,22 @@ export default {
   },
 
   computed: {
+    ...mapState("calendars", ["selectedCalendar"]),
     validSchedules() {
       return this.section.horarios.filter(
         (h) => h.horario != "0:00:00 - 0:00:00"
       );
     },
+
+    isAdded() {
+      const { section } = this;
+      const { sections } = this.selectedCalendar;
+      return sections.some((s) => s.seccion === section.seccion);
+    },
   },
 
-  mounted() {
-    console.log(this.section);
+  methods: {
+    ...mapActions("calendars", ["addSection", "removeSection"]),
   },
 };
 </script>
