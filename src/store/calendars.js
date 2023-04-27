@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 /**
  * Calendars follow the following structure:
  * {
@@ -41,6 +43,10 @@ const mutations = {
     const index = state.localCalendars.findIndex((c) => c.id === calendar.id);
     state.localCalendars.splice(index, 1, calendar);
   },
+
+  addSection(state, section) {
+    state.selectedCalendar.sections.push(section);
+  },
 };
 
 const actions = {
@@ -64,7 +70,8 @@ const actions = {
   },
 
   async addCalendar({ commit, dispatch }, calendar) {
-    commit("addCalendar", calendar);
+    // adds uuid to calendar
+    commit("addCalendar", { id: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
 
@@ -102,15 +109,17 @@ const actions = {
    * They are not used anywhere else.
    */
 
-  async addSection({ state, dispatch }, section) {
+  async addSection({ state, dispatch, commit }, section) {
     const calendar = state.selectedCalendar;
-    calendar.sections.push(section);
+    commit("addSection", section);
     dispatch("updateCalendar", calendar);
   },
 
   async removeSection({ state, dispatch }, section) {
     const calendar = state.selectedCalendar;
-    calendar.sections = calendar.sections.filter((s) => s.id !== section.id);
+    calendar.sections = calendar.sections.filter(
+      (s) => s.seccion !== section.seccion
+    );
     dispatch("updateCalendar", calendar);
   },
 };

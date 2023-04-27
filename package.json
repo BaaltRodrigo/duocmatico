@@ -12,6 +12,7 @@
     "@mdi/font": "5.9.55",
     "firebase": "^9.18.0",
     "roboto-fontface": "*",
+    "uuid": "^9.0.0",
     "vue": "^3.2.47",
     "vue-cal": "^4.8.1",
     "vue-router": "^4.1.6",
