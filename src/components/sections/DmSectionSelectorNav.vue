@@ -80,9 +80,14 @@
           </v-list>
         </v-window-item>
         <!-- Window to select sections -->
-        <v-window-item :value="2" class="px-8">
-          <!-- The group selected name -->
-          Poner cosas aca
+        <v-window-item :value="2" class="px-4">
+          <dm-section-card
+            v-for="section in group.sections"
+            :key="section.sigla"
+            :section="section"
+            class="my-2"
+          >
+          </dm-section-card>
         </v-window-item>
       </v-window>
     </v-card>
@@ -91,9 +96,14 @@
 
 <script>
 import { mapActions, mapGetters, mapState } from "vuex";
+import DmSectionCard from "./DmSectionCard.vue";
 
 export default {
   name: "DmSectionSelectorNav",
+
+  components: {
+    DmSectionCard,
+  },
 
   computed: {
     ...mapState("calendars", ["sectionsSidebar"]),
@@ -126,6 +136,10 @@ export default {
       this.step = 2;
       this.group = groupSelected;
       console.log(this.group);
+    },
+
+    getValidSchedules(schedules) {
+      return schedules.filter((h) => h.horario != "0:00:00 - 0:00:00");
     },
   },
 };
