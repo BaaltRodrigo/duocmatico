@@ -3,9 +3,8 @@
     app
     floating
     width="500"
-    class="pa-4 mb-4"
+    class="pl-4 pb-4"
     :model-value="sectionsSidebar"
-    transition="slide-y-reverse transition-fast"
   >
     <template v-slot:prepend>
       <v-chip
