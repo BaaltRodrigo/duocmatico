@@ -82,7 +82,7 @@
         <v-window-item :value="2" class="px-4">
           <dm-section-card
             v-for="section in group.sections"
-            :key="section.sigla"
+            :key="section.seccion"
             :section="section"
             class="my-2"
           >
@@ -143,9 +143,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.custom-input {
-  border-radius: 20px;
-}
-</style>
