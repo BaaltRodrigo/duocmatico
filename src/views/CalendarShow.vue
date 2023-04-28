@@ -16,7 +16,7 @@
         <template v-slot:event="{ event }">
           <v-card
             class="rounded-lg"
-            variant="outlined"
+            variant="tonal"
             height="100%"
             :color="event.color"
           >
@@ -161,3 +161,10 @@ export default {
   },
 };
 </script>
+
+<!-- Similar border radius to rounded-lg -->
+<style>
+.vuecal__event {
+  border-radius: 0.5rem;
+}
+</style>
