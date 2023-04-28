@@ -20,9 +20,9 @@
             height="100%"
             :color="event.color"
           >
-            <v-card-title class="text-capitalize text-body-2">{{
-              event.title
-            }}</v-card-title>
+            <v-card-title class="text-capitalize text-body-2">
+              {{ event.title }}
+            </v-card-title>
             <v-card-text>
               {{ event.start.toTimeString().slice(0, 5) }} -
               {{ event.end.toTimeString().slice(0, 5) }}
