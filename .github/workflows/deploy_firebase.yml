@@ -2,7 +2,7 @@ name: Firebase Continuous Deployment
 
 on:
   push:
-    branches: [1.x]
+    branches: [2.x]
 
 jobs:
   deploy:
@@ -15,8 +15,14 @@ jobs:
       - name: "Create env file"
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
+
+      - name: "Installing dependencies"
       - run: npm ci
+
+      - name: "Building app"
       - run: npm run build
+
+      - name: "Deploying to Firebase"
       - uses: w9jds/firebase-action@master
         with:
           args: deploy --only hosting
