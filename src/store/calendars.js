@@ -102,22 +102,23 @@ const actions = {
     dispatch("saveLocalCalendars");
   },
 
-  async selectCalendarByIndex({ state, commit, rootState }, index) {
+  async selectCalendarByIndex({ state, commit, dispatch, rootState }, index) {
     const calendar = state.localCalendars[index];
     commit("setSelectedCalendar", calendar);
     // check if sections needs to be cleaned
     const { carga, carrera } = calendar;
     const academicChargeState = rootState.academicCharges;
-    if (
+    const fetchSections =
       carga != academicChargeState.carga ||
-      carrera != academicChargeState.carrera
-    ) {
-      // Null needs to be passed as a second argument on a mutation without arguments
-      console.log("sections cleaned");
-      commit("academicCharges/clearSections", null, { root: true });
-    }
+      carrera != academicChargeState.carrera;
+
     commit("academicCharges/setCarga", calendar.carga, { root: true });
     commit("academicCharges/setCarrera", calendar.carrera, { root: true });
+    if (fetchSections) {
+      await dispatch("academicCharges/getSectionsFromFirebase", null, {
+        root: true,
+      });
+    }
   },
 
   /**
