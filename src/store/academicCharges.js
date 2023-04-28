@@ -77,7 +77,7 @@ const actions = {
   async getCargasFromFirebase({ commit }) {
     const cargasRef = doc(db, "opciones", "cargas-disponibles");
     const cargasDoc = await getDoc(cargasRef);
-    console.log("Cargas disponibles:", cargasDoc.data());
+    // console.log("Cargas disponibles:", cargasDoc.data());
     commit("setCargasAcademicas", cargasDoc.data().cargas);
     commit("addLogEvent", `Cargas academicas cargadas desde firebase`, {
       root: true,
@@ -154,7 +154,7 @@ const actions = {
           return c.ramos;
         })
         .flat(1);
-      console.log(flatSections);
+      // console.log(flatSections);
       const uploadRequests = [];
       // console.log(flatSections);
       flatSections.forEach(async (section) => {

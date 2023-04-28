@@ -72,9 +72,6 @@ export default {
       if (this.secciones.length === 0) {
         // Only getting sections from firebase if sections array is empty
         this.$store.dispatch("academicCharges/getSectionsFromFirebase");
-      } else {
-        console.log("Sections grouped");
-        console.log(this.sectionsGroupedByCourse);
       }
       this.$store.dispatch("calendars/toggleSectionsSidebar");
     },
@@ -153,9 +150,6 @@ export default {
     );
   },
 
-  mounted() {
-    console.log(this.calendarEvents);
-  },
   async beforeUnmount() {
     await this.$store.dispatch("calendars/setSectionsSidebar", false);
   },

@@ -134,7 +134,6 @@ export default {
     selectCourse(groupSelected) {
       this.step = 2;
       this.group = groupSelected;
-      console.log(this.group);
     },
 
     getValidSchedules(schedules) {
