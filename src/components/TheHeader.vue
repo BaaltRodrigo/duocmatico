@@ -1,10 +1,10 @@
 <template>
   <v-app-bar app fixed flat>
-    <!-- <template v-slot:prepend>
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-    </template> -->
     <v-app-bar-title @click="$router.push({ name: 'home' })">
       Duocmatico
+      <v-chip variant="outlined" size="x-small" label color="primary">
+        Beta
+      </v-chip>
     </v-app-bar-title>
     <v-spacer></v-spacer>
     <v-btn icon href="https://github.com/BaaltRodrigo/duocmatico" target="none">
