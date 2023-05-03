@@ -1,6 +1,6 @@
 {
-  "name": "duocmatico2",
-  "version": "0.0.0",
+  "name": "duocmatico",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "serve": "vite preview",
