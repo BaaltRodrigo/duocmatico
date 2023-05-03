@@ -19,6 +19,7 @@
             variant="tonal"
             height="100%"
             :color="event.color"
+            @click="openSectionInformation(event.sectionId)"
           >
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
@@ -42,6 +43,10 @@
     >
       Agregar secciones
     </v-btn>
+
+    <v-dialog v-model="sectionInformation" width="50%">
+      <dm-section-card :section="section" hide-add-button></dm-section-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -49,12 +54,14 @@
 import { mapGetters, mapState } from "vuex";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
+import DmSectionCard from "../components/sections/DmSectionCard.vue";
 
 export default {
   name: "CalendarShow",
 
   components: {
     VueCal,
+    DmSectionCard,
   },
 
   computed: {
@@ -67,6 +74,11 @@ export default {
     },
   },
 
+  data: () => ({
+    sectionInformation: false,
+    section: null,
+  }),
+
   methods: {
     openSectionsSidebar() {
       if (this.secciones.length === 0) {
@@ -74,6 +86,13 @@ export default {
         this.$store.dispatch("academicCharges/getSectionsFromFirebase");
       }
       this.$store.dispatch("calendars/toggleSectionsSidebar");
+    },
+
+    openSectionInformation(sectionId) {
+      this.section = this.secciones.find(
+        (section) => section.seccion === sectionId
+      );
+      this.$nextTick(() => (this.sectionInformation = true));
     },
 
     getCalendarEvents() {
@@ -95,6 +114,7 @@ export default {
             ...this.getScheduleCalendarEvents(schedule), // start, end, sala
             color: "purple",
             class: `text-capitalize`,
+            sectionId: section.seccion,
           };
         });
     },
@@ -139,6 +159,11 @@ export default {
         ),
       };
     },
+  },
+
+  mounted() {
+    console.log("Calendario:", this.selectedCalendar);
+    console.log("Eventos", this.calendarEvents);
   },
 
   async created() {

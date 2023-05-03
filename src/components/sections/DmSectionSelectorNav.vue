@@ -85,6 +85,7 @@
             :key="section.seccion"
             :section="section"
             class="my-2"
+            is-in-selection
           >
           </dm-section-card>
         </v-window-item>
