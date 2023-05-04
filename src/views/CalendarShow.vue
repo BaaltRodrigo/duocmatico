@@ -44,7 +44,7 @@
       Agregar secciones
     </v-btn>
 
-    <v-dialog v-model="sectionInformation" width="50%">
+    <v-dialog v-model="sectionInformation" min-width="50%">
       <dm-section-card :section="section" hide-add-button></dm-section-card>
     </v-dialog>
   </v-container>

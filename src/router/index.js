@@ -1,8 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/Home.vue";
-import AboutView from "../views/About.vue";
 import CalendarIndex from "../views/CalendarIndex.vue";
-import LoginView from "../views/Login.vue";
 import checkIfCalendarIndexExists from "./middlewares/checkCalendarExists";
 
 const routes = [
@@ -22,16 +20,6 @@ const routes = [
     name: "calendars.show",
     component: () => import("../views/CalendarShow.vue"),
     beforeEnter: [checkIfCalendarIndexExists],
-  },
-  {
-    path: "/about",
-    name: "About",
-    component: AboutView,
-  },
-  {
-    path: "/signin",
-    name: "signin",
-    component: LoginView,
   },
 ];
 
