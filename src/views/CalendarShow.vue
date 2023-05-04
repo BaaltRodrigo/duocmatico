@@ -44,7 +44,7 @@
       Agregar secciones
     </v-btn>
 
-    <v-dialog v-model="sectionInformation" min-width="50%">
+    <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
       <dm-section-card :section="section" hide-add-button></dm-section-card>
     </v-dialog>
   </v-container>
@@ -52,6 +52,7 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
+import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
@@ -71,6 +72,11 @@ export default {
 
     calendarEvents() {
       return this.getCalendarEvents();
+    },
+
+    isMobile() {
+      const { mobile } = useDisplay();
+      return mobile.value;
     },
   },
 
