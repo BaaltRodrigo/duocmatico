@@ -26,7 +26,7 @@ export default {
     //
   }),
 
-  async mounted() {
+  async created() {
     // get load saved local calendars
     await this.$store.dispatch("calendars/getLocalCalendars");
     // add uuid to all calendars without uuid
