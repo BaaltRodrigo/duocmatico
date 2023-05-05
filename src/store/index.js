@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import authModule from "./auth";
 import academicChargesModule from "./academicCharges";
 import calendarModule from "./calendars";
 
@@ -19,6 +20,7 @@ const actions = {};
 const modules = {
   academicCharges: academicChargesModule,
   calendars: calendarModule,
+  auth: authModule,
 };
 
 const store = createStore({ state, mutations, actions, modules });
