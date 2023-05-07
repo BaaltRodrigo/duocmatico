@@ -7,4 +7,8 @@ import store from "./store";
 
 loadFonts();
 
+// This is not when the app is mounted because the user could be logged in
+// but the page could be refreshed and the state would be lost.
+await store.dispatch("auth/checkUser");
+
 createApp(App).use(router).use(store).use(vuetify).mount("#app");

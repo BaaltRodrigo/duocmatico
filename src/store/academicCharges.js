@@ -1,4 +1,4 @@
-import { db } from "../helpers/firebase.js";
+import { db } from "../config/firebase.js";
 import {
   arrayUnion,
   collection,

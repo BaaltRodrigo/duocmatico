@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/Home.vue";
 import CalendarIndex from "../views/CalendarIndex.vue";
+// Middlewares
 import checkIfCalendarIndexExists from "./middlewares/checkCalendarExists";
+import onlyGuests from "./middlewares/onlyGuests";
 
 const routes = [
   {
@@ -20,6 +22,18 @@ const routes = [
     name: "calendars.show",
     component: () => import("../views/CalendarShow.vue"),
     beforeEnter: [checkIfCalendarIndexExists],
+  },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("../views/auth/Login.vue"),
+    beforeEnter: [onlyGuests],
+  },
+  {
+    path: "/registration",
+    name: "registration",
+    component: () => import("../views/auth/Registration.vue"),
+    beforeEnter: [onlyGuests],
   },
 ];
 

@@ -9,6 +9,7 @@
 </template>
 
 <script>
+import { useDisplay } from "vuetify";
 import TheHeader from "./components/TheHeader.vue";
 import TheSidebar from "./components/TheSidebar.vue";
 import DmSectionSelectorNav from "./components/sections/DmSectionSelectorNav.vue";
@@ -26,7 +27,14 @@ export default {
     //
   }),
 
-  async mounted() {
+  provide() {
+    const { mobile } = useDisplay();
+    return {
+      isMobile: mobile.value,
+    };
+  },
+
+  async created() {
     // get load saved local calendars
     await this.$store.dispatch("calendars/getLocalCalendars");
     // add uuid to all calendars without uuid
