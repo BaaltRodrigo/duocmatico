@@ -1,9 +1,12 @@
+import { db } from "../config/firebase";
+import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
 import {
   browserLocalPersistence,
   getAuth,
   GoogleAuthProvider,
   setPersistence,
   signInWithPopup,
+  signOut,
 } from "firebase/auth";
 
 const state = {
@@ -37,7 +40,30 @@ const actions = {
     commit("setUser", user);
   },
 
-  async loginWhitGoogle({ commit }) {
+  async updateFirebaseUser({ commit }, user) {
+    // get user from firebase collection with user uuid
+    const userRef = doc(db, "users", user.uid);
+    const userDoc = await getDoc(userRef);
+
+    if (!userDoc.exists()) {
+      // create new user with base roles
+      await setDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user?.photoURL,
+      });
+    } else {
+      // update user, but not the roles
+      await updateDoc(userRef, {
+        name: user.displayName,
+        email: user.email,
+        photoURL: user?.photoURL,
+      });
+    }
+    commit("setUser", user);
+  },
+
+  async loginWhitGoogle({ commit, dispatch }) {
     try {
       const provider = new GoogleAuthProvider();
       const auth = getAuth();
@@ -45,6 +71,7 @@ const actions = {
       const response = await signInWithPopup(auth, provider);
       console.log(response.user);
       commit("setUser", response.user);
+      dispatch("updateFirebaseUser", response.user);
     } catch (error) {
       console.log(error);
     }
@@ -58,7 +85,8 @@ const actions = {
   },
 
   async logout({ commit }) {
-    await firebase.auth().signOut();
+    const auth = getAuth();
+    await signOut(auth);
     commit("setUser", null);
   },
 
