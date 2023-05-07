@@ -1,36 +1,40 @@
 <template>
   <v-container>
-    <v-alert
-      type="info"
-      variant="tonal"
-      color="primary"
-      class="text-justify rounded-xl"
-    >
-      Por el momento solo disponemos de autenticacion con Google, pero
-      proximamente podras registrarte con tu correo y contraseña, entre otros.
-    </v-alert>
+    <dm-auth-in-progress></dm-auth-in-progress>
     <br />
-    <v-card variant="outlined" max-width="35%" class="rounded-xl">
-      <v-card-item class="text-center">
-        <v-card-title>Iniciar sesion</v-card-title>
-      </v-card-item>
-      <v-card-text>
-        <dm-auth-providers class="my-3"></dm-auth-providers>
-      </v-card-text>
-    </v-card>
+    <v-container>
+      <v-row justify="center">
+        <v-card
+          variant="outlined"
+          :width="isMobile ? '100%' : '35%'"
+          class="rounded-xl elevation-4"
+        >
+          <v-card-item class="text-center">
+            <v-card-title>Iniciar sesion</v-card-title>
+          </v-card-item>
+          <v-card-text>
+            <dm-auth-providers class="my-3"></dm-auth-providers>
+          </v-card-text>
+        </v-card>
+      </v-row>
+    </v-container>
   </v-container>
 </template>
 
 <script>
 import DmAuthProviders from "../../components/auth/Providers.vue";
+import DmAuthInProgress from "../../components/auth/WorkInProgressAlert.vue";
 import { mapActions } from "vuex";
 
 export default {
   name: "Login",
 
   components: {
+    DmAuthInProgress,
     DmAuthProviders,
   },
+
+  inject: ["isMobile"],
 
   data: () => ({
     showFields: false,
