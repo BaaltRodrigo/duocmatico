@@ -12,7 +12,7 @@
           <v-img :src="user.photoURL" alt="user-profile-picture"></v-img>
           <v-menu activator="parent" min-width="120px">
             <v-list>
-              <v-list-item>
+              <v-list-item @click="handleLogout">
                 <template v-slot:prepend>
                   <v-icon icon="mdi-logout"></v-icon>
                 </template>
@@ -69,6 +69,10 @@ export default {
 
     goToSignUp() {
       this.$router.push({ name: "registration" });
+    },
+
+    async handleLogout() {
+      await this.$store.dispatch("auth/logout");
     },
   },
 };
