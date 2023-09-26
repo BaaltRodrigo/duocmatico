@@ -2,37 +2,40 @@
   <v-card
     class="rounded-xl"
     variant="outlined"
-    style="background-color: #f5f5f5"
+    style="background-color: #FFF7EA"
     title="Nuevo Calendario"
   >
-    <v-card-text>
+    <v-card-text transparent>
       <v-form ref="form">
         <v-text-field
           v-model="name"
           filled
           variant="outlined"
           label="Nombre del calendario"
+          bg-color="white"
         ></v-text-field>
         <v-autocomplete
           v-model="cargaForm"
           :items="cargasAcademicas"
           label="Carga academica"
           variant="outlined"
+          bg-color="white"
         ></v-autocomplete>
         <v-autocomplete
           v-model="careerForm"
           :items="carreras"
           label="Carrera"
           variant="outlined"
+          bg-color="white"
         ></v-autocomplete>
       </v-form>
       <v-card-actions>
         <v-btn
-          :disabled="isDisabled"
+          :disabled="false"
           block
-          color="purple"
-          variant="outlined"
-          class="rounded-pill"
+          color="#FF9C72"
+          variant="flat"
+          class="rounded-pill text-white"
           @click="createCalendar"
         >
           Empieza a armar tu horario!

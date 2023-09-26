@@ -6,11 +6,11 @@
         <v-card
           @click="newCalendarForm = true"
           variant="flat"
-          height="16vh"
+          height="150px"
           class="rounded-lg"
-          style="border: 4px dashed lightgray; background-color: transparent"
+          style="border: 4px  lightgray; background-color: #FF9C72"
         >
-          <v-container class="text-center">
+          <v-container class="text-center text-white mt-4">
             <v-icon size="7vh">mdi-plus</v-icon>
             <h3>Nuevo calendario</h3>
           </v-container>
@@ -26,9 +26,9 @@
         :key="`calendar-${index}`"
       >
         <v-card
-          height="16vh"
-          variant="outlined"
-          class="rounded-xl elevation-4"
+          height="150px"
+          class="rounded-xl"
+          style="background-color: #F0BD6A"
           @click="
             $router.push({ name: 'calendars.show', params: { id: index } })
           "
@@ -37,6 +37,17 @@
           <v-card-subtitle class="ml-2 my-n2 text-capitalize">
             {{ `${calendar.carrera} - ${calendar.carga}`.toLowerCase() }}
           </v-card-subtitle>
+          <v-card-actions class="float-end mt-8">
+            <v-btn icon>
+              <v-icon>mdi-share-variant</v-icon>
+            </v-btn>
+            <v-btn icon>
+              <v-icon>mdi-delete</v-icon>
+            </v-btn>
+            <v-btn icon color="grey-lighten-5" variant="flat">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+          </v-card-actions>
         </v-card>
       </v-col>
     </v-row>
@@ -71,3 +82,4 @@ export default {
   }),
 };
 </script>
+

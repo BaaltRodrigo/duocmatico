@@ -2,7 +2,7 @@
   <v-app>
     <the-header></the-header>
     <dm-section-selector-nav></dm-section-selector-nav>
-    <v-main>
+    <v-main class="my-app">
       <router-view></router-view>
     </v-main>
   </v-app>
@@ -11,7 +11,6 @@
 <script>
 import { useDisplay } from "vuetify";
 import TheHeader from "./components/TheHeader.vue";
-import TheSidebar from "./components/TheSidebar.vue";
 import DmSectionSelectorNav from "./components/sections/DmSectionSelectorNav.vue";
 
 export default {
@@ -20,12 +19,7 @@ export default {
   components: {
     DmSectionSelectorNav,
     TheHeader,
-    TheSidebar,
   },
-
-  data: () => ({
-    //
-  }),
 
   provide() {
     const { mobile } = useDisplay();
@@ -44,6 +38,11 @@ export default {
 </script>
 
 <style>
+
+/* Set de background color in all views */
+.my-app {
+  background-color: #FFF7EA;
+}
 /* Set the style for the entire scrollbar */
 ::-webkit-scrollbar {
   width: 5px; /* width of the scrollbar */
