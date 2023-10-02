@@ -35,6 +35,12 @@ const routes = [
     component: () => import("../views/auth/Registration.vue"),
     beforeEnter: [onlyGuests],
   },
+  // 404 page by default to any route match
+  {
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("../views/errors/NotFound.vue"),
+  },
 ];
 
 const router = createRouter({
