@@ -31,7 +31,7 @@
       </v-form>
       <v-card-actions>
         <v-btn
-          :disabled="isDisabled"
+          :disabled="false"
           block
           color="#FF9C72"
           variant="flat"

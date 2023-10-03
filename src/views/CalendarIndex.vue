@@ -41,7 +41,7 @@
             <v-btn icon>
               <v-icon>mdi-share-variant</v-icon>
             </v-btn>
-            <v-btn icon>
+            <v-btn icon v-on:click.stop.prevent="deleteCalendar = true">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
             <v-btn icon color="grey-lighten-5" variant="flat">
@@ -60,25 +60,45 @@
   >
     <dm-calendar-form @created="newCalendarForm = false"></dm-calendar-form>
   </v-dialog>
+
+  <v-dialog
+    v-model="deleteCalendar"
+    max-width="530px"
+    content-class="elevation-0"
+    hide-overlay
+  >
+    <dm-delete-calendar @created="deleteCalendar = false"></dm-delete-calendar>
+  </v-dialog>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapAction } from "vuex";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
+import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
 
 export default {
   name: "CalendarIndexView",
 
   components: {
     DmCalendarForm,
+    DmDeleteCalendar,
   },
 
   computed: {
     ...mapState("calendars", ["localCalendars"]),
   },
 
+  methods:{
+    ...mapAction("calendars", ["removeCalendar"]),
+
+    deleteCalendar(){
+      
+    }
+  },
+
   data: () => ({
     newCalendarForm: false,
+    deleteCalendar: false,
   }),
 };
 </script>
