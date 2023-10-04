@@ -20,9 +20,6 @@
     <v-btn @click="submitForm" block variant="flat" color="orange-darken-1">
       Ingresar
     </v-btn>
-    <v-alert v-if="loginError" class="mt-4" text type="error" variant="tonal">
-      {{ loginErrorMessage }}
-    </v-alert>
   </v-form>
 </template>
 
@@ -40,8 +37,6 @@ export default {
     email: null,
     password: null,
     showPassword: false,
-    loginError: false,
-    loginErrorMessage: "",
   }),
 
   methods: {

@@ -12,15 +12,7 @@
             <auth-providers buttonText="Ingresar con Google" />
             <v-container class="text-center">O también</v-container>
             <login-form />
-            <v-alert
-              v-if="loginError"
-              class="mt-4"
-              text
-              type="error"
-              variant="tonal"
-            >
-              {{ loginErrorMessage }}
-            </v-alert>
+
             <v-container class="text-center mb-n1 mt-2">
               <router-link to="/password-recovery" :style="{ color: 'orange' }">
                 Olvide mi contraseña
