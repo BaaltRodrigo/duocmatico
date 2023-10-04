@@ -3,7 +3,7 @@
     @click="handleWithGoogle"
     variant="outlined"
     block
-    color="primary"
+    color="orange"
     class="text-capitalize"
   >
     <v-icon class="mx-3">mdi-google</v-icon>

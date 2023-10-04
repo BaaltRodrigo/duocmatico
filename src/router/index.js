@@ -35,6 +35,13 @@ const routes = [
     component: () => import("../views/auth/Registration.vue"),
     beforeEnter: [onlyGuests],
   },
+
+  {
+    path: "/password-recovery",
+    name: "password-recovery",
+    component: () => import("../views/auth/PasswordRecoveryView.vue"),
+    beforeEnter: [onlyGuests],
+  },
   // 404 page by default to any route match
   {
     path: "/:pathMatch(.*)*",

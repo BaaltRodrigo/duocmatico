@@ -39,14 +39,8 @@
         </v-autocomplete>
       </v-form>
       <v-card-actions>
-        <v-btn
-          :disabled="isDisabled"
-          block
-          color="purple"
-          variant="outlined"
-          class="rounded-pill"
-          @click="createCalendar"
-        >
+        <v-btn :disabled="isDisabled" block color="green-accent-1" variant="flat" class="rounded-pill text-white"
+          @click="createCalendar">
           Empieza a armar tu horario!
         </v-btn>
       </v-card-actions>
