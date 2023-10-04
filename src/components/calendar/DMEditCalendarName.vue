@@ -1,28 +1,13 @@
 <template>
-  <v-card class="rounded-xl" title="Editar nombre del calendario" variant="outlined" style="background-color: #FFF7EA">
+  <v-card class="rounded-xl" title="Editar nombre del calendario">
     <v-card-text>
-      <v-text-field 
-        v-model="editedName" 
-        label="Nombre del calendario"
-        filled
-        variant="outlined"
-        bg-color="white" 
-        required
-        :error-messages="nameErrorMessages"
-      >
+      <v-text-field v-model="editedName" label="Nombre del calendario" variant="outlined" required
+        :error-messages="nameErrorMessages">
       </v-text-field>
-      <div class="d-flex justify-space-between ">
-        <v-btn
-          block
-          color="#FF9C72"
-          variant="flat"
-          class="rounded-pill text-white"
-          @click="updateCalendarName"
-          :disabled="editedName.length === 0"
-        >
-          Cambiar nombre
-        </v-btn>
-      </div>
+      <v-btn block color="green-accent-1" variant="flat" class="rounded-pill" @click="updateCalendarName"
+        :disabled="editedName.length === 0">
+        Cambiar nombre
+      </v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -48,11 +33,11 @@ export default {
           name: this.editedName,
         });
 
-        this.$emit("name-updated");
-        this.$emit("close-card");
+        this.$emit("updated");
         this.nameErrorMessages = [];
       }
     },
   },
+  emits: ["updated"]
 };
 </script>

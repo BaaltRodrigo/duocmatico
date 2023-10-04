@@ -3,9 +3,9 @@
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
     <v-row>
       <v-col cols="12" md="4">
-        <v-card @click="newCalendarForm = true" variant="flat" height="150px" class="rounded-lg"
-          style="border: 4px  lightgray; background-color: #FF9C72">
-          <v-container class="text-center text-white mt-4">
+        <v-card @click="newCalendarForm = true" variant="flat" height="150px" class="rounded-xl"
+          style="border: 4px dashed lightgray; background-color: transparent">
+          <v-container class="text-center mt-4">
             <v-icon size="7vh">mdi-plus</v-icon>
             <h3>Nuevo calendario</h3>
           </v-container>
@@ -14,21 +14,20 @@
     </v-row>
     <v-row>
       <v-col cols="12" md="4" v-for="(calendar, index) in localCalendars" :key="`calendar-${index}`">
-        <v-card height="150px" class="rounded-xl" style="background-color: #F0BD6A" @click="
-          $router.push({ name: 'calendars.show', params: { id: index } })
-          ">
+        <v-card height="150px" class="rounded-xl elevation-4" variant="outlined"
+          @click="$router.push({ name: 'calendars.show', params: { id: index } })">
           <v-card-title class="ml-2">{{ calendar.name }}</v-card-title>
           <v-card-subtitle class="ml-2 my-n2 text-capitalize">
             {{ `${calendar.carrera} - ${calendar.carga}`.toLowerCase() }}
           </v-card-subtitle>
           <v-card-actions class="float-end mt-8">
-            <v-btn icon v-on:click.stop.prevent=true>
+            <v-btn icon @click.stop.prevent=true>
               <v-icon>mdi-share-variant</v-icon>
             </v-btn>
-            <v-btn icon v-on:click.stop.prevent="calendarToDelete = calendar; deleteCalendar = true">
+            <v-btn icon @click.stop.prevent="calendarToDelete = calendar; deleteCalendar = true">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
-            <v-btn icon color="grey-lighten-5" variant="flat" v-on:click.stop.prevent="openEditCalendarNameCard(calendar)">
+            <v-btn icon color="grey-lighten-5" variant="flat" @click.stop.prevent="openEditCalendarNameCard(calendar)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </v-card-actions>
@@ -45,7 +44,7 @@
   </v-dialog>
 
   <v-dialog v-model="editCalendarName" max-width="480px" content-class="elevation-0" hide-overlay>
-    <DmEditCalendarName :calendar="calendarEditName" @name-updated="nameUpdated" @close-card="closeCard" />
+    <DmEditCalendarName :calendar="calendarEditName" @updated="nameUpdated" />
   </v-dialog>
 </template>
 
@@ -53,7 +52,7 @@
 import { mapState } from "vuex";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
-import DmEditCalendarName from "../components/calendar/DMEditCalendarName.vue";
+import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
 
 export default {
   name: "CalendarIndexView",
@@ -76,7 +75,7 @@ export default {
     calendarEditName() {
       return this.localCalendars.find((c) => c === this.calendarToEditName);
     },
-  },  
+  },
 
   methods: {
     openEditCalendarNameCard(calendar) {
@@ -84,9 +83,6 @@ export default {
       this.editCalendarName = true;
     },
     nameUpdated() {
-      this.editCalendarName = false;
-    },
-    closeCard() {
       this.editCalendarName = false;
     },
   },

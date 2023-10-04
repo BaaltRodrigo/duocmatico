@@ -1,14 +1,12 @@
 <template>
-  <v-card class="rounded-xl" variant="outlined" style="background-color: #FFF7EA">
-    <v-card-text class="text-subtitle-1">
+  <v-card class="rounded-xl">
+    <v-card-text>
       <v-alert class="rounded-lg" type="warning" variant="tonal" icon="mdi-alert-circle">
         ¿Estás seguro de que deseas eliminar este item?
       </v-alert>
-      <div class="d-flex justify-space-between mt-4">
-        <v-btn block color="#FF9C72" variant="flat" class="rounded-pill text-white" @click="confirmDelete">
-          Sí, eliminar este calendario
-        </v-btn>
-      </div>
+      <v-btn block color="error" variant="flat" class="rounded-pill  mt-3" @click="confirmDelete">
+        Sí, eliminar este calendario
+      </v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -21,12 +19,6 @@ export default {
 
   props: {
     calendar: Object,
-  },
-
-  data() {
-    return {
-      showDialog: true,
-    };
   },
 
   methods: {
