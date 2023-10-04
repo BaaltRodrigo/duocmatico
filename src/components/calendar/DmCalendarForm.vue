@@ -29,7 +29,14 @@
           item-title="name"
           item-value="id"
           variant="outlined"
-        ></v-autocomplete>
+        >
+          <template #item="{ props, item }">
+            <v-list-item v-bind="props">
+              <v-list-item-title class="text-capitalize" v-text="item.name">
+              </v-list-item-title>
+            </v-list-item>
+          </template>
+        </v-autocomplete>
       </v-form>
       <v-card-actions>
         <v-btn
@@ -79,7 +86,8 @@ export default {
     calendarableItems() {
       if (!this.academicCharge) return [];
 
-      console.log("Calendarable items changed");
+      console.log("Calendarable items changed", this.academicCharge);
+      console.log(this.academicCharge["careers"]);
       return this.academicCharge["careers"];
     },
   },
@@ -107,7 +115,6 @@ export default {
 
   methods: {
     ...mapActions("academicCharges", [
-      "setCargaAcademica",
       "getAcademicCharge",
       "getAcademicCharges",
       "setCarrera",
@@ -122,20 +129,20 @@ export default {
       this.calendarableLoading = false;
     },
 
-    async changeCarrera() {
-      await this.setCarrera(this.careerForm);
-    },
-
     async createCalendar() {
       await this.addCalendar({
         name: this.name,
-        carga: this.cargaForm,
-        carrera: this.careerForm,
+        description: "",
+        academic_charge_id: this.chargeId,
+        calendarable_id: this.calendarableId,
+        calendarable_type: this.calendarableType,
         sections: [],
       });
       this.$emit("created");
     },
   },
+
+  emits: ["created"],
 
   async mounted() {
     await this.getAcademicCharges();
