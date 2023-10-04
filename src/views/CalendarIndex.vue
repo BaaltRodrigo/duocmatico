@@ -12,7 +12,6 @@
         </v-card>
       </v-col>
     </v-row>
-    <!-- Get calendars from store and create a card for every one -->
     <v-row>
       <v-col cols="12" md="4" v-for="(calendar, index) in localCalendars" :key="`calendar-${index}`">
         <v-card height="150px" class="rounded-xl" style="background-color: #F0BD6A" @click="
@@ -29,7 +28,7 @@
             <v-btn icon v-on:click.stop.prevent="calendarToDelete = calendar; deleteCalendar = true">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
-            <v-btn icon color="grey-lighten-5" variant="flat" v-on:click.stop.prevent=true>
+            <v-btn icon color="grey-lighten-5" variant="flat" v-on:click.stop.prevent="openEditCalendarNameCard(calendar)">
               <v-icon>mdi-pencil</v-icon>
             </v-btn>
           </v-card-actions>
@@ -42,7 +41,11 @@
   </v-dialog>
 
   <v-dialog v-model="deleteCalendar" max-width="530px" content-class="elevation-0" hide-overlay>
-    <dm-delete-calendar @deleted="deleteCalendar" :calendar="calendarToDelete"></dm-delete-calendar>
+    <dm-delete-calendar @deleted-successfully="deleteCalendar = false" :calendar="calendarToDelete"></dm-delete-calendar>
+  </v-dialog>
+
+  <v-dialog v-model="editCalendarName" max-width="480px" content-class="elevation-0" hide-overlay>
+    <DmEditCalendarName :calendar="calendarEditName" @name-updated="nameUpdated" @close-card="closeCard" />
   </v-dialog>
 </template>
 
@@ -50,6 +53,7 @@
 import { mapState } from "vuex";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
+import DmEditCalendarName from "../components/calendar/DMEditCalendarName.vue";
 
 export default {
   name: "CalendarIndexView",
@@ -57,16 +61,35 @@ export default {
   components: {
     DmCalendarForm,
     DmDeleteCalendar,
-  },
-
-  computed: {
-    ...mapState("calendars", ["localCalendars"]),
+    DmEditCalendarName,
   },
 
   data: () => ({
     newCalendarForm: false,
-    deleteCalendar: null,
+    deleteCalendar: false,
+    editCalendarName: false,
+    calendarToEditName: null,
   }),
+
+  computed: {
+    ...mapState("calendars", ["localCalendars"]),
+    calendarEditName() {
+      return this.localCalendars.find((c) => c === this.calendarToEditName);
+    },
+  },  
+
+  methods: {
+    openEditCalendarNameCard(calendar) {
+      this.calendarToEditName = calendar;
+      this.editCalendarName = true;
+    },
+    nameUpdated() {
+      this.editCalendarName = false;
+    },
+    closeCard() {
+      this.editCalendarName = false;
+    },
+  },
 };
 </script>
 
