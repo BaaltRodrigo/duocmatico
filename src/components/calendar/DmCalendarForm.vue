@@ -1,8 +1,7 @@
 <template>
   <v-card
-    class="rounded-xl"
+    class="rounded-xl bg-white"
     variant="outlined"
-    style="background-color: #f5f5f5"
     title="Nuevo Calendario"
   >
     <v-card-text>
@@ -14,15 +13,21 @@
           label="Nombre del calendario"
         ></v-text-field>
         <v-autocomplete
-          v-model="cargaForm"
-          :items="cargasAcademicas"
-          label="Carga academica"
+          v-model="chargeId"
+          :items="academicCharges"
+          item-title="full_name"
+          item-value="id"
+          label="Carga Academica"
           variant="outlined"
-        ></v-autocomplete>
+        >
+        </v-autocomplete>
         <v-autocomplete
-          v-model="careerForm"
-          :items="carreras"
+          v-model="calendarableId"
+          :loading="calendarableLoading"
+          :items="calendarableItems"
           label="Carrera"
+          item-title="name"
+          item-value="id"
           variant="outlined"
         ></v-autocomplete>
       </v-form>
@@ -40,6 +45,18 @@
       </v-card-actions>
     </v-card-text>
   </v-card>
+  <!-- loading dialog to wait api response -->
+  <v-dialog v-model="calendarableLoading" persistent width="auto">
+    <v-card
+      class="rounded-lg bg-white text-center"
+      variant="outlined"
+      title="Obteniendo datos"
+    >
+      <v-card-text class="text-center">
+        <v-progress-circular indeterminate color="purple"></v-progress-circular>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>
@@ -49,37 +66,60 @@ export default {
   name: "DmCalendarForm",
 
   computed: {
-    ...mapState("academicCharges", ["cargasAcademicas", "carga", "carreras"]),
+    ...mapState("academicCharges", [
+      "academicCharges",
+      "academicCharge",
+      "carreras",
+    ]),
 
     isDisabled() {
-      return !(this.name && this.cargaForm && this.careerForm);
+      return !(this.name && this.chargeId && this.calendarableId);
+    },
+
+    calendarableItems() {
+      if (!this.academicCharge) return [];
+
+      console.log("Calendarable items changed");
+      return this.academicCharge["careers"];
     },
   },
 
   data: () => ({
     name: null,
-    cargaForm: null,
-    careerForm: null,
+    chargeId: null,
+    calendarableId: null,
+    calendarableType: "careers",
+    calendarableLoading: false, // Used to disable the autocomplete while loading
+    calendarableTypes: ["careers", "schools"],
   }),
 
   watch: {
-    cargaForm() {
-      this.changeCargaAcademica();
+    chargeId: {
+      immediate: true,
+      deep: true,
+      async handler(newValue) {
+        await this.$nextTick();
+        this.chargeId = newValue;
+        this.changeAcademicCharge();
+      },
     },
   },
 
   methods: {
     ...mapActions("academicCharges", [
       "setCargaAcademica",
-      "getCargasFromFirebase",
+      "getAcademicCharge",
+      "getAcademicCharges",
       "setCarrera",
     ]),
     ...mapActions("calendars", ["addCalendar"]),
 
-    async changeCargaAcademica() {
-      this.careerForm = null; // Esto ocurre siempre que cambia la carga academica
-      if (!this.cargaForm) return; // Carga academica es borrada -> no hago nada
-      await this.setCargaAcademica(this.cargaForm);
+    async changeAcademicCharge() {
+      if (!this.chargeId) return; // Academic charge is not selected
+      this.calendarableLoading = true;
+      this.calendarableId = null;
+      await this.getAcademicCharge(this.chargeId);
+      this.calendarableLoading = false;
     },
 
     async changeCarrera() {
@@ -98,7 +138,7 @@ export default {
   },
 
   async mounted() {
-    await this.getCargasFromFirebase();
+    await this.getAcademicCharges();
   },
 };
 </script>
