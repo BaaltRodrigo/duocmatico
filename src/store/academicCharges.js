@@ -1,24 +1,8 @@
-import { db } from "../config/firebase.js";
-import {
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  where,
-} from "firebase/firestore";
+import axios from "axios";
 
 const state = {
-  rootCollection: "cargas-academicas",
-  cargasAcademicas: [],
-  carga: null,
-  carreras: [],
-  carrera: null,
-  secciones: [],
+  academicCharges: [],
+  academicCharge: null,
 };
 
 const getters = {
@@ -44,12 +28,12 @@ const mutations = {
     state.secciones = [];
   },
 
-  setCargasAcademicas(state, cargas) {
-    state.cargasAcademicas = cargas;
+  setCharges(state, charges) {
+    state.academicCharges = charges;
   },
 
-  setCarga(state, carga) {
-    state.carga = carga;
+  setCharge(state, charge) {
+    state.academicCharge = charge;
   },
 
   setCarreras(state, carreras) {
@@ -74,12 +58,31 @@ const mutations = {
 };
 
 const actions = {
-  async getCargasFromFirebase({ commit }) {
-    const cargasRef = doc(db, "opciones", "cargas-disponibles");
-    const cargasDoc = await getDoc(cargasRef);
-    // console.log("Cargas disponibles:", cargasDoc.data());
-    commit("setCargasAcademicas", cargasDoc.data().cargas);
-    commit("addLogEvent", `Cargas academicas cargadas desde firebase`, {
+  async getAcademicCharges({ rootState, commit }) {
+    const request = {
+      url: `${rootState.apiUrl}/academic-charges`,
+      method: "GET",
+    };
+    const response = await axios(request);
+
+    console.log("Academi charges:", response.data.charges);
+    commit("setCharges", response.data.charges);
+    commit("addLogEvent", `Academic charges loaded from the API`, {
+      root: true,
+    });
+  },
+
+  async getAcademicCharge({ rootState, commit }, id) {
+    const request = {
+      url: `${rootState.apiUrl}/academic-charges/${id}`,
+      method: "GET",
+    };
+    const response = await axios(request);
+
+    console.log("Charge:", response.data);
+    commit("setCharge", response.data);
+    commit("setCarreras", response.data.careers);
+    commit("addLogEvent", `Academic charge loaded from the API`, {
       root: true,
     });
   },
@@ -217,7 +220,7 @@ const actions = {
 export default {
   namespaced: true,
   state,
-  getters,
+  // getters,
   actions,
   mutations,
 };
