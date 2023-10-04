@@ -18,11 +18,7 @@
         md="6"
         class="d-flex flex-column justify-center align-center order-1 order-md-2"
       >
-        <v-card
-          variant="outlined"
-          v-if="!emailSent"
-          class="mb-9 card-width bg-white"
-        >
+        <v-card variant="outlined" v-if="!emailSent" class="mb-9 card-width">
           <v-card-title class="text-center my-2">
             Recuperar contraseña
           </v-card-title>
@@ -39,7 +35,7 @@
             </v-alert>
           </v-card-text>
         </v-card>
-        <v-card variant="outlined" v-if="emailSent" class="card-width bg-white">
+        <v-card variant="outlined" v-if="emailSent" class="card-width">
           <v-card-item>
             <v-img :src="emailSentImage" height="200"></v-img>
             <v-card-text>

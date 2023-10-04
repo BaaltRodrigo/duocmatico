@@ -6,19 +6,15 @@
         md="6"
         class="d-flex flex-column justify-center align-center"
       >
-        <v-card variant="outlined" class="mb-9 card-width bg-white">
+        <v-card variant="outlined" class="mb-9 card-width">
           <v-card-title class="text-center my-2"> Registrarse </v-card-title>
           <v-card-text>
             <auth-providers buttonText="Registrar con Google" />
             <v-container class="text-center">O también</v-container>
             <registration-form />
-            <terms-and-privacy-message class="mt-2" />
           </v-card-text>
         </v-card>
-        <v-card
-          variant="outlined"
-          class="text-center rounded-lg bg-white card-width"
-        >
+        <v-card variant="outlined" class="text-center rounded-lg card-width">
           <v-card-text>
             ¿Ya tienes cuenta?
             <v-btn
@@ -44,7 +40,6 @@
 <script>
 import AuthProviders from "../../components/auth/Providers.vue";
 import RegistrationForm from "../../components/auth/RegistrationForm.vue";
-import TermsAndPrivacyMessage from "../../components/auth/TermsAndPrivacyMessage.vue";
 import registrationImage from "../../assets/images/registration.svg";
 
 export default {
@@ -52,7 +47,6 @@ export default {
   components: {
     AuthProviders,
     RegistrationForm,
-    TermsAndPrivacyMessage,
   },
   data() {
     return {
