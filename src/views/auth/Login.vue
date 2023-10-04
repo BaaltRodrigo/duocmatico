@@ -39,7 +39,7 @@
       </v-col>
       <v-col cols="12" md="6" class="d-flex justify-center align-center">
         <div class="aspect-ratio">
-          <img :src="loginImage" alt="Descripción del SVG" />
+          <img :src="loginImage" alt="login image" />
         </div>
       </v-col>
     </v-row>

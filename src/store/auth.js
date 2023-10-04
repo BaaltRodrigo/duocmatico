@@ -43,30 +43,6 @@ const actions = {
     commit("setUser", user);
   },
 
-  async updateFirebaseUser({ commit }, user) {
-    const userRef = doc(db, "users", user.uid);
-
-    // Obtienes userDoc aquí
-    const userDoc = await getDoc(userRef);
-
-    if (!userDoc.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-      });
-      user.photoURL = user.photoURL;
-    } else {
-      await updateDoc(userRef, {
-        name: user.displayName,
-        email: user.email,
-        photoURL: user.photoURL,
-      });
-      user.photoURL = user.photoURL;
-    }
-    commit("setUser", user);
-  },
-
   async loginWhitGoogle({ commit, dispatch }) {
     try {
       const provider = new GoogleAuthProvider();
@@ -75,7 +51,6 @@ const actions = {
       const response = await signInWithPopup(auth, provider);
       console.log(response.user);
       commit("setUser", response.user);
-      dispatch("updateFirebaseUser", response.user);
     } catch (error) {
       console.log(error);
     }
@@ -92,7 +67,6 @@ const actions = {
       );
       console.log(userCredential.user);
       commit("setUser", userCredential.user);
-      dispatch("updateFirebaseUser", userCredential.user);
     } catch (error) {
       console.error(error);
     }
@@ -117,7 +91,6 @@ const actions = {
       password
     );
     commit("setUser", userCredential.user);
-    dispatch("updateFirebaseUser", userCredential.user);
   },
   async requestPasswordReset({ commit }, email) {
     try {
