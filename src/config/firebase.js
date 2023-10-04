@@ -10,7 +10,7 @@ import { getAuth } from "firebase/auth";
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIRESTORE_API_KEY,
-  authDomain: import.meta.env.VITE_FIRESTORE_AUTHDOMAIN,
+  authDomain: import.meta.env.VITE_FIRESTORE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIRESTORE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIRESTORE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIRESTORE_MESSAGING_SENDER,
