@@ -21,11 +21,16 @@
           variant="outlined"
         >
         </v-autocomplete>
+        <!-- combobox to select career or school -->
+        <v-radio-group inline v-model="calendarableType">
+          <v-radio label="Carreras" value="career"></v-radio>
+          <v-radio class="mx-auto" label="Escuelas" value="school"></v-radio>
+        </v-radio-group>
         <v-autocomplete
           v-model="calendarableId"
           :loading="calendarableLoading"
           :items="calendarableItems"
-          label="Carrera"
+          :label="calendarableType === 'career' ? 'Carrera' : 'Escuela'"
           item-title="name"
           item-value="id"
           variant="outlined"
@@ -39,8 +44,14 @@
         </v-autocomplete>
       </v-form>
       <v-card-actions>
-        <v-btn :disabled="isDisabled" block color="green-accent-1" variant="flat" class="rounded-pill text-white"
-          @click="createCalendar">
+        <v-btn
+          :disabled="isDisabled"
+          block
+          color="green-accent-1"
+          variant="flat"
+          class="rounded-pill text-white"
+          @click="createCalendar"
+        >
           Empieza a armar tu horario!
         </v-btn>
       </v-card-actions>
@@ -78,11 +89,12 @@ export default {
     },
 
     calendarableItems() {
+      // Empty charge returns empty array to not break the autocomplete
       if (!this.academicCharge) return [];
 
-      console.log("Calendarable items changed", this.academicCharge);
-      console.log(this.academicCharge["careers"]);
-      return this.academicCharge["careers"];
+      // We search the calendarable type in plural.
+      // As the API uses singular model names for the morph relationship
+      return this.academicCharge[this.calendarableType + "s"];
     },
   },
 
@@ -90,9 +102,8 @@ export default {
     name: null,
     chargeId: null,
     calendarableId: null,
-    calendarableType: "careers",
+    calendarableType: "career",
     calendarableLoading: false, // Used to disable the autocomplete while loading
-    calendarableTypes: ["careers", "schools"],
   }),
 
   watch: {
@@ -116,18 +127,26 @@ export default {
     ...mapActions("calendars", ["addCalendar"]),
 
     async changeAcademicCharge() {
-      if (!this.chargeId) return; // Academic charge is not selected
+      if (!this.chargeId) return; // Academic charge is not selected or not modified
+
       this.calendarableLoading = true;
       this.calendarableId = null;
+
       await this.getAcademicCharge(this.chargeId);
       this.calendarableLoading = false;
     },
 
     async createCalendar() {
+      const calendarable = this.calendarableItems.find(
+        (c) => c.id === this.calendarableId
+      );
+
       await this.addCalendar({
         name: this.name,
         description: "",
         academic_charge_id: this.chargeId,
+        academicCharge: this.academicCharge,
+        calendarable: calendarable,
         calendarable_id: this.calendarableId,
         calendarable_type: this.calendarableType,
         sections: [],
