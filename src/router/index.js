@@ -18,7 +18,7 @@ const routes = [
     component: CalendarIndex,
   },
   {
-    path: "/c/:id",
+    path: "/c/:uuid",
     name: "calendars.show",
     component: () => import("../views/CalendarShow.vue"),
     beforeEnter: [checkIfCalendarIndexExists],
