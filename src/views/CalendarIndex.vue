@@ -21,15 +21,18 @@
       <v-col
         cols="12"
         md="4"
-        v-for="(calendar, index) in localCalendars"
-        :key="`calendar-${index}`"
+        v-for="calendar in localCalendars"
+        :key="`calendar-${calendar.uuid}`"
       >
         <v-card
           height="150px"
           class="rounded-xl elevation-4"
           variant="outlined"
           @click="
-            $router.push({ name: 'calendars.show', params: { id: index } })
+            $router.push({
+              name: 'calendars.show',
+              params: { uuid: calendar.uuid },
+            })
           "
         >
           <v-card-title class="ml-2">{{ calendar.name }}</v-card-title>
