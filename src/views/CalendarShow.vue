@@ -112,7 +112,7 @@ export default {
         .filter((h) => h.horario != "0:00:00 - 0:00:00") // Deleting non valid schedules
         .map((schedule) => {
           // const { start, end } = this.getScheduleCalendarEvents(schedule);
-          // For some reason, there is no need to substract the timezone offset
+          // For some reason, there is no need to subtract the timezone offset
           // start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
           // end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
           return {
