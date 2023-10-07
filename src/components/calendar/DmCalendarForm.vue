@@ -43,18 +43,16 @@
           </template>
         </v-autocomplete>
       </v-form>
-      <v-card-actions>
-        <v-btn
-          :disabled="isDisabled"
-          block
-          color="green-accent-1"
-          variant="flat"
-          class="rounded-pill text-white"
-          @click="createCalendar"
-        >
-          Empieza a armar tu horario!
-        </v-btn>
-      </v-card-actions>
+      <v-btn
+        :disabled="isDisabled"
+        block
+        :variant="isDisabled ? 'text' : 'elevated'"
+        color="green-accent-1"
+        class="rounded-pill text-none mb-2"
+        @click="createCalendar"
+      >
+        Empieza a armar tu horario!
+      </v-btn>
     </v-card-text>
   </v-card>
   <!-- loading dialog to wait api response -->
@@ -78,11 +76,7 @@ export default {
   name: "DmCalendarForm",
 
   computed: {
-    ...mapState("academicCharges", [
-      "academicCharges",
-      "academicCharge",
-      "carreras",
-    ]),
+    ...mapState("academicCharges", ["academicCharges", "academicCharge"]),
 
     isDisabled() {
       return !(this.name && this.chargeId && this.calendarableId);
@@ -122,7 +116,6 @@ export default {
     ...mapActions("academicCharges", [
       "getAcademicCharge",
       "getAcademicCharges",
-      "setCarrera",
     ]),
     ...mapActions("calendars", ["addCalendar"]),
 
