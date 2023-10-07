@@ -5,6 +5,7 @@ import calendarModule from "./calendars";
 
 const state = {
   eventLog: [],
+  apiUrl: import.meta.env.VITE_API_URL,
 };
 
 const mutations = {
