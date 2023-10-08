@@ -4,6 +4,7 @@ import CalendarIndex from "../views/CalendarIndex.vue";
 // Middlewares
 import checkIfCalendarIndexExists from "./middlewares/checkCalendarExists";
 import onlyGuests from "./middlewares/onlyGuests";
+import store from "../store";
 
 const routes = [
   {
@@ -49,6 +50,16 @@ const routes = [
     component: () => import("../views/errors/NotFound.vue"),
   },
 ];
+
+// Add middleware to all routes to set the 404 state to false
+// before each route change
+routes.forEach((route) => {
+  route.beforeEnter = (to, from, next) => {
+    // console.log("Setting 404 to false");
+    store.commit("set404", false);
+    next();
+  };
+});
 
 const router = createRouter({
   history: createWebHistory(),
