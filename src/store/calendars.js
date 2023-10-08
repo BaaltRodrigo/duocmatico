@@ -119,28 +119,28 @@ const actions = {
     }
   },
 
-  async createCalendar({ dispatch, rootState }, calendar) {
+  async createCalendar({ dispatch, commit, rootState }, calendar) {
     const { token } = rootState.auth;
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addCalendar", { uuid: uuidv4(), ...calendar });
+      commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
       dispatch("saveLocalCalendars");
       return calendar;
-    }
-
-    try {
-      const response = await axios.post(
-        `${rootState.apiUrl}/calendars`,
-        calendar,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      console.error(error);
+    } else {
+      try {
+        const response = await axios.post(
+          `${rootState.apiUrl}/calendars`,
+          calendar,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
     }
   },
 
