@@ -27,6 +27,7 @@
         <v-card
           class="rounded-xl elevation-4"
           variant="outlined"
+          height="100%"
           @click="
             $router.push({
               name: 'calendars.show',
@@ -54,7 +55,7 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <v-card-text class="d-flex justify-space-between">
+          <v-card-text class="d-flex justify-space-between align-end">
             <v-btn
               class="elevation-2"
               size="small"
