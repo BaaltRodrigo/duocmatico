@@ -169,10 +169,6 @@ export default {
     },
   },
 
-  mounted() {
-    console.log("Calendario:", this.calendar);
-  },
-
   /**
    * Here we check everything we need to show the calendar
    * If something is missing, we get it from the API
