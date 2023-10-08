@@ -134,11 +134,12 @@ export default {
         (c) => c.id === this.calendarableId
       );
 
+      // This calendar object is using the API name convention
       await this.createCalendar({
         name: this.name,
         description: "",
         academic_charge_id: this.chargeId,
-        academicCharge: this.academicCharge,
+        academic_charge: this.academicCharge,
         calendarable: calendarable,
         calendarable_id: this.calendarableId,
         calendarable_type: this.calendarableType,
