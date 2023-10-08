@@ -182,19 +182,16 @@ export default {
     const { uuid } = this.$route.params;
 
     // Calendar is inside local calendars, use that one
-    console.log("Getting calendar from LocalStorage");
     await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
     if (this.calendar) return;
 
     // Calendar is inside API calendars, use that one
-    console.log("Getting calendar from API");
     await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
     if (this.calendar) return;
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);
     this.$store.commit("set404", true);
-    console.log("Calendar not found");
   },
 };
 </script>
