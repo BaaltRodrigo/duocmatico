@@ -14,7 +14,6 @@ import { auth } from "../config/firebase";
 const state = {
   user: null,
   token: null,
-  loggedIn: false,
 };
 
 const getters = {
@@ -26,7 +25,6 @@ const getters = {
 const mutations = {
   setUser(state, user) {
     state.user = user;
-    state.loggedIn = !!user;
   },
 
   setToken(state, token) {
