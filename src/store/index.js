@@ -6,6 +6,7 @@ import calendarModule from "./calendars";
 const state = {
   eventLog: [],
   apiUrl: import.meta.env.VITE_API_URL,
+  show404: false,
 };
 
 const mutations = {
@@ -13,6 +14,10 @@ const mutations = {
     const eventDate = new Date();
     state.eventLog.push(`[${eventDate.toISOString()}] ${event}`);
     // console.log(state.eventLog);
+  },
+
+  set404(state, value) {
+    state.show404 = value;
   },
 };
 
