@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <the-header></the-header>
-    <dm-section-selector-nav></dm-section-selector-nav>
+    <!-- <dm-section-selector-nav></dm-section-selector-nav> -->
     <v-main>
       <router-view></router-view>
     </v-main>
@@ -40,7 +40,7 @@ export default {
 <style>
 /* Set de background color in all views */
 .my-app {
-  background-color: #FFF7EA;
+  background-color: #fff7ea;
 }
 
 /* Set the style for the entire scrollbar */
