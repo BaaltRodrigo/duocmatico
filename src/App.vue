@@ -3,15 +3,18 @@
     <the-header></the-header>
     <!-- <dm-section-selector-nav></dm-section-selector-nav> -->
     <v-main>
-      <router-view></router-view>
+      <not-found v-if="show404" />
+      <router-view v-else></router-view>
     </v-main>
   </v-app>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import { useDisplay } from "vuetify";
 import TheHeader from "./components/TheHeader.vue";
 import DmSectionSelectorNav from "./components/sections/DmSectionSelectorNav.vue";
+import NotFound from "./views/errors/NotFound.vue";
 
 export default {
   name: "App",
@@ -19,6 +22,11 @@ export default {
   components: {
     DmSectionSelectorNav,
     TheHeader,
+    NotFound,
+  },
+
+  computed: {
+    ...mapState(["show404"]),
   },
 
   provide() {
