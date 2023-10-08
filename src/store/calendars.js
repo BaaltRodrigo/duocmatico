@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import axios from "axios";
 
 /**
  * Calendars follow the following structure:
@@ -12,8 +13,9 @@ import { v4 as uuidv4 } from "uuid";
 
 const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
+  apiCalendars: [],
   sectionsSidebar: false, // Used to toggle the sections sidebar in the calendar editor
-  selectedCalendar: null,
+  calendar: null,
 };
 
 const mutations = {
@@ -25,17 +27,21 @@ const mutations = {
     state.localCalendars = calendars;
   },
 
-  setSelectedCalendar(state, calendar) {
-    state.selectedCalendar = calendar;
+  setApiCalendars(state, calendars) {
+    state.apiCalendars = calendars;
+  },
+
+  setCalendar(state, calendar) {
+    state.calendar = calendar;
   },
 
   addCalendar(state, calendar) {
     state.localCalendars.push(calendar);
   },
 
-  removeCalendar(state, calendar) {
+  removeLocalCalendar(state, calendar) {
     state.localCalendars = state.localCalendars.filter(
-      (c) => c.id !== calendar.id
+      (c) => c.uid !== calendar.uid
     );
   },
 
@@ -57,7 +63,7 @@ const actions = {
    */
   async addUuidToCalendars({ state, dispatch }) {
     const calendars = state.localCalendars.map((calendar) => {
-      return calendar.uuid ? calendar : { id: uuidv4(), ...calendar };
+      return calendar.uuid ? calendar : { uuid: uuidv4(), ...calendar };
     });
     dispatch("setLocalCalendars", calendars);
   },
@@ -88,18 +94,60 @@ const actions = {
 
   async addCalendar({ commit, dispatch }, calendar) {
     // adds uuid to calendar
-    commit("addCalendar", { id: uuidv4(), ...calendar });
+    commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
 
-  async removeCalendar({ commit, dispatch }, calendar) {
-    commit("removeCalendar", calendar);
+  /**
+   * Used to get the current user calendars from the API
+   */
+  async getApiCalendars({ rootState, commit }) {
+    try {
+      const { token } = rootState.auth;
+      const response = await axios.get(`${rootState.apiUrl}/calendars`, {
+        headers: {
+          Authorization: `Bearer ` + token,
+        },
+      });
+      commit("setApiCalendars", response.data);
+    } catch (error) {
+      return;
+    }
+  },
+
+  /**
+   * This function is a general way to delete calendars. It first
+   * check if the calendar is inside the local calendars.
+   * We always check inside the API because the user could have
+   * deleted the calendar from the API.
+   */
+  async deleteCalendar({ commit, dispatch, rootState }, calendar) {
+    // Remove it from local calendars does not affect if it's on API
+    commit("removeLocalCalendar", calendar);
     dispatch("saveLocalCalendars");
+
+    try {
+      // Delete if from the api
+      const { token } = rootState.auth;
+      await axios.delete(`${state.apiUrl}/calendars/${calendar.uid}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // If there is an error, the calendar does not exists on API
+      // or it's not owned by the user, so we can safely ignore it
+    }
   },
 
   async updateCalendar({ commit, dispatch }, calendar) {
     commit("updateCalendar", calendar);
     dispatch("saveLocalCalendars");
+  },
+
+  async getLocalCalendarByUuid({ state, commit }, uuid) {
+    const calendar = state.localCalendars.find((c) => c.uuid === uuid);
+    commit("setCalendar", calendar);
   },
 
   async selectCalendarByIndex({ state, commit, dispatch, rootState }, index) {
