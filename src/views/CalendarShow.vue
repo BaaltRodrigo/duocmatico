@@ -1,6 +1,6 @@
 <template>
-  <v-container>
-    <h4 class="text-h4 mb-2">{{ selectedCalendar.name }}</h4>
+  <v-container v-if="calendar">
+    <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
 
     <v-card class="rounded-xl elevation-0" variant="outlined" height="70vh">
       <vue-cal
@@ -39,7 +39,7 @@
       variant="outlined"
       class="rounded-pill text-capitalize"
       color="primary"
-      @click="openSectionsSidebar()"
+      @click="handleGetSections()"
     >
       Agregar secciones
     </v-btn>
@@ -66,7 +66,7 @@ export default {
   },
 
   computed: {
-    ...mapState("calendars", ["selectedCalendar"]),
+    ...mapState("calendars", ["calendar"]),
     ...mapState("academicCharges", ["secciones"]),
     ...mapGetters("academicCharges", ["sectionsGroupedByCourse"]),
 
@@ -81,17 +81,19 @@ export default {
   },
 
   data: () => ({
+    loaded: false,
     sectionInformation: false,
     section: null,
   }),
 
   methods: {
-    openSectionsSidebar() {
-      if (this.secciones.length === 0) {
-        // Only getting sections from firebase if sections array is empty
-        this.$store.dispatch("academicCharges/getSectionsFromFirebase");
-      }
-      this.$store.dispatch("calendars/toggleSectionsSidebar");
+    // An example of how to get sections
+    handleGetSections() {
+      this.$store.dispatch("academicCharges/getSections", {
+        academicChargeId: this.calendar.academic_charge_id,
+        calendarableType: this.calendar.calendarable_type,
+        calendarableId: this.calendar.calendarable_id,
+      });
     },
 
     openSectionInformation(sectionId) {
@@ -102,7 +104,7 @@ export default {
     },
 
     getCalendarEvents() {
-      const { sections } = this.selectedCalendar;
+      const { sections } = this.calendar;
       return sections.map((section) => this.getSectionEvents(section)).flat();
     },
 
@@ -167,22 +169,25 @@ export default {
     },
   },
 
-  mounted() {
-    console.log("Calendario:", this.selectedCalendar);
-    console.log("Eventos", this.calendarEvents);
-  },
-
+  /**
+   * Here we check everything we need to show the calendar
+   * If something is missing, we get it from the API
+   * If something is missing on the API, we show an error
+   */
   async created() {
-    // set calendar from param id in url to store
-    // set a calendar with this action also set academic charges and career into store
-    await this.$store.dispatch(
-      "calendars/selectCalendarByIndex",
-      this.$route.params.id
-    );
-  },
+    const { uuid } = this.$route.params;
 
-  async beforeUnmount() {
-    await this.$store.dispatch("calendars/setSectionsSidebar", false);
+    // Calendar is inside local calendars, use that one
+    await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
+    if (this.calendar) return;
+
+    // Calendar is inside API calendars, use that one
+    await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
+    if (this.calendar) return;
+
+    // Calendar is not in local or API calendars, show error
+    this.$store.commit("calendars/setCalendar", null);
+    this.$store.commit("set404", true);
   },
 };
 </script>

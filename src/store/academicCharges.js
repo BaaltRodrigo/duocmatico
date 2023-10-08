@@ -3,20 +3,20 @@ import axios from "axios";
 const state = {
   academicCharges: [],
   academicCharge: null,
+  sections: [],
 };
 
 const mutations = {
-  clearState(state) {
-    state.academicCharges = [];
-    state.academicCharge = null;
-  },
-
   setCharges(state, charges) {
     state.academicCharges = charges;
   },
 
   setCharge(state, charge) {
     state.academicCharge = charge;
+  },
+
+  setSections(state, sections) {
+    state.sections = sections;
   },
 };
 
@@ -37,6 +37,40 @@ const actions = {
 
     commit("setCharge", response.data);
     commit("addLogEvent", `Academic charge loaded from the API`, {
+      root: true,
+    });
+  },
+
+  /**
+   * This action is used when we want to add sections to a calendar.
+   * Use it wisely, as this action will fetch plenty of data from the API.
+   *
+   * payload must contain:
+   * - academicChargeId
+   * - calendarableId
+   * - calendarableType
+   */
+  async getSections({ rootState, commit }, payload) {
+    const { academicChargeId, calendarableId, calendarableType } = payload;
+    if (!(academicChargeId && calendarableId && calendarableType)) {
+      // Early exist for missing params
+      commit("addLogEvent", `Missing params for getSections`, {
+        root: true,
+      });
+      commit("set404", true, { root: true });
+      return;
+    }
+
+    const route = `${rootState.apiUrl}/academic-charges/${academicChargeId}/sections`;
+    const response = await axios.get(route, {
+      params: {
+        resource_id: calendarableId,
+        resource_type: calendarableType,
+      },
+    });
+
+    commit("setSections", response.data);
+    commit("addLogEvent", `Sections loaded from the API`, {
       root: true,
     });
   },

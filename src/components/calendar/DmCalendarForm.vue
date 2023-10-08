@@ -15,10 +15,10 @@
         <v-autocomplete
           v-model="chargeId"
           :items="academicCharges"
-          item-title="full_name"
           item-value="id"
           label="Carga Academica"
           variant="outlined"
+          :item-title="(item) => `${item.season} ${item.name}`"
         >
         </v-autocomplete>
         <!-- combobox to select career or school -->
@@ -49,7 +49,7 @@
         :variant="isDisabled ? 'text' : 'elevated'"
         color="green-accent-1"
         class="rounded-pill text-none mb-2"
-        @click="createCalendar"
+        @click="handleSubmit"
       >
         Empieza a armar tu horario!
       </v-btn>
@@ -117,7 +117,7 @@ export default {
       "getAcademicCharge",
       "getAcademicCharges",
     ]),
-    ...mapActions("calendars", ["addCalendar"]),
+    ...mapActions("calendars", ["createCalendar"]),
 
     async changeAcademicCharge() {
       if (!this.chargeId) return; // Academic charge is not selected or not modified
@@ -129,16 +129,17 @@ export default {
       this.calendarableLoading = false;
     },
 
-    async createCalendar() {
+    async handleSubmit() {
       const calendarable = this.calendarableItems.find(
         (c) => c.id === this.calendarableId
       );
 
-      await this.addCalendar({
+      // This calendar object is using the API name convention
+      await this.createCalendar({
         name: this.name,
         description: "",
         academic_charge_id: this.chargeId,
-        academicCharge: this.academicCharge,
+        academic_charge: this.academicCharge,
         calendarable: calendarable,
         calendarable_id: this.calendarableId,
         calendarable_type: this.calendarableType,
