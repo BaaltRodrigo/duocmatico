@@ -144,10 +144,12 @@ export default {
   }),
 
   computed: {
-    ...mapState("calendars", ["localCalendars", "apiCalendars"]),
+    ...mapState("calendars", ["localCalendars", "apiCalendars", "calendar"]),
     ...mapState("auth", ["token"]),
+
     calendarEditName() {
-      return this.localCalendars.find((c) => c === this.calendarToEditName);
+      const allCalendars = [...this.localCalendars, ...this.apiCalendars];
+      return allCalendars.find((c) => c.uuid === this.calendarToEditName.uuid);
     },
   },
 
@@ -159,6 +161,7 @@ export default {
 
     nameUpdated() {
       this.editCalendarName = false;
+      this.$store.dispatch("calendars/getApiCalendars");
     },
 
     handleCreated() {
