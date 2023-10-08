@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/Home.vue";
 import CalendarIndex from "../views/CalendarIndex.vue";
 // Middlewares
-import checkIfCalendarIndexExists from "./middlewares/checkCalendarExists";
 import onlyGuests from "./middlewares/onlyGuests";
 import store from "../store";
 
@@ -22,7 +21,6 @@ const routes = [
     path: "/c/:uuid",
     name: "calendars.show",
     component: () => import("../views/CalendarShow.vue"),
-    beforeEnter: [checkIfCalendarIndexExists],
   },
   {
     path: "/login",
