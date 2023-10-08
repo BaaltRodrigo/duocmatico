@@ -1,28 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
-/**
- * Calendars follow the following structure:
- * {
- *  name: "My calendar",
- *  carga: "An academic load",
- *  career: "A career",
- *  sections: [] // An array of sections
- * }
- */
-
 const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
   apiCalendars: [],
-  sectionsSidebar: false, // Used to toggle the sections sidebar in the calendar editor
   calendar: null,
 };
 
 const mutations = {
-  setSectionsSidebar(state, value) {
-    state.sectionsSidebar = value;
-  },
-
   setLocalCalendars(state, calendars) {
     state.localCalendars = calendars;
   },
@@ -35,23 +20,19 @@ const mutations = {
     state.calendar = calendar;
   },
 
-  addCalendar(state, calendar) {
+  addLocalCalendar(state, calendar) {
     state.localCalendars.push(calendar);
   },
 
   removeLocalCalendar(state, calendar) {
     state.localCalendars = state.localCalendars.filter(
-      (c) => c.uid !== calendar.uid
+      (c) => c.uuid !== calendar.uuid
     );
   },
 
-  updateCalendar(state, calendar) {
+  updateLocalCalendar(state, calendar) {
     const index = state.localCalendars.findIndex((c) => c.id === calendar.id);
     state.localCalendars.splice(index, 1, calendar);
-  },
-
-  addSection(state, section) {
-    state.selectedCalendar.sections.push(section);
   },
 };
 
@@ -83,15 +64,6 @@ const actions = {
     dispatch("saveLocalCalendars");
   },
 
-  async toggleSectionsSidebar({ commit, state }) {
-    commit("setSectionsSidebar", !state.sectionsSidebar);
-  },
-
-  // There are cases when the sections sidebar needs to be closed by default
-  async setSectionsSidebar({ commit }, value) {
-    commit("setSectionsSidebar", value);
-  },
-
   async addCalendar({ commit, dispatch }, calendar) {
     // adds uuid to calendar
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
@@ -109,9 +81,15 @@ const actions = {
           Authorization: `Bearer ` + token,
         },
       });
-      commit("setApiCalendars", response.data);
+
+      const calendars = response.data.map((calendar) => {
+        return { ...calendar, fromApi: true };
+      });
+
+      commit("setApiCalendars", calendars);
       return response.data;
     } catch (error) {
+      console.log(error);
       return null;
     }
   },
@@ -141,6 +119,31 @@ const actions = {
     }
   },
 
+  async createCalendar({ state, dispatch, rootState }, calendar) {
+    const { token } = rootState.auth;
+    // Create Local Calendar when token is null
+    if (!token) {
+      commit("addCalendar", { uuid: uuidv4(), ...calendar });
+      dispatch("saveLocalCalendars");
+      return calendar;
+    }
+
+    try {
+      const response = await axios.post(
+        `${rootState.apiUrl}/calendars`,
+        calendar,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  },
+
   async updateCalendar({ commit, dispatch }, calendar) {
     commit("updateCalendar", calendar);
     dispatch("saveLocalCalendars");
@@ -158,34 +161,19 @@ const actions = {
   async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
     try {
       const { token } = rootState.auth;
-      const response = await axios.get(`${state.apiUrl}/calendars/${uuid}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.get(
+        `${rootState.apiUrl}/calendars/${uuid}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(response.data);
       commit("setCalendar", response.data);
       return response.data;
     } catch (error) {
       return null;
-    }
-  },
-
-  async selectCalendarByIndex({ state, commit, dispatch, rootState }, index) {
-    const calendar = state.localCalendars[index];
-    commit("setSelectedCalendar", calendar);
-    // check if sections needs to be cleaned
-    const { carga, carrera } = calendar;
-    const academicChargeState = rootState.academicCharges;
-    const fetchSections =
-      carga != academicChargeState.carga ||
-      carrera != academicChargeState.carrera;
-
-    commit("academicCharges/setCarga", calendar.carga, { root: true });
-    commit("academicCharges/setCarrera", calendar.carrera, { root: true });
-    if (fetchSections) {
-      await dispatch("academicCharges/getSectionsFromFirebase", null, {
-        root: true,
-      });
     }
   },
 
