@@ -122,6 +122,7 @@ export default {
 
   computed: {
     ...mapState("calendars", ["localCalendars"]),
+    ...mapState("auth", ["loggedUser"]),
     calendarEditName() {
       return this.localCalendars.find((c) => c === this.calendarToEditName);
     },
@@ -135,6 +136,12 @@ export default {
     nameUpdated() {
       this.editCalendarName = false;
     },
+  },
+
+  created() {
+    if (!this.loggedUser) return;
+
+    this.$store.dispatch("calendars/getApiCalendars");
   },
 };
 </script>
