@@ -110,8 +110,9 @@ const actions = {
         },
       });
       commit("setApiCalendars", response.data);
+      return response.data;
     } catch (error) {
-      return;
+      return null;
     }
   },
 
@@ -148,6 +149,25 @@ const actions = {
   async getLocalCalendarByUuid({ state, commit }, uuid) {
     const calendar = state.localCalendars.find((c) => c.uuid === uuid);
     commit("setCalendar", calendar);
+  },
+
+  /**
+   * Fetch a calendar from the API by its uuid
+   * If the calendar is not found, it returns null
+   */
+  async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
+    try {
+      const { token } = rootState.auth;
+      const response = await axios.get(`${state.apiUrl}/calendars/${uuid}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      commit("setCalendar", response.data);
+      return response.data;
+    } catch (error) {
+      return null;
+    }
   },
 
   async selectCalendarByIndex({ state, commit, dispatch, rootState }, index) {
