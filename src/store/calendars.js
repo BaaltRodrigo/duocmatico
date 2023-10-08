@@ -108,7 +108,7 @@ const actions = {
     try {
       // Delete if from the api
       const { token } = rootState.auth;
-      await axios.delete(`${state.apiUrl}/calendars/${calendar.uid}`, {
+      await axios.delete(`${rootState.apiUrl}/calendars/${calendar.uuid}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
