@@ -1,10 +1,21 @@
 <template>
   <v-card class="rounded-xl">
     <v-card-text>
-      <v-alert class="rounded-lg" type="warning" variant="tonal" icon="mdi-alert-circle">
+      <v-alert
+        class="rounded-lg"
+        type="warning"
+        variant="tonal"
+        icon="mdi-alert-circle"
+      >
         ¿Estás seguro de que deseas eliminar este item?
       </v-alert>
-      <v-btn block color="error" variant="flat" class="rounded-pill  mt-3" @click="confirmDelete">
+      <v-btn
+        block
+        color="error"
+        variant="flat"
+        class="rounded-pill mt-3"
+        @click="confirmDelete"
+      >
         Sí, eliminar este calendario
       </v-btn>
     </v-card-text>
@@ -22,10 +33,10 @@ export default {
   },
 
   methods: {
-    ...mapActions("calendars", ["removeCalendar"]),
+    ...mapActions("calendars", ["deleteCalendar"]),
     confirmDelete() {
       if (this.calendar) {
-        this.removeCalendar(this.calendar).then(() => {
+        this.deleteCalendar(this.calendar).then(() => {
           this.$emit("deleted-successfully");
         });
       }
