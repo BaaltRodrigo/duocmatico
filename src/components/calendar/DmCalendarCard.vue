@@ -1,10 +1,10 @@
 <template>
   <v-card
-    :variant="selected ? 'tonal' : 'outlined'"
+    variant="outlined"
     class="rounded-xl pl-2 py-1 elevation-4"
     :ripple="false"
-    :color="selected ? 'primary' : 'black'"
-    @click="me"
+    color="black"
+    @click="$emit('show', calendar)"
   >
     <v-list-item class="text-black">
       <v-list-item-title class="font-weight-bold">
@@ -21,9 +21,33 @@
       </template>
       <!-- Item options action -->
       <template #append>
-        <v-btn variant="text" icon @click.stop.prevent="true">
-          <v-icon size="large">mdi-dots-vertical</v-icon>
-        </v-btn>
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn
+              variant="text"
+              v-bind="props"
+              icon
+              @click.stop.prevent="true"
+            >
+              <v-icon size="large">mdi-dots-vertical</v-icon>
+            </v-btn>
+          </template>
+          <v-card variant="outlined" class="rounded-lg">
+            <v-list density="compact">
+              <v-list-item
+                v-for="item in menuOptions"
+                :key="item.id"
+                @click="$emit(item.event, calendar)"
+                :class="item.color ? `text-${item.color}` : ''"
+              >
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <template v-slot:prepend>
+                  <v-icon :icon="item.icon"></v-icon>
+                </template>
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
       </template>
     </v-list-item>
   </v-card>
@@ -45,7 +69,30 @@ export default {
     },
   },
 
+  data: () => ({
+    menuItems: [
+      { title: "Ver calendario", icon: "mdi-eye", event: "show" },
+      { title: "Cambiar nombre", icon: "mdi-pencil", event: "rename" },
+      // { title: "Compartir", icon: "mdi-share-variant", event: "share" },
+      // {
+      //   title: "Agregar a la cuenta",
+      //   icon: "mdi-account-plus",
+      //   event: "synchronize",
+      // },
+      { title: "Eliminar", icon: "mdi-delete", event: "delete", color: "red" },
+    ],
+  }),
+
   computed: {
+    menuOptions() {
+      // remove sycnronize option if calendar is from api
+      if (this.calendar.fromApi) {
+        return this.menuItems.filter((item) => item.event !== "synchronize");
+      }
+
+      return this.menuItems.filter((item) => item.event !== "share");
+    },
+
     cloudIcon() {
       if (!this.calendar.fromApi) {
         return "mdi-web-off";
@@ -72,5 +119,7 @@ export default {
       });
     },
   },
+
+  emits: ["show", "rename", "share", "synchronize", "delete"],
 };
 </script>
