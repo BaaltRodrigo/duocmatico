@@ -42,17 +42,19 @@ export default {
     updateCalendarName() {
       if (this.editedName.length === 0) {
         this.nameErrorMessages = ["El nombre es obligatorio"];
-      } else {
-        this.$store.dispatch("calendars/updateCalendar", {
-          ...this.calendar,
-          name: this.editedName,
-        });
-
-        this.$emit("updated");
-        this.nameErrorMessages = [];
+        return;
       }
+
+      this.$store.dispatch("calendars/updateCalendar", {
+        ...this.calendar,
+        name: this.editedName,
+      });
+
+      this.$emit("updated");
+      this.nameErrorMessages = [];
     },
   },
+
   emits: ["updated"],
 };
 </script>
