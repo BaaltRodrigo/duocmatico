@@ -10,9 +10,11 @@
       <v-list-item-title class="font-weight-bold">
         {{ calendar.name }}
       </v-list-item-title>
-      <v-list-item-subtitle class="text-capitalize">
+      <v-list-item-title
+        class="text-capitalize text-medium-emphasis text-body-2"
+      >
         {{ calendarSubtitle }}
-      </v-list-item-subtitle>
+      </v-list-item-title>
       <!-- Api calendar indicator -->
       <template v-slot:prepend>
         <v-avatar>
