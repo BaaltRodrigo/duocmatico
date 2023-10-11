@@ -1,7 +1,7 @@
 <template>
   <v-card
     variant="outlined"
-    class="rounded-xl pl-2 py-1 elevation-4"
+    class="rounded-xl py-1 elevation-4"
     :ripple="false"
     color="black"
     @click="$emit('show', calendar)"
