@@ -146,7 +146,7 @@ const actions = {
 
   async updateCalendar({ commit, dispatch, rootState }, calendar) {
     if (!calendar.fromApi) {
-      commit("updateCalendar", calendar);
+      commit("updateLocalCalendar", calendar);
       dispatch("saveLocalCalendars");
     } else {
       // TODO: Clean this up

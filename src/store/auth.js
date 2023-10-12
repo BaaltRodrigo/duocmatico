@@ -73,6 +73,7 @@ const actions = {
   async logout({ commit }) {
     await signOut(auth);
     commit("setUser", null);
+    commit("setToken", null);
   },
 
   async registration(
