@@ -7,7 +7,7 @@
           block
           class="text-none elevation-4 rounded-xl bg-green-accent-1"
           variant="outlined"
-          height="100%"
+          :height="isMobile ? '64px' : '100%'"
           @click="newCalendarForm = true"
         >
           <v-icon size="32" class="mr-2">mdi-plus</v-icon>
@@ -69,6 +69,7 @@
 
 <script>
 import { mapState } from "vuex";
+import { useDisplay } from "vuetify/lib/framework.mjs";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
@@ -94,6 +95,11 @@ export default {
   computed: {
     ...mapState("calendars", ["localCalendars", "apiCalendars", "calendar"]),
     ...mapState("auth", ["token"]),
+
+    isMobile() {
+      const { mobile, smAndDown } = useDisplay();
+      return mobile.value || smAndDown.value;
+    },
 
     calendarEditName() {
       const allCalendars = [...this.localCalendars, ...this.apiCalendars];
