@@ -3,21 +3,17 @@
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
     <v-row>
       <v-col cols="12" md="4" xl="3">
-        <v-card
+        <v-btn
+          block
+          class="text-none elevation-4 rounded-xl bg-green-accent-1"
+          variant="outlined"
+          height="100%"
           @click="newCalendarForm = true"
-          variant="flat"
-          height="150px"
-          class="rounded-xl"
-          style="border: 4px dashed lightgray; background-color: transparent"
         >
-          <v-container class="text-center mt-4">
-            <v-icon size="7vh">mdi-plus</v-icon>
-            <h3>Nuevo calendario</h3>
-          </v-container>
-        </v-card>
+          <v-icon size="32" class="mr-2">mdi-plus</v-icon>
+          Crear nuevo calendario
+        </v-btn>
       </v-col>
-    </v-row>
-    <v-row>
       <v-col
         cols="12"
         md="4"
@@ -26,7 +22,6 @@
         :key="`calendar-${calendar.uuid}`"
       >
         <dm-calendar-card
-          class="mb-2"
           :calendar="calendar"
           @delete="handleDelete"
           @rename="handleRename"
