@@ -2,7 +2,7 @@
   <v-container class>
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
     <v-row>
-      <v-col cols="12" md="4">
+      <v-col cols="12" md="4" xl="3">
         <v-card
           @click="newCalendarForm = true"
           variant="flat"
@@ -21,76 +21,22 @@
       <v-col
         cols="12"
         md="4"
+        xl="3"
         v-for="calendar in [...localCalendars, ...apiCalendars]"
         :key="`calendar-${calendar.uuid}`"
       >
-        <v-card
-          class="rounded-xl elevation-4"
-          variant="outlined"
-          height="100%"
-          @click="
-            $router.push({
-              name: 'calendars.show',
-              params: { uuid: calendar.uuid },
-            })
-          "
-          :title="calendar.name"
+        <dm-calendar-card
+          class="mb-2"
+          :calendar="calendar"
+          @delete="handleDelete"
+          @rename="handleRename"
+          @show="handleShow"
         >
-          <v-card-text>
-            <v-row dense>
-              <v-col cols="auto">
-                <v-chip size="small" label
-                  >{{ calendar.academic_charge.season }}
-                </v-chip>
-              </v-col>
-              <v-col cols="auto">
-                <v-chip size="small" label class="text-capitalize">
-                  {{ calendar.academic_charge.name.toLowerCase() }}
-                </v-chip>
-              </v-col>
-              <v-col cols="auto">
-                <v-chip size="small" label>
-                  {{ calendar.calendarable.name.toLowerCase() }}
-                </v-chip>
-              </v-col>
-            </v-row>
-          </v-card-text>
-          <v-card-text class="d-flex justify-space-between align-end">
-            <v-btn
-              class="elevation-2"
-              size="small"
-              variant="outlined"
-              @click.stop.prevent="true"
-            >
-              <v-icon>mdi-share-variant</v-icon>
-            </v-btn>
-            <v-btn
-              class="text-none elevation-2"
-              size="small"
-              color="error"
-              variant="outlined"
-              @click.stop.prevent="
-                calendarToDelete = calendar;
-                deleteCalendar = true;
-              "
-            >
-              <v-icon>mdi-delete</v-icon>
-              Eliminar
-            </v-btn>
-            <v-btn
-              size="small"
-              variant="outlined"
-              class="text-none elevation-2"
-              @click.stop.prevent="openEditCalendarNameCard(calendar)"
-            >
-              <v-icon>mdi-pencil</v-icon>
-              Cambiar nombre
-            </v-btn>
-          </v-card-text>
-        </v-card>
+        </dm-calendar-card>
       </v-col>
     </v-row>
   </v-container>
+  <!-- Option dialogs -->
   <v-dialog
     v-model="newCalendarForm"
     max-width="480px"
@@ -117,13 +63,18 @@
     max-width="480px"
     content-class="elevation-0"
     hide-overlay
+    @done="getCalendars()"
   >
-    <DmEditCalendarName :calendar="calendarEditName" @updated="nameUpdated" />
+    <dm-edit-calendar-name
+      :calendar="calendarEditName"
+      @updated="nameUpdated"
+    />
   </v-dialog>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
 import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
@@ -132,6 +83,7 @@ export default {
   name: "CalendarIndexView",
 
   components: {
+    DmCalendarCard,
     DmCalendarForm,
     DmDeleteCalendar,
     DmEditCalendarName,
@@ -155,7 +107,31 @@ export default {
   },
 
   methods: {
+    getCalendars() {
+      this.$store.dispatch("calendars/getLocalCalendars");
+
+      if (!this.token) return;
+      this.$store.dispatch("calendars/getApiCalendars");
+    },
+
     openEditCalendarNameCard(calendar) {
+      this.calendarToEditName = calendar;
+      this.editCalendarName = true;
+    },
+
+    handleShow(calendar) {
+      this.$router.push({
+        name: "calendars.show",
+        params: { uuid: calendar.uuid },
+      });
+    },
+
+    handleDelete(calendar) {
+      this.calendarToDelete = calendar;
+      this.deleteCalendar = true;
+    },
+
+    handleRename(calendar) {
       this.calendarToEditName = calendar;
       this.editCalendarName = true;
     },
@@ -172,9 +148,7 @@ export default {
   },
 
   created() {
-    if (!this.token) return;
-
-    this.$store.dispatch("calendars/getApiCalendars");
+    this.getCalendars();
   },
 };
 </script>
