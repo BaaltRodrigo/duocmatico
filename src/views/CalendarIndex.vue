@@ -1,6 +1,20 @@
 <template>
   <v-container class>
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
+    <v-card
+      variant="outlined"
+      class="elevation-4 rounded-xl my-4"
+      :width="isMobile ? '100%' : '480'"
+    >
+      <v-text-field
+        v-model="search"
+        variant="solo"
+        hide-details
+        density="comfortable"
+        placeholder="Busca entre tus calendarios"
+        clearable
+      ></v-text-field>
+    </v-card>
     <v-row>
       <v-col cols="12" md="4" xl="3">
         <v-btn
@@ -18,7 +32,7 @@
         cols="12"
         md="4"
         xl="3"
-        v-for="calendar in [...localCalendars, ...apiCalendars]"
+        v-for="calendar in filteredCalendars"
         :key="`calendar-${calendar.uuid}`"
       >
         <dm-calendar-card
@@ -86,6 +100,7 @@ export default {
   },
 
   data: () => ({
+    search: "",
     newCalendarForm: false,
     deleteCalendar: false,
     editCalendarName: false,
@@ -104,6 +119,20 @@ export default {
     calendarEditName() {
       const allCalendars = [...this.localCalendars, ...this.apiCalendars];
       return allCalendars.find((c) => c.uuid === this.calendarToEditName.uuid);
+    },
+
+    filteredCalendars() {
+      const allCalendars = [...this.localCalendars, ...this.apiCalendars];
+      if (!this.search) return allCalendars;
+
+      return allCalendars.filter(
+        (c) =>
+          c.name.toLowerCase().includes(this.search.toLowerCase()) ||
+          c.academic_charge.name
+            .toLowerCase()
+            .includes(this.search.toLowerCase()) ||
+          c.calendarable.name.toLowerCase().includes(this.search.toLowerCase())
+      );
     },
   },
 
