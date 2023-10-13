@@ -6,6 +6,10 @@ const base = {
   VCard: {
     variant: "outlined",
   },
+
+  VTextField: {
+    variant: "outlined",
+  },
 };
 
 export { base };

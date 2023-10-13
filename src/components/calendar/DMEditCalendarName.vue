@@ -4,7 +4,6 @@
       <v-text-field
         v-model="editedName"
         label="Nombre del calendario"
-        variant="outlined"
         required
         :error-messages="nameErrorMessages"
       >

@@ -4,14 +4,12 @@
       v-model="email"
       density="comfortable"
       class="my-1"
-      variant="outlined"
       label="Email"
     ></v-text-field>
     <v-text-field
       v-model="password"
       density="comfortable"
       class="my-1"
-      variant="outlined"
       label="Contraseña"
       :type="showPassword ? 'text' : 'password'"
       :append-inner-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
