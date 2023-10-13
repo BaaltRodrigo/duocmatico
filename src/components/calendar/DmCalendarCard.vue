@@ -1,6 +1,5 @@
 <template>
   <v-card
-    variant="outlined"
     class="rounded-xl py-1 elevation-4"
     :ripple="false"
     color="black"
@@ -34,7 +33,7 @@
               <v-icon size="large">mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
-          <v-card variant="outlined" class="rounded-lg">
+          <v-card class="rounded-lg">
             <v-list density="compact">
               <v-list-item
                 v-for="item in menuOptions"

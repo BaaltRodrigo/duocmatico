@@ -1,9 +1,5 @@
 <template>
-  <v-card
-    class="rounded-xl bg-white"
-    variant="outlined"
-    title="Nuevo Calendario"
-  >
+  <v-card class="rounded-xl bg-white" title="Nuevo Calendario">
     <v-card-text>
       <v-form ref="form">
         <v-text-field
@@ -57,11 +53,7 @@
   </v-card>
   <!-- loading dialog to wait api response -->
   <v-dialog v-model="calendarableLoading" persistent width="auto">
-    <v-card
-      class="rounded-lg bg-white text-center"
-      variant="outlined"
-      title="Obteniendo datos"
-    >
+    <v-card class="rounded-lg bg-white text-center" title="Obteniendo datos">
       <v-card-text class="text-center">
         <v-progress-circular indeterminate color="purple"></v-progress-circular>
       </v-card-text>

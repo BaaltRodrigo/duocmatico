@@ -6,7 +6,7 @@
         md="6"
         class="d-flex flex-column justify-center align-center"
       >
-        <v-card variant="outlined" class="mb-9 card-width">
+        <v-card class="mb-9 card-width">
           <v-card-title class="text-center my-2"> Registrarse </v-card-title>
           <v-card-text>
             <auth-providers buttonText="Registrar con Google" />
@@ -14,7 +14,7 @@
             <registration-form />
           </v-card-text>
         </v-card>
-        <v-card variant="outlined" class="text-center rounded-lg card-width">
+        <v-card class="text-center rounded-lg card-width">
           <v-card-text>
             ¿Ya tienes cuenta?
             <v-btn

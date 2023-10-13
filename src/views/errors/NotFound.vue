@@ -4,7 +4,6 @@
     <v-container class="fill-height bg-grey-lighten-2 rounded-xl">
       <left-right-grid justify="space-around" :image="not_found_image" reversed>
         <v-card
-          variant="outlined"
           class="rounded-lg pa-4 bg-white"
           title="No encontramos lo que estas buscando"
           text="Quizas alguna de estas opciones pueda ayudarte"

@@ -2,11 +2,7 @@
   <v-container v-if="calendar">
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
 
-    <v-card
-      class="my-4 rounded-xl elevation-0"
-      variant="outlined"
-      height="70vh"
-    >
+    <v-card class="my-4 rounded-xl elevation-0" height="70vh">
       <vue-cal
         hide-view-selector
         hide-title-bar

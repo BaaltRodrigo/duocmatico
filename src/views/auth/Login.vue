@@ -6,7 +6,7 @@
         md="6"
         class="d-flex flex-column justify-center align-center"
       >
-        <v-card variant="outlined" class="mb-9 card-width bg-white">
+        <v-card class="mb-9 card-width bg-white">
           <v-card-title class="text-center my-2"> Iniciar Sesión </v-card-title>
           <v-card-text>
             <auth-providers buttonText="Ingresar con Google" />
