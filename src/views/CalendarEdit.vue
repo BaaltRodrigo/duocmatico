@@ -1,6 +1,6 @@
 <template>
   <v-container v-if="calendar">
-    <DMEditSidebar :calendar="calendar" />
+    <dm-edit-sidebar :calendar="calendar" />
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
     <v-card class="rounded-xl elevation-0" variant="outlined" height="70vh">
       <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
@@ -36,7 +36,7 @@ import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
 import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
-import DMEditSidebar from "../components/calendar/DMEditSidebar.vue"
+import DmEditSidebar from "../components/sections/DmEditSidebar.vue"
 
 export default {
   name: "CalendarShow",
@@ -45,7 +45,7 @@ export default {
     VueCal,
     DmSectionCard,
     DmEditCalendarName,
-    DMEditSidebar
+    DmEditSidebar
   },
 
   computed: {
