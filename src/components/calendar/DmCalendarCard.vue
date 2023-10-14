@@ -1,11 +1,6 @@
 <template>
-  <v-card
-    class="rounded-xl py-1 elevation-4"
-    :ripple="false"
-    color="black"
-    @click="$emit('show', calendar)"
-  >
-    <v-list-item class="text-black">
+  <v-card class="py-1" :ripple="false" @click="$emit('show', calendar)">
+    <v-list-item>
       <v-list-item-title class="font-weight-bold">
         {{ calendar.name }}
       </v-list-item-title>
@@ -33,7 +28,7 @@
               <v-icon size="large">mdi-dots-vertical</v-icon>
             </v-btn>
           </template>
-          <v-card class="rounded-lg">
+          <v-card>
             <v-list density="compact">
               <v-list-item
                 v-for="item in menuOptions"

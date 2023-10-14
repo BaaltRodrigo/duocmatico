@@ -1,10 +1,7 @@
 <template>
   <v-container class>
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
-    <v-card
-      class="elevation-4 rounded-xl my-4"
-      :width="isMobile ? '100%' : '480'"
-    >
+    <v-card class="elevation-4 my-4" :width="isMobile ? '100%' : '480'">
       <v-text-field
         v-model="search"
         variant="solo"
@@ -14,13 +11,13 @@
         clearable
       ></v-text-field>
     </v-card>
-    <v-row>
+    <v-row :dense="!isMobile">
       <v-col cols="12" md="4" xl="3">
         <v-btn
           block
-          class="elevation-4 rounded-xl bg-green-accent-1"
+          class="rounded-lg elevation-4 bg-primary"
           variant="outlined"
-          :height="isMobile ? '64px' : '100%'"
+          height="64px"
           @click="newCalendarForm = true"
         >
           <v-icon size="32" class="mr-2">mdi-plus</v-icon>
@@ -45,34 +42,18 @@
     </v-row>
   </v-container>
   <!-- Option dialogs -->
-  <v-dialog
-    v-model="newCalendarForm"
-    max-width="480px"
-    content-class="elevation-0"
-    hide-overlay
-  >
+  <v-dialog v-model="newCalendarForm">
     <dm-calendar-form @created="handleCreated"></dm-calendar-form>
   </v-dialog>
 
-  <v-dialog
-    v-model="deleteCalendar"
-    max-width="530px"
-    content-class="elevation-0"
-    hide-overlay
-  >
+  <v-dialog v-model="deleteCalendar" c>
     <dm-delete-calendar
       @deleted-successfully="deleteCalendar = false"
       :calendar="calendarToDelete"
     ></dm-delete-calendar>
   </v-dialog>
 
-  <v-dialog
-    v-model="editCalendarName"
-    max-width="480px"
-    content-class="elevation-0"
-    hide-overlay
-    @done="getCalendars()"
-  >
+  <v-dialog v-model="editCalendarName" @done="getCalendars()">
     <dm-edit-calendar-name
       :calendar="calendarEditName"
       @updated="nameUpdated"
