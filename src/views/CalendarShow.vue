@@ -3,24 +3,11 @@
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
 
     <v-card class="rounded-xl elevation-0" variant="outlined" height="70vh">
-      <vue-cal
-        hide-view-selector
-        hide-title-bar
-        :disable-views="['years', 'year', 'month', 'day']"
-        :hide-weekdays="[7]"
-        :time-from="8 * 60"
-        :time-step="30"
-        locale="es"
-        :events="calendarEvents"
-      >
+      <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
+        :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
         <template v-slot:event="{ event }">
-          <v-card
-            class="rounded-lg"
-            variant="tonal"
-            height="100%"
-            :color="event.color"
-            @click="openSectionInformation(event.sectionId)"
-          >
+          <v-card class="rounded-lg" variant="tonal" height="100%" :color="event.color"
+            @click="openSectionInformation(event.sectionId)">
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
             </v-card-title>
@@ -35,12 +22,8 @@
       </vue-cal>
     </v-card>
     <br />
-    <v-btn
-      variant="outlined"
-      class="rounded-pill text-capitalize"
-      color="primary"
-      @click="handleGetSections()"
-    >
+    <v-btn variant="outlined" class="rounded-pill text-capitalize" color="primary"
+      @click="$router.push({ name: `calendars.edit` })">
       Agregar secciones
     </v-btn>
 
@@ -87,6 +70,15 @@ export default {
   }),
 
   methods: {
+
+    showMe() {
+      this.$router.push({
+        name: "calendars.edit",
+        params: { uuid: this.calendar.uuid },
+      });
+      console.log(this.sections)
+    },
+
     // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {
