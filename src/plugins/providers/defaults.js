@@ -17,6 +17,7 @@ const base = {
     width: 500,
     contentClass: "elevation-0",
     hideOverlay: true,
+    // Cards inside dialogs are rounded xl, not lg and has no elevation
     VCard: {
       class: "bg-white rounded-xl elevation-0",
     },
