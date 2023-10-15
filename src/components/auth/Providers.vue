@@ -1,7 +1,7 @@
 <template>
-  <v-btn @click="handleWithGoogle" size="large" variant="outlined" block>
+  <v-btn @click="handleWithGoogle" size="x-large" variant="outlined" block>
     <v-icon class="mx-3">mdi-google</v-icon>
-    Ingresar con Google
+    <span class="text-body-1"> Ingresar con Google </span>
   </v-btn>
 </template>
 

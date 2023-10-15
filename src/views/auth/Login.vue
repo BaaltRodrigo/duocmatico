@@ -6,33 +6,28 @@
         md="6"
         class="d-flex flex-column justify-center align-center"
       >
-        <v-card class="mb-9 card-width bg-white">
-          <v-card-title class="text-center my-2"> Iniciar Sesión </v-card-title>
+        <v-card class="mb-6 card-width text-center" :title="'Iniciar Sesión'">
           <v-card-text>
-            <auth-providers buttonText="Ingresar con Google" />
-            <v-container class="text-center">O también</v-container>
+            <auth-providers />
+            <v-container>O también</v-container>
             <login-form />
 
-            <v-container class="text-center mb-n1 mt-2">
-              <router-link to="/password-recovery" :style="{ color: 'orange' }">
+            <p class="mt-4">
+              <router-link to="/password-recovery">
                 Olvide mi contraseña
               </router-link>
-            </v-container>
+            </p>
           </v-card-text>
         </v-card>
-        <v-card
-          variant="outlined"
-          class="text-center rounded-lg bg-white card-width"
-        >
+        <v-card class="text-center card-width">
           <v-card-text>
             ¿No tienes cuenta?
             <v-btn
+              class="mx-2"
+              variant="flat"
               @click="$router.push({ name: 'registration' })"
-              variant="text"
-              class="text-none mx-2"
-              color="orange"
             >
-              Regístrate
+              Crea una aqui
             </v-btn>
           </v-card-text>
         </v-card>
