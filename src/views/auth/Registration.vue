@@ -7,21 +7,22 @@
         class="d-flex flex-column justify-center align-center"
       >
         <v-card class="mb-9 card-width">
-          <v-card-title class="text-center my-2"> Registrarse </v-card-title>
+          <v-card-item class="text-center">
+            <v-card-title>Registrate</v-card-title>
+          </v-card-item>
           <v-card-text>
             <auth-providers buttonText="Registrar con Google" />
             <v-container class="text-center">O también</v-container>
             <registration-form />
           </v-card-text>
         </v-card>
-        <v-card class="text-center rounded-lg card-width">
+        <v-card class="text-center card-width">
           <v-card-text>
             ¿Ya tienes cuenta?
             <v-btn
               @click="$router.push({ name: 'login' })"
-              variant="text"
-              class="text-none mx-2"
-              color="orange-darken-1"
+              variant="flat"
+              class="mx-2"
             >
               Ingresa a tu cuenta
             </v-btn>
