@@ -4,15 +4,13 @@
     <v-container class="fill-height bg-grey-lighten-2 rounded-xl">
       <left-right-grid justify="space-around" :image="not_found_image" reversed>
         <v-card
-          class="rounded-lg pa-4 bg-white"
+          class="pa-4"
           title="No encontramos lo que estas buscando"
           text="Quizas alguna de estas opciones pueda ayudarte"
         >
           <v-card-actions>
             <v-btn
-              class="text-none"
               variant="elevated"
-              color="green-accent-1"
               @click="$router.push({ name: 'calendars.index' })"
             >
               Ir a mis calendarios
