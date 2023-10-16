@@ -1,5 +1,5 @@
 <template>
-  <v-card class="rounded-xl" title="Editar nombre del calendario">
+  <v-card title="Editar nombre del calendario">
     <v-card-text>
       <v-text-field
         v-model="editedName"
@@ -10,7 +10,6 @@
       </v-text-field>
       <v-btn
         block
-        color="green-accent-1"
         variant="flat"
         class="rounded-pill"
         @click="updateCalendarName"

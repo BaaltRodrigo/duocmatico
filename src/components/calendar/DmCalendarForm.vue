@@ -1,5 +1,5 @@
 <template>
-  <v-card class="rounded-xl bg-white" title="Nuevo Calendario">
+  <v-card title="Nuevo Calendario">
     <v-card-text>
       <v-form ref="form">
         <v-text-field
@@ -40,8 +40,7 @@
         :disabled="isDisabled"
         block
         :variant="isDisabled ? 'text' : 'elevated'"
-        color="green-accent-1"
-        class="rounded-pill text-none mb-2"
+        class="rounded-pill mb-2"
         @click="handleSubmit"
       >
         Empieza a armar tu horario!
@@ -50,9 +49,12 @@
   </v-card>
   <!-- loading dialog to wait api response -->
   <v-dialog v-model="calendarableLoading" persistent width="auto">
-    <v-card class="rounded-lg bg-white text-center" title="Obteniendo datos">
+    <v-card class="text-center" title="Obteniendo datos">
       <v-card-text class="text-center">
-        <v-progress-circular indeterminate color="purple"></v-progress-circular>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
       </v-card-text>
     </v-card>
   </v-dialog>
