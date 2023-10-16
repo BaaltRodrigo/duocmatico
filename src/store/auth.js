@@ -1,6 +1,5 @@
 import {
   browserLocalPersistence,
-  getAuth,
   GoogleAuthProvider,
   setPersistence,
   signInWithPopup,
@@ -43,28 +42,28 @@ const actions = {
     commit("setUser", user);
   },
 
-  async loginWhitGoogle({ commit, dispatch }) {
+  async loginWhitGoogle({ commit }) {
     try {
       const provider = new GoogleAuthProvider();
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithPopup(auth, provider);
-      console.log(response.user);
+      const token = await response.user.getIdToken();
+
       commit("setUser", response.user);
+      commit("setToken", token);
     } catch (error) {
       console.log(error);
     }
   },
 
-  async login({ commit, dispatch }, { email, password }) {
+  async login({ commit }, { email, password }) {
     try {
       await setPersistence(auth, browserLocalPersistence);
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log(userCredential.user);
-      commit("setUser", userCredential.user);
+      const response = await signInWithEmailAndPassword(auth, email, password);
+
+      const token = await response.user.getIdToken();
+      commit("setUser", response.user);
+      commit("setToken", token);
     } catch (error) {
       console.error(error);
     }
@@ -72,23 +71,29 @@ const actions = {
 
   async logout({ commit }) {
     await signOut(auth);
+    // Clean auth status
     commit("setUser", null);
     commit("setToken", null);
+
+    // Clean another modules state if needed
+    commit("calendars/setApiCalendars", [], { root: true });
   },
 
-  async registration(
-    { commit, dispatch },
-    { email, password, passwordConfirmation }
-  ) {
+  async registration({ commit }, payload) {
+    const { email, password, passwordConfirmation } = payload;
     if (password !== passwordConfirmation) {
       throw new Error("Passwords do not match");
     }
-    const userCredential = await createUserWithEmailAndPassword(
+
+    const response = await createUserWithEmailAndPassword(
       auth,
       email,
       password
     );
-    commit("setUser", userCredential.user);
+    const token = await response.user.getIdToken();
+
+    commit("setUser", response.user);
+    commit("setToken", token);
   },
 
   async requestPasswordReset({ commit }, email) {
