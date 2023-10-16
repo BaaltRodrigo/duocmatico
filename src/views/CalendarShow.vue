@@ -16,7 +16,6 @@
         <!-- This slot is how every calendar event should render -->
         <template v-slot:event="{ event }">
           <v-card
-            class="rounded-lg"
             variant="tonal"
             height="100%"
             :color="event.color"
@@ -35,11 +34,7 @@
         </template>
       </vue-cal>
     </v-card>
-    <v-btn
-      class="rounded-xl text-none"
-      color="green-accent-1"
-      @click="handleGetSections()"
-    >
+    <v-btn class="rounded-xl" @click="handleGetSections()">
       Agregar secciones
     </v-btn>
 

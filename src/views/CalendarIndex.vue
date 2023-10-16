@@ -1,12 +1,11 @@
 <template>
   <v-container class>
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
-    <v-card class="elevation-4 my-4" :width="isMobile ? '100%' : '480'">
+    <v-card class="my-4" :width="isMobile ? '100%' : '480'">
       <v-text-field
         v-model="search"
         variant="solo"
         hide-details
-        density="comfortable"
         placeholder="Busca entre tus calendarios"
         clearable
       ></v-text-field>
@@ -15,13 +14,13 @@
       <v-col cols="12" md="4" xl="3">
         <v-btn
           block
-          class="rounded-lg elevation-4 bg-primary"
           variant="outlined"
+          class="elevation-4"
           height="64px"
           @click="newCalendarForm = true"
         >
           <v-icon size="32" class="mr-2">mdi-plus</v-icon>
-          Crear nuevo calendario
+          <span class="text-body-1"> Crear nuevo calendario </span>
         </v-btn>
       </v-col>
       <v-col
@@ -46,7 +45,7 @@
     <dm-calendar-form @created="handleCreated"></dm-calendar-form>
   </v-dialog>
 
-  <v-dialog v-model="deleteCalendar" c>
+  <v-dialog v-model="deleteCalendar">
     <dm-delete-calendar
       @deleted-successfully="deleteCalendar = false"
       :calendar="calendarToDelete"
