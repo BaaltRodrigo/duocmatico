@@ -1,13 +1,7 @@
 <template>
-  <v-btn
-    @click="handleWithGoogle"
-    variant="outlined"
-    block
-    color="orange"
-    class="text-capitalize"
-  >
+  <v-btn @click="handleWithGoogle" size="x-large" variant="outlined" block>
     <v-icon class="mx-3">mdi-google</v-icon>
-    Ingresar con Google
+    <span class="text-body-1"> Ingresar con Google </span>
   </v-btn>
 </template>
 
@@ -23,6 +17,7 @@ export default {
 
   methods: {
     ...mapActions("auth", ["loginWhitGoogle"]),
+
     async handleWithGoogle() {
       await this.loginWhitGoogle();
       if (this.user) {
