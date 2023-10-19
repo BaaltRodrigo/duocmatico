@@ -1,15 +1,10 @@
 <template>
-  <v-card
-    class="rounded-xl bg-white"
-    variant="outlined"
-    title="Nuevo Calendario"
-  >
+  <v-card title="Nuevo Calendario">
     <v-card-text>
       <v-form ref="form">
         <v-text-field
           v-model="name"
           filled
-          variant="outlined"
           label="Nombre del calendario"
         ></v-text-field>
         <v-autocomplete
@@ -17,7 +12,6 @@
           :items="academicCharges"
           item-value="id"
           label="Carga Academica"
-          variant="outlined"
           :item-title="(item) => `${item.season} ${item.name}`"
         >
         </v-autocomplete>
@@ -33,7 +27,6 @@
           :label="calendarableType === 'career' ? 'Carrera' : 'Escuela'"
           item-title="name"
           item-value="id"
-          variant="outlined"
         >
           <template #item="{ props, item }">
             <v-list-item v-bind="props">
@@ -47,8 +40,7 @@
         :disabled="isDisabled"
         block
         :variant="isDisabled ? 'text' : 'elevated'"
-        color="green-accent-1"
-        class="rounded-pill text-none mb-2"
+        class="rounded-pill mb-2"
         @click="handleSubmit"
       >
         Empieza a armar tu horario!
@@ -57,13 +49,12 @@
   </v-card>
   <!-- loading dialog to wait api response -->
   <v-dialog v-model="calendarableLoading" persistent width="auto">
-    <v-card
-      class="rounded-lg bg-white text-center"
-      variant="outlined"
-      title="Obteniendo datos"
-    >
+    <v-card class="text-center" title="Obteniendo datos">
       <v-card-text class="text-center">
-        <v-progress-circular indeterminate color="purple"></v-progress-circular>
+        <v-progress-circular
+          indeterminate
+          color="primary"
+        ></v-progress-circular>
       </v-card-text>
     </v-card>
   </v-dialog>

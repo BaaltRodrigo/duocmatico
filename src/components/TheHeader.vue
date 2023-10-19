@@ -1,14 +1,11 @@
 <template>
-  <v-app-bar app fixed flat>
-    <v-app-bar-title @click="goToHome">
+  <v-app-bar app fixed>
+    <v-app-bar-title @click="changeRoute('home')">
       Duocmatico
-      <v-chip variant="outlined" size="x-small" label color="primary">
-        Beta
-      </v-chip>
+      <v-chip variant="flat" size="small" label color="primary"> Beta </v-chip>
     </v-app-bar-title>
     <template #append>
-      <span v-if="user && user.email">{{ user.email }}</span>
-      <v-btn v-if="!!user" icon>
+      <v-btn v-if="!!user" icon class="rounded-pill">
         <v-avatar>
           <v-img
             v-if="user && user.photoURL"
@@ -20,31 +17,32 @@
             :src="defaultImage"
             alt="default-profile-picture"
           ></v-img>
-          <v-menu activator="parent" min-width="120px">
-            <v-list>
-              <v-list-item @click="handleLogout">
-                <template v-slot:prepend>
-                  <v-icon icon="mdi-logout"></v-icon>
-                </template>
-                <v-list-item-title>Cerrar sesion</v-list-item-title>
-              </v-list-item>
-            </v-list>
+          <v-menu activator="parent">
+            <v-card>
+              <v-list>
+                <v-list-item @click="handleLogout">
+                  <template v-slot:prepend>
+                    <v-icon icon="mdi-logout"></v-icon>
+                  </template>
+                  <v-list-item-title>Cerrar sesion</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-card>
           </v-menu>
         </v-avatar>
       </v-btn>
 
       <div v-else>
         <v-btn
-          @click="goToLogin"
+          @click="changeRoute('login')"
           size="small"
+          class="mr-2 bg-primary"
           variant="outlined"
-          class="text-capitalize mr-2"
-          color="orange"
         >
           Iniciar sesion
         </v-btn>
         <v-btn
-          @click="goToSignUp"
+          @click="changeRoute('registration')"
           size="small"
           variant="outlined"
           class="text-capitalize"
@@ -74,16 +72,8 @@ export default {
   },
 
   methods: {
-    goToHome() {
-      this.$router.push({ name: "home" });
-    },
-
-    goToLogin() {
-      this.$router.push({ name: "login" });
-    },
-
-    goToSignUp() {
-      this.$router.push({ name: "registration" });
+    changeRoute(route) {
+      this.$router.push({ name: route });
     },
 
     async handleLogout() {
