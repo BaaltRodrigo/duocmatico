@@ -5,33 +5,38 @@
         variant="outlined" :append-icon="'mdi-cog-outline'" @click:append="show = !show">
       </v-text-field>
       <v-expand-transition>
-        <div v-show="show">
-          <v-card-text>
-            <v-card-text class="text-subtitle-1">
-              Semestre
-            </v-card-text>
-            <v-row>
-              <v-col cols="7">
-                <v-autocomplete variant="outlined" clearable label="Ingrese su semestre "></v-autocomplete>
-              </v-col>
-              <v-col cols="5">
-                <v-radio-group>
-                  <v-radio label="Diurno" value="1"></v-radio>
-                  <v-radio label="Vespertino" value="2"></v-radio>
-                </v-radio-group>
-                <v-btn color="green" variant="flat">Limpiar Datos</v-btn>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </div>
+        <v-card-text class="text-subtitle-1" v-show="show">
+          Semestre
+          <v-row>
+            <v-col cols="7">
+              <v-autocomplete class="pt-1" variant="outlined" clearable label="Cualquier semestre"></v-autocomplete>
+            </v-col>
+            <v-col cols="5">
+              <v-radio-group>
+                <v-radio label="Diurno" value="1"></v-radio>
+                <v-radio label="Vespertino" value="2"></v-radio>
+              </v-radio-group>
+              <v-btn color="green" variant="flat">Limpiar Datos</v-btn>
+            </v-col>
+          </v-row>
+        </v-card-text>
       </v-expand-transition>
     </v-card>
-    <dm-section-card :calendar="calendar" />
+    <v-expansion-panels class="ml-5 mt-2" variant="inset" v-if="groupedSections">
+      <v-expansion-panel v-for="(group, subjectId) in groupedSections" :key="subjectId">
+        <v-expansion-panel-title expand-icon="mdi-menu-down" class="text-body-1">
+          {{ formatGroupName(group.subject.name) }}
+        </v-expansion-panel-title>
+        <v-expansion-panel-text>
+          <dm-section-card v-for="section in group.sections" :key="section.id" :section="section" :calendar="calendar" />
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
   </v-navigation-drawer>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 import DmSectionCard from './DmSectionCard.vue';
 
 export default {
@@ -43,6 +48,23 @@ export default {
     DmSectionCard
   },
 
+  computed: {
+    ...mapState('academicCharges', ['sections']),
+    groupedSections() {
+      return this.sections.reduce((acc, section) => {
+        const subjectId = section.subject.id;
+        if (!acc[subjectId]) {
+          acc[subjectId] = {
+            subject: section.subject,
+            sections: [],
+          };
+        }
+        acc[subjectId].sections.push(section);
+        return acc;
+      }, {});
+    },
+  },
+
   props: {
     calendar: {
       type: Object,
@@ -52,6 +74,13 @@ export default {
 
   methods: {
     ...mapActions('academicCharges', ['getSections']),
+    formatGroupName(name) {
+      let sentences = name.replace(/-/g, ' ').split(" ").map(word => {
+        return word[0].toUpperCase() + word.slice(1);
+      })
+      return sentences.join(" ");
+    },
+
   },
   created() {
     this.getSections({

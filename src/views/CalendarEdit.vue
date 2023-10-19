@@ -2,20 +2,20 @@
   <v-container v-if="calendar">
     <dm-edit-sidebar :calendar="calendar" />
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
-    <v-card class="rounded-xl elevation-0" variant="outlined" height="70vh">
+    <v-card class="my-4 elevation-0" height="70vh">
       <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
         :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
+        <!-- This slot is how every calendar event should render -->
         <template v-slot:event="{ event }">
-          <v-card class="rounded-lg" variant="tonal" height="100%" :color="event.color"
-            @click="openSectionInformation(event.sectionId)">
+          <v-card variant="tonal" height="100%" :color="event.color" @click="openSectionInformation(event.sectionId)">
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
             </v-card-title>
-            <v-card-text>
+            <v-card-text class="text-body-2">
               {{ event.start.toTimeString().slice(0, 5) }} -
               {{ event.end.toTimeString().slice(0, 5) }}
               <br />
-              Sala: {{ event.sala }}
+              Sala: {{ event.classroom.toUpperCase() }}
             </v-card-text>
           </v-card>
         </template>
@@ -23,7 +23,7 @@
     </v-card>
     <br />
 
-    <v-btn variant="outlined" class="rounded-pill text-capitalize" color="primary" @click=$router.go(-1)>
+    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.show` })">
       Finalizar
     </v-btn>
   </v-container>
@@ -35,7 +35,6 @@ import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
-import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
 import DmEditSidebar from "../components/sections/DmEditSidebar.vue"
 
 export default {
@@ -44,7 +43,6 @@ export default {
   components: {
     VueCal,
     DmSectionCard,
-    DmEditCalendarName,
     DmEditSidebar
   },
 
