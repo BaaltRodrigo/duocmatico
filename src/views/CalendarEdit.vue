@@ -21,7 +21,6 @@
         </template>
       </vue-cal>
     </v-card>
-    <br />
 
     <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.show` })">
       Finalizar
@@ -92,27 +91,27 @@ export default {
     },
 
     getSectionEvents(section) {
-      const { horarios } = section;
-      return horarios
-        .filter((h) => h.horario != "0:00:00 - 0:00:00") // Deleting non valid schedules
+      const { schedules } = section;
+      return schedules
+        .filter((schedule) => schedule.times != "0:00:00 - 0:00:00") // Deleting non valid schedules
         .map((schedule) => {
           // const { start, end } = this.getScheduleCalendarEvents(schedule);
           // For some reason, there is no need to subtract the timezone offset
           // start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
           // end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
           return {
-            title: section.asignatura.toLowerCase(),
+            title: section.subject.name.toLowerCase(),
             ...this.getScheduleCalendarEvents(schedule), // start, end, sala
             color: "purple",
             class: `text-capitalize`,
-            sectionId: section.seccion,
+            sectionId: section.code,
           };
         });
     },
 
     getScheduleCalendarEvents(schedule) {
       // The early exit will never be executed because we are filtering
-      if (schedule.horario === "0:00:00 - 0:00:00") return null;
+      if (schedule.times === "0:00:00 - 0:00:00") return null;
 
       const today = new Date(); // used to calculate current week's monday
       const monday = new Date(
@@ -122,29 +121,29 @@ export default {
       );
 
       const dayToNumber = {
-        Lunes: 1,
-        Martes: 2,
-        Miercoles: 3,
-        Jueves: 4,
-        Viernes: 5,
-        Sabado: 6,
+        lunes: 1,
+        martes: 2,
+        miercoles: 3,
+        jueves: 4,
+        viernes: 5,
+        sabado: 6,
       };
 
       // string without first 3 characters of schedule.horario
-      const [start, end] = schedule.horario.slice(3).split(" - ");
+      const [start, end] = schedule.times.slice(3).split(" - ");
       return {
-        sala: schedule.sala,
+        classroom: schedule.classroom,
         start: new Date(
           monday.getFullYear(),
           monday.getMonth(),
-          monday.getDate() + dayToNumber[schedule.dia] - 1, // Monday + day of schedule
+          monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
           start.split(":")[0],
           start.split(":")[1]
         ),
         end: new Date(
           monday.getFullYear(),
           monday.getMonth(),
-          monday.getDate() + dayToNumber[schedule.dia] - 1, // Monday + day of schedule
+          monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
           end.split(":")[0],
           end.split(":")[1]
         ),
@@ -161,11 +160,18 @@ export default {
     const { uuid } = this.$route.params;
     // Calendar is inside local calendars, use that one
     await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) return;
+    if (this.calendar) {
+      console.log(this.calendar)
+      return
+    };
 
     // Calendar is inside API calendars, use that one
     await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
-    if (this.calendar) return;
+    if (this.calendar) {
+      console.log("api")
+      console.log(this.calendar)
+      return
+    };
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);

@@ -6,14 +6,16 @@
         {{ formatGroupName(section.subject.name) }}
       </v-list-item-subtitle>
       <template #append>
-        <v-btn variant="outlined" class="rounded-pill text-capitalize" size="small" @click="">Agregar
+        <v-btn variant="outlined" class="rounded-pill text-capitalize" size="small"
+          @click="!isAdded ? addSection(section) : removeSection(section)">
+          {{ !isAdded ? "Agregar" : "Quitar" }}
         </v-btn>
       </template>
     </v-list-item>
     <v-container fluid>
       <v-row>
-        <v-col cols="12">
-          <v-card variant="outlined" class="rounded-xl">
+        <v-col cols="12" :md="!isInSelection ? 12 : 6">
+          <v-card class="elevation-0">
             <v-table density="compact">
               <thead>
                 <tr>
@@ -34,64 +36,70 @@
             </v-table>
           </v-card>
         </v-col>
-        <v-col cols="12">
-          <v-expand-transition>
-            <div v-show="show" v-if="section.id === show">
-              <v-card variant="outlined" class="rounded-xl mb-4">
-                <v-table density="compact">
-                  <tbody>
-                    <tr>
-                      <th>Docente</th>
-                      <td>{{ formatGroupName(section.teacher) || "Sin Docente" }}</td>
-                    </tr>
-                    <tr>
-                      <th>Jornada</th>
-                      <td>
-                        <v-chip label variant="outlined" size="small" class="text-capitalize">
-                          {{ section.shift }}
-                        </v-chip>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th>Semestre</th>
-                      <td>{{ section.subject.level === 0 ? "Optativo" : section.subject.level }}</td>
-                    </tr>
-                  </tbody>
-                </v-table>
-              </v-card>
-            </div>
-          </v-expand-transition>
+        <v-col cols="12" v-show="show" v-if="section.id === show" :md="!isInSelection ? 12 : 6">
+          <v-card class="elevation-0">
+            <v-table density="compact">
+              <tbody>
+                <tr>
+                  <th>Docente</th>
+                  <td class="text-capitalize">{{ formatGroupName(section.teacher) || "Sin Docente" }}</td>
+                </tr>
+                <tr>
+                  <th>Jornada</th>
+                  <td>
+                    <v-chip label variant="outlined" size="small" class="text-capitalize">
+                      {{ section.shift }}
+                    </v-chip>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Semestre</th>
+                  <td>{{ section.subject.level === 0 ? "Optativo" : section.subject.level }}</td>
+                </tr>
+              </tbody>
+            </v-table>
+          </v-card>
+        </v-col>
+        <v-col cols="12" v-if="!hideAddButton">
+          <v-btn text="Ver más" class="rounded-pill" block @click="toggleExpand(section.id)">
+            {{ showMoreInformation ? "Ocultar" : "Ver Mas" }}
+          </v-btn>
         </v-col>
       </v-row>
-      <v-btn text="Ver más" class="rounded-pill" block @click="toggleExpand(section.id)" />
     </v-container>
   </v-card>
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
 
 export default {
   data: () => ({
-    show: null,
+    show: false,
   }),
 
   props: {
-    calendar: {
-      type: Object,
-      default: () => ({}),
-    },
     section: {
       type: Object,
       default: () => ({}),
     },
+
+    isInSelection: {
+      type: Boolean,
+      default: false,
+    },
+
+    hideAddButton: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   methods: {
+    ...mapActions("calendars", ["addSection", "removeSection"]),
+
     formatGroupName(name) {
-      let sentences = name.replace(/-/g, ' ').split(" ").map(word => {
-        return word[0].toUpperCase() + word.slice(1);
-      })
-      return sentences.join(" ");
+      return name.replace(/-/g, ' ')
     },
 
     toggleExpand(sectionId) {
@@ -100,7 +108,28 @@ export default {
       } else {
         this.show = sectionId
       }
-    }
+    },
   },
+
+  computed: {
+    ...mapState("calendars", ["calendar"]),
+    validSchedules() {
+      return this.section.horarios.filter(
+        (h) => h.horario != "0:00:00 - 0:00:00"
+      );
+    },
+
+    isAdded() {
+      const { section } = this;
+      const { sections } = this.calendar;
+      return sections.some((s) => s.code === section.code);
+    },
+
+    showMoreInformation() {
+      return this.show || !this.isInSelection;
+    },
+  },
+
+
 };
 </script>

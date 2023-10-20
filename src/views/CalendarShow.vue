@@ -69,14 +69,6 @@ export default {
 
   methods: {
 
-    showMe() {
-      this.$router.push({
-        name: "calendars.edit",
-        params: { uuid: this.calendar.uuid },
-      });
-      console.log(this.sections)
-    },
-
     // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {

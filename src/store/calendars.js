@@ -34,6 +34,10 @@ const mutations = {
     const index = state.localCalendars.findIndex((c) => c.id === calendar.id);
     state.localCalendars.splice(index, 1, calendar);
   },
+
+  addSection(state, section) {
+    state.calendar.sections.push(section)
+  }
 };
 
 const actions = {
@@ -87,7 +91,7 @@ const actions = {
       });
 
       commit("setApiCalendars", calendars);
-      return response.data;
+      return calendars;
     } catch (error) {
       console.log(error);
       return null;
@@ -161,6 +165,9 @@ const actions = {
             },
           }
         );
+
+        // TODO: send sections to api
+
         return response.data;
       } catch (error) {
         console.error(error);
@@ -188,7 +195,7 @@ const actions = {
           },
         }
       );
-      commit("setCalendar", response.data);
+      commit("setCalendar", { ...response.data, fromApi: true });
       return response.data;
     } catch (error) {
       return null;
@@ -202,15 +209,15 @@ const actions = {
    */
 
   async addSection({ state, dispatch, commit }, section) {
-    const calendar = state.selectedCalendar;
+    const calendar = state.calendar;
     commit("addSection", section);
     dispatch("updateCalendar", calendar);
   },
 
   async removeSection({ state, dispatch }, section) {
-    const calendar = state.selectedCalendar;
+    const calendar = state.calendar;
     calendar.sections = calendar.sections.filter(
-      (s) => s.seccion !== section.seccion
+      (s) => s.code !== section.code
     );
     dispatch("updateCalendar", calendar);
   },
