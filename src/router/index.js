@@ -23,6 +23,11 @@ const routes = [
     component: () => import("../views/CalendarShow.vue"),
   },
   {
+    path: "/c/:uuid/edit",
+    name: "calendars.edit",
+    component: () => import("../views/CalendarEdit.vue"),
+  },
+  {
     path: "/login",
     name: "login",
     component: () => import("../views/auth/Login.vue"),
