@@ -42,13 +42,26 @@ const actions = {
   },
 
   /**
+   * Sent the csv data related from an academic charge xlsx file
+   * into the database.
+   *
+   * This return may change to a response for a job in the queue
+   * @return { Promise } The response from the API
+   */
+  async uploadAcademicChargeFile({ rootState, commit }, payload) {},
+
+  /**
    * This action is used when we want to add sections to a calendar.
    * Use it wisely, as this action will fetch plenty of data from the API.
-   *
    * payload must contain:
    * - academicChargeId
    * - calendarableId
    * - calendarableType
+   *
+   * @param { Object } payload The payload object
+   * @param { Number } payload.academicChargeId The academic charge id
+   * @param { Number } payload.calendarableId The calendarable id
+   * @param { String } payload.calendarableType The calendarable type  school | career
    */
   async getSections({ rootState, commit }, payload) {
     const { academicChargeId, calendarableId, calendarableType } = payload;
