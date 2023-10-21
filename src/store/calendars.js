@@ -36,8 +36,8 @@ const mutations = {
   },
 
   addSection(state, section) {
-    state.calendar.sections.push(section)
-  }
+    state.calendar.sections.push(section);
+  },
 };
 
 const actions = {
@@ -166,7 +166,17 @@ const actions = {
           }
         );
 
-        // TODO: send sections to api
+        // TODO: send sections to api with an elegant way
+        const sectionsId = calendar.sections.map((s) => s.id);
+        const sectionsResponse = await axios.post(
+          `${rootState.apiUrl}/calendars/${calendar.uuid}/sections`,
+          { sections: sectionsId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         return response.data;
       } catch (error) {
