@@ -13,14 +13,12 @@
 import { mapState } from "vuex";
 import { useDisplay } from "vuetify";
 import TheHeader from "./components/TheHeader.vue";
-import DmSectionSelectorNav from "./components/sections/DmSectionSelectorNav.vue";
 import NotFound from "./views/errors/NotFound.vue";
 
 export default {
   name: "App",
 
   components: {
-    DmSectionSelectorNav,
     TheHeader,
     NotFound,
   },
