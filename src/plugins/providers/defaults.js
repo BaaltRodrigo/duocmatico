@@ -23,8 +23,17 @@ const base = {
     },
   },
 
+  VListItem: {
+    VBtn: {
+      icon: true,
+      color: "",
+    },
+  },
+
   VBtn: {
-    class: "text-none bg-primary rounded-lg",
+    color: "primary",
+    variant: "flat",
+    class: "text-none rounded-lg",
   },
 
   VCard: {
