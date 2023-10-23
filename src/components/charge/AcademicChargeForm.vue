@@ -21,14 +21,9 @@
 <script>
 import { mapActions } from "vuex";
 import { read, utils } from "xlsx";
-import ChargeFormHeadersTable from "./ChargeFormHeadersTable.vue";
 
 export default {
   name: "AcademicChargeForm",
-
-  components: {
-    ChargeFormHeadersTable,
-  },
 
   watch: {
     uploadedFile: "handleFileUpload",
@@ -57,16 +52,16 @@ export default {
         return;
       }
       // There is only one file, so we use the first element every time
-      console.log("[File Form] File uploaded: ", {
-        name: file.name,
-        type: file.type,
-        size: file.size + " bytes",
-      });
+      // console.log("[File Form] File uploaded: ", {
+      //   name: file.name,
+      //   type: file.type,
+      //   size: file.size + " bytes",
+      // });
       // Using XLSX library, read the file and convert it to csv
       const reader = new FileReader();
       reader.onload = (e) => {
         this.loading = true;
-        console.log("[File Form] Reading file");
+        // console.log("[File Form] Reading file");
         const data = new Uint8Array(e.target.result);
         const workbook = read(data, { type: "array" });
 
@@ -77,20 +72,23 @@ export default {
         const csv = utils.sheet_to_csv(sheet);
         this.csvData = csv;
         this.loading = false;
-        console.log("[File Form] CSV converted");
+        // console.log("[File Form] CSV converted");
       };
 
       reader.readAsArrayBuffer(file);
     },
 
     // TODO: Send file to API
-    handleSubmit() {
+    async handleSubmit() {
       if (!this.csvData) {
         console.log("[File Form] No csv data to send");
         return;
       }
+      // Convert the csvData into a csv file
+      const csvFile = new Blob([this.csvData], { type: "text/csv" });
+      csvFile.name = "carga_academica.csv";
 
-      console.log("[File Form] Sending csv data to API");
+      await this.uploadAcademicChargeFile({ file: csvFile });
     },
   },
 
