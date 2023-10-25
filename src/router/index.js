@@ -13,6 +13,11 @@ const routes = [
     redirect: "/c",
   },
   {
+    path: "/f",
+    name: "files.index",
+    component: () => import("../views/files/FilesIndex.vue"),
+  },
+  {
     path: "/c",
     name: "calendars.index",
     component: CalendarIndex,

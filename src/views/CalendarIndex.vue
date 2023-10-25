@@ -14,8 +14,9 @@
       <v-col cols="12" md="4" xl="3">
         <v-btn
           block
+          color="black"
           variant="outlined"
-          class="elevation-4"
+          class="elevation-4 bg-primary"
           height="64px"
           @click="newCalendarForm = true"
         >
