@@ -1,5 +1,5 @@
 <template>
-  <v-card :loading="loading">
+  <v-card :loading="loading" class="pb-2">
     <v-card-item>
       <v-card-title>Compartir: {{ calendar.name }}</v-card-title>
     </v-card-item>
@@ -41,14 +41,14 @@
       v-if="isPublic"
       density="compact"
       icon="mdi-information-outline"
-      color="#D3E3FE"
+      color="blue-lighten-4"
       class="mx-6 rounded-lg"
     >
       Otras personas podran ver este calendario
     </v-alert>
 
     <v-card-text class="d-flex justify-space-between">
-      <v-btn variant="outlined" color="black" @click="test">
+      <v-btn variant="outlined" color="black" @click="copyToClipboard">
         <v-icon class="mr-3">mdi-link</v-icon>
         Copiar enlace
       </v-btn>
@@ -80,8 +80,8 @@ export default {
   }),
 
   methods: {
-    test() {
-      console.log(this.calendar);
+    copyToClipboard() {
+      navigator.clipboard.writeText(this.url);
     },
 
     async togglePrivacy() {
