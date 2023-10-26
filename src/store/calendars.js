@@ -31,8 +31,13 @@ const mutations = {
   },
 
   updateLocalCalendar(state, calendar) {
-    const index = state.localCalendars.findIndex((c) => c.id === calendar.id);
+    const index = state.localCalendars.findIndex((c) => c.uid === calendar.uid);
     state.localCalendars.splice(index, 1, calendar);
+  },
+
+  updateApiCalendar(state, calendar) {
+    const index = state.apiCalendars.findIndex((c) => c.uid === calendar.uid);
+    state.apiCalendars.splice(index, 1, calendar);
   },
 
   addSection(state, section) {
@@ -183,6 +188,30 @@ const actions = {
         console.error(error);
       }
     }
+  },
+
+  async togglePrivacy({ state, commit, rootState }, uuid) {
+    const calendar = state.apiCalendars.find((c) => c.uuid === uuid);
+    if (!calendar) {
+      return Promise.reject("Calendar not found");
+    }
+
+    const { token } = rootState.auth;
+    const response = await axios.patch(
+      rootState.apiUrl + "/calendars/" + uuid,
+      { is_public: !calendar["is_public"] },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const apiCalendar = { ...response.data, fromApi: true };
+    commit("updateApiCalendar", apiCalendar);
+    commit("setCalendar", apiCalendar);
+
+    return Promise.resolve(apiCalendar);
   },
 
   async getLocalCalendarByUuid({ state, commit }, uuid) {

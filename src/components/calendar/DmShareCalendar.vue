@@ -1,36 +1,58 @@
 <template>
-  <v-card>
+  <v-card :loading="loading">
     <v-card-item>
       <v-card-title>Compartir: {{ calendar.name }}</v-card-title>
     </v-card-item>
-    <v-card-text>
-      <v-card
-        @click=""
-        v-ripple.stop
-        class="d-flex flex-column justify-center align-center pt-4"
+    <!-- Sharing status for the calendar -->
+    <v-list>
+      <p class="mx-6 font-weight-medium">Acceso general</p>
+      <v-list-item
+        @click="togglePrivacy"
+        class="px-6 py-3"
+        value="sharing-status"
       >
-        <v-icon size="77">mdi-lock</v-icon>
-        <p>
-          Hazme click para que este calendario sea
-          {{ !isPublic ? "publico" : "privado" }}
-        </p>
-        <v-switch hide-details inset></v-switch>
-      </v-card>
-    </v-card-text>
-    <v-card-text>
-      <!-- Option to make the calendar public -->
-      <v-btn block variant="tonal">
-        <span class="text-body-1 float-left"> Hacer publico </span>
-        <v-icon class="float-right">mdi-lock</v-icon>
-      </v-btn>
-      <v-list-item density="default" @click="" class="rounded-xl py-3">
-        <v-list-item-content>
-          <v-list-item-title> {{ url }} </v-list-item-title>
-        </v-list-item-content>
-        <template #append>
-          <v-icon>mdi-content-copy</v-icon>
+        <template v-slot:prepend>
+          <v-avatar :color="isPublic ? 'primary' : 'grey-lighten-1'">
+            <v-icon>{{ isPublic ? "mdi-earth" : "mdi-lock-outline" }}</v-icon>
+          </v-avatar>
+        </template>
+        <v-list-item-title>{{
+          isPublic ? "Publico" : "Privado"
+        }}</v-list-item-title>
+        <v-list-item-subtitle>
+          {{
+            isPublic
+              ? "Cualquiera puede ver este calendario"
+              : "Solo tu tienes acceso a este calendario"
+          }}
+        </v-list-item-subtitle>
+        <template v-slot:append>
+          <p
+            class="text-subtitle-1 px-4 font-weight-medium"
+            :icon="false"
+            variant="text"
+          >
+            Cambiar
+          </p>
         </template>
       </v-list-item>
+    </v-list>
+    <v-alert
+      v-if="isPublic"
+      density="compact"
+      icon="mdi-information-outline"
+      color="#D3E3FE"
+      class="mx-6 rounded-lg"
+    >
+      Otras personas podran ver este calendario
+    </v-alert>
+
+    <v-card-text class="d-flex justify-space-between">
+      <v-btn variant="outlined" color="black" @click="test">
+        <v-icon class="mr-3">mdi-link</v-icon>
+        Copiar enlace
+      </v-btn>
+      <v-btn>Listo</v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -50,6 +72,27 @@ export default {
 
     url() {
       return `${window.location.origin}/c/${this.calendar.uuid}`;
+    },
+  },
+
+  data: () => ({
+    loading: false,
+  }),
+
+  methods: {
+    test() {
+      console.log(this.calendar);
+    },
+
+    async togglePrivacy() {
+      this.loading = true;
+
+      const response = await this.$store.dispatch(
+        "calendars/togglePrivacy",
+        this.calendar.uuid
+      );
+
+      this.loading = false;
     },
   },
 };
