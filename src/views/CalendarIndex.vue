@@ -62,7 +62,7 @@
   </v-dialog>
 
   <v-dialog v-model="showShareDialog">
-    <dm-share-calendar />
+    <dm-share-calendar @close="showShareDialog = false" />
   </v-dialog>
 </template>
 
