@@ -91,10 +91,10 @@ export default {
 
     cloudIcon() {
       if (!this.calendar.fromApi) {
-        return "mdi-web-off";
+        return "mdi-earth-off";
       }
 
-      return this.calendar.is_public ? "mdi-lock-open" : "mdi-lock";
+      return this.calendar.is_public ? "mdi-earth" : "mdi-lock";
     },
 
     calendarSubtitle() {
