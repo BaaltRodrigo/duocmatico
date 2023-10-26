@@ -1,7 +1,7 @@
 <template>
   <v-container v-if="calendar">
+    <dm-edit-sidebar :calendar="calendar" />
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
-
     <v-card class="my-4 elevation-0" height="70vh">
       <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
         :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
@@ -21,22 +21,20 @@
         </template>
       </vue-cal>
     </v-card>
-    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.edit` })">
-      Agregar secciones
-    </v-btn>
 
-    <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
-      <dm-section-card :section="section" hide-add-button></dm-section-card>
-    </v-dialog>
+    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.show` })">
+      Finalizar
+    </v-btn>
   </v-container>
 </template>
-
+  
 <script>
-import { mapGetters, mapState } from "vuex";
+import { mapActions, mapState } from "vuex";
 import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
+import DmEditSidebar from "../components/sections/DmEditSidebar.vue"
 
 export default {
   name: "CalendarShow",
@@ -44,12 +42,12 @@ export default {
   components: {
     VueCal,
     DmSectionCard,
+    DmEditSidebar
   },
 
   computed: {
     ...mapState("calendars", ["calendar"]),
-    ...mapState("academicCharges", ["secciones"]),
-    ...mapGetters("academicCharges", ["sectionsGroupedByCourse"]),
+    ...mapState("academicCharges", ["sections"]),
 
     calendarEvents() {
       return this.getCalendarEvents();
@@ -68,14 +66,16 @@ export default {
   }),
 
   methods: {
+    ...mapActions("academicCharges", ["getSections"]),
 
     // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {
-        academicChargeId: this.calendar.academic_charge_id,
+        academicChargeId: this.calendar.academic_charge.id,
         calendarableType: this.calendar.calendarable_type,
-        calendarableId: this.calendar.calendarable_id,
+        calendarableId: this.calendar.calendarable.id,
       });
+
     },
 
     openSectionInformation(sectionId) {
@@ -158,14 +158,20 @@ export default {
    */
   async created() {
     const { uuid } = this.$route.params;
-
     // Calendar is inside local calendars, use that one
     await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) return;
+    if (this.calendar) {
+      console.log(this.calendar)
+      return
+    };
 
     // Calendar is inside API calendars, use that one
     await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
-    if (this.calendar) return;
+    if (this.calendar) {
+      console.log("api")
+      console.log(this.calendar)
+      return
+    };
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);
@@ -173,8 +179,8 @@ export default {
   },
 };
 </script>
-
-<!-- Similar border radius to rounded-lg -->
+  
+  <!-- Similar border radius to rounded-lg -->
 <style>
 .vuecal__event {
   border-radius: 0.5rem;

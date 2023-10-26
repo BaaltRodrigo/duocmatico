@@ -1,51 +1,42 @@
 import { v4 as uuidv4 } from "uuid";
-
-/**
- * Calendars follow the following structure:
- * {
- *  name: "My calendar",
- *  carga: "An academic load",
- *  career: "A career",
- *  sections: [] // An array of sections
- * }
- */
+import axios from "axios";
 
 const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
-  sectionsSidebar: false, // Used to toggle the sections sidebar in the calendar editor
-  selectedCalendar: null,
+  apiCalendars: [],
+  calendar: null,
 };
 
 const mutations = {
-  setSectionsSidebar(state, value) {
-    state.sectionsSidebar = value;
-  },
-
   setLocalCalendars(state, calendars) {
     state.localCalendars = calendars;
   },
 
-  setSelectedCalendar(state, calendar) {
-    state.selectedCalendar = calendar;
+  setApiCalendars(state, calendars) {
+    state.apiCalendars = calendars;
   },
 
-  addCalendar(state, calendar) {
+  setCalendar(state, calendar) {
+    state.calendar = calendar;
+  },
+
+  addLocalCalendar(state, calendar) {
     state.localCalendars.push(calendar);
   },
 
-  removeCalendar(state, calendar) {
+  removeLocalCalendar(state, calendar) {
     state.localCalendars = state.localCalendars.filter(
-      (c) => c.id !== calendar.id
+      (c) => c.uuid !== calendar.uuid
     );
   },
 
-  updateCalendar(state, calendar) {
+  updateLocalCalendar(state, calendar) {
     const index = state.localCalendars.findIndex((c) => c.id === calendar.id);
     state.localCalendars.splice(index, 1, calendar);
   },
 
   addSection(state, section) {
-    state.selectedCalendar.sections.push(section);
+    state.calendar.sections.push(section);
   },
 };
 
@@ -57,7 +48,7 @@ const actions = {
    */
   async addUuidToCalendars({ state, dispatch }) {
     const calendars = state.localCalendars.map((calendar) => {
-      return calendar.uuid ? calendar : { id: uuidv4(), ...calendar };
+      return calendar.uuid ? calendar : { uuid: uuidv4(), ...calendar };
     });
     dispatch("setLocalCalendars", calendars);
   },
@@ -77,47 +68,147 @@ const actions = {
     dispatch("saveLocalCalendars");
   },
 
-  async toggleSectionsSidebar({ commit, state }) {
-    commit("setSectionsSidebar", !state.sectionsSidebar);
-  },
-
-  // There are cases when the sections sidebar needs to be closed by default
-  async setSectionsSidebar({ commit }, value) {
-    commit("setSectionsSidebar", value);
-  },
-
   async addCalendar({ commit, dispatch }, calendar) {
     // adds uuid to calendar
-    commit("addCalendar", { id: uuidv4(), ...calendar });
+    commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
 
-  async removeCalendar({ commit, dispatch }, calendar) {
-    commit("removeCalendar", calendar);
-    dispatch("saveLocalCalendars");
-  },
-
-  async updateCalendar({ commit, dispatch }, calendar) {
-    commit("updateCalendar", calendar);
-    dispatch("saveLocalCalendars");
-  },
-
-  async selectCalendarByIndex({ state, commit, dispatch, rootState }, index) {
-    const calendar = state.localCalendars[index];
-    commit("setSelectedCalendar", calendar);
-    // check if sections needs to be cleaned
-    const { carga, carrera } = calendar;
-    const academicChargeState = rootState.academicCharges;
-    const fetchSections =
-      carga != academicChargeState.carga ||
-      carrera != academicChargeState.carrera;
-
-    commit("academicCharges/setCarga", calendar.carga, { root: true });
-    commit("academicCharges/setCarrera", calendar.carrera, { root: true });
-    if (fetchSections) {
-      await dispatch("academicCharges/getSectionsFromFirebase", null, {
-        root: true,
+  /**
+   * Used to get the current user calendars from the API
+   */
+  async getApiCalendars({ rootState, commit }) {
+    try {
+      const { token } = rootState.auth;
+      const response = await axios.get(`${rootState.apiUrl}/calendars`, {
+        headers: {
+          Authorization: `Bearer ` + token,
+        },
       });
+
+      const calendars = response.data.map((calendar) => {
+        return { ...calendar, fromApi: true };
+      });
+
+      commit("setApiCalendars", calendars);
+      return calendars;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  },
+
+  /**
+   * This function is a general way to delete calendars. It first
+   * check if the calendar is inside the local calendars.
+   * We always check inside the API because the user could have
+   * deleted the calendar from the API.
+   */
+  async deleteCalendar({ commit, dispatch, rootState }, calendar) {
+    // Remove it from local calendars does not affect if it's on API
+    commit("removeLocalCalendar", calendar);
+    dispatch("saveLocalCalendars");
+
+    try {
+      // Delete if from the api
+      const { token } = rootState.auth;
+      await axios.delete(`${rootState.apiUrl}/calendars/${calendar.uuid}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      // If there is an error, the calendar does not exists on API
+      // or it's not owned by the user, so we can safely ignore it
+    }
+  },
+
+  async createCalendar({ dispatch, commit, rootState }, calendar) {
+    const { token } = rootState.auth;
+    // Create Local Calendar when token is null
+    if (!token) {
+      commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
+      dispatch("saveLocalCalendars");
+      return calendar;
+    } else {
+      try {
+        const response = await axios.post(
+          `${rootState.apiUrl}/calendars`,
+          calendar,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  },
+
+  async updateCalendar({ commit, dispatch, rootState }, calendar) {
+    if (!calendar.fromApi) {
+      commit("updateLocalCalendar", calendar);
+      dispatch("saveLocalCalendars");
+    } else {
+      // TODO: Clean this up
+      try {
+        const { token } = rootState.auth;
+        const response = await axios.put(
+          `${rootState.apiUrl}/calendars/${calendar.uuid}`,
+          calendar,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // TODO: send sections to api with an elegant way
+        const sectionsId = calendar.sections.map((s) => s.id);
+        const sectionsResponse = await axios.post(
+          `${rootState.apiUrl}/calendars/${calendar.uuid}/sections`,
+          { sections: sectionsId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        return response.data;
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  },
+
+  async getLocalCalendarByUuid({ state, commit }, uuid) {
+    const calendar = state.localCalendars.find((c) => c.uuid === uuid);
+    commit("setCalendar", calendar);
+  },
+
+  /**
+   * Fetch a calendar from the API by its uuid
+   * If the calendar is not found, it returns null
+   */
+  async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
+    try {
+      const { token } = rootState.auth;
+      const response = await axios.get(
+        `${rootState.apiUrl}/calendars/${uuid}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      commit("setCalendar", { ...response.data, fromApi: true });
+      return response.data;
+    } catch (error) {
+      return null;
     }
   },
 
@@ -128,15 +219,15 @@ const actions = {
    */
 
   async addSection({ state, dispatch, commit }, section) {
-    const calendar = state.selectedCalendar;
+    const calendar = state.calendar;
     commit("addSection", section);
     dispatch("updateCalendar", calendar);
   },
 
   async removeSection({ state, dispatch }, section) {
-    const calendar = state.selectedCalendar;
+    const calendar = state.calendar;
     calendar.sections = calendar.sections.filter(
-      (s) => s.seccion !== section.seccion
+      (s) => s.code !== section.code
     );
     dispatch("updateCalendar", calendar);
   },

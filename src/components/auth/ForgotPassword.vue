@@ -4,7 +4,6 @@
       v-model="email"
       label="Email"
       :error-messages="v$.email.$errors.map((e) => e.$message)"
-      variant="outlined"
     ></v-text-field>
     <!-- TODO: Put a captcha here -->
     <v-btn

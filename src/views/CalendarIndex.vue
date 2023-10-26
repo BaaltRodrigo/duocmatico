@@ -1,73 +1,164 @@
 <template>
-  <v-container>
+  <v-container class>
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
-    <v-row>
-      <v-col cols="12" md="4">
-        <v-card
+    <v-card class="my-4" :width="isMobile ? '100%' : '480'">
+      <v-text-field
+        v-model="search"
+        variant="solo"
+        hide-details
+        placeholder="Busca entre tus calendarios"
+        clearable
+      ></v-text-field>
+    </v-card>
+    <v-row :dense="!isMobile">
+      <v-col cols="12" md="4" xl="3">
+        <v-btn
+          block
+          color="black"
+          variant="outlined"
+          class="elevation-4 bg-primary"
+          height="64px"
           @click="newCalendarForm = true"
-          variant="flat"
-          height="16vh"
-          class="rounded-lg"
-          style="border: 4px dashed lightgray; background-color: transparent"
         >
-          <v-container class="text-center">
-            <v-icon size="7vh">mdi-plus</v-icon>
-            <h3>Nuevo calendario</h3>
-          </v-container>
-        </v-card>
+          <v-icon size="32" class="mr-2">mdi-plus</v-icon>
+          <span class="text-body-1"> Crear nuevo calendario </span>
+        </v-btn>
       </v-col>
-    </v-row>
-    <!-- Get calendars from store and create a card for every one -->
-    <v-row>
       <v-col
         cols="12"
         md="4"
-        v-for="(calendar, index) in localCalendars"
-        :key="`calendar-${index}`"
+        xl="3"
+        v-for="calendar in filteredCalendars"
+        :key="`calendar-${calendar.uuid}`"
       >
-        <v-card
-          height="16vh"
-          variant="outlined"
-          class="rounded-xl elevation-4"
-          @click="
-            $router.push({ name: 'calendars.show', params: { id: index } })
-          "
+        <dm-calendar-card
+          :calendar="calendar"
+          @delete="handleDelete"
+          @rename="handleRename"
+          @show="handleShow"
         >
-          <v-card-title class="ml-2">{{ calendar.name }}</v-card-title>
-          <v-card-subtitle class="ml-2 my-n2 text-capitalize">
-            {{ `${calendar.carrera} - ${calendar.carga}`.toLowerCase() }}
-          </v-card-subtitle>
-        </v-card>
+        </dm-calendar-card>
       </v-col>
     </v-row>
   </v-container>
-  <v-dialog
-    v-model="newCalendarForm"
-    max-width="480px"
-    content-class="elevation-0"
-    hide-overlay
-  >
-    <dm-calendar-form @created="newCalendarForm = false"></dm-calendar-form>
+  <!-- Option dialogs -->
+  <v-dialog v-model="newCalendarForm">
+    <dm-calendar-form @created="handleCreated"></dm-calendar-form>
+  </v-dialog>
+
+  <v-dialog v-model="deleteCalendar">
+    <dm-delete-calendar
+      @deleted-successfully="deleteCalendar = false"
+      :calendar="calendarToDelete"
+    ></dm-delete-calendar>
+  </v-dialog>
+
+  <v-dialog v-model="editCalendarName" @done="getCalendars()">
+    <dm-edit-calendar-name
+      :calendar="calendarEditName"
+      @updated="nameUpdated"
+    />
   </v-dialog>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import { useDisplay } from "vuetify/lib/framework.mjs";
+import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
+import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
+import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
 
 export default {
   name: "CalendarIndexView",
 
   components: {
+    DmCalendarCard,
     DmCalendarForm,
-  },
-
-  computed: {
-    ...mapState("calendars", ["localCalendars"]),
+    DmDeleteCalendar,
+    DmEditCalendarName,
   },
 
   data: () => ({
+    search: "",
     newCalendarForm: false,
+    deleteCalendar: false,
+    editCalendarName: false,
+    calendarToEditName: null,
   }),
+
+  computed: {
+    ...mapState("calendars", ["localCalendars", "apiCalendars", "calendar"]),
+    ...mapState("auth", ["token"]),
+
+    isMobile() {
+      const { mobile, smAndDown } = useDisplay();
+      return mobile.value || smAndDown.value;
+    },
+
+    calendarEditName() {
+      const allCalendars = [...this.localCalendars, ...this.apiCalendars];
+      return allCalendars.find((c) => c.uuid === this.calendarToEditName.uuid);
+    },
+
+    filteredCalendars() {
+      const allCalendars = [...this.localCalendars, ...this.apiCalendars];
+      if (!this.search) return allCalendars;
+
+      return allCalendars.filter(
+        (c) =>
+          c.name.toLowerCase().includes(this.search.toLowerCase()) ||
+          c.academic_charge.name
+            .toLowerCase()
+            .includes(this.search.toLowerCase()) ||
+          c.calendarable.name.toLowerCase().includes(this.search.toLowerCase())
+      );
+    },
+  },
+
+  methods: {
+    getCalendars() {
+      this.$store.dispatch("calendars/getLocalCalendars");
+
+      if (!this.token) return;
+      this.$store.dispatch("calendars/getApiCalendars");
+    },
+
+    openEditCalendarNameCard(calendar) {
+      this.calendarToEditName = calendar;
+      this.editCalendarName = true;
+    },
+
+    handleShow(calendar) {
+      this.$router.push({
+        name: "calendars.show",
+        params: { uuid: calendar.uuid },
+      });
+    },
+
+    handleDelete(calendar) {
+      this.calendarToDelete = calendar;
+      this.deleteCalendar = true;
+    },
+
+    handleRename(calendar) {
+      this.calendarToEditName = calendar;
+      this.editCalendarName = true;
+    },
+
+    nameUpdated() {
+      this.editCalendarName = false;
+      this.$store.dispatch("calendars/getApiCalendars");
+    },
+
+    handleCreated() {
+      this.newCalendarForm = false;
+      this.$store.dispatch("calendars/getApiCalendars");
+    },
+  },
+
+  created() {
+    this.getCalendars();
+  },
 };
 </script>

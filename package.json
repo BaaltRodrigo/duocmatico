@@ -9,7 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mdi/font": "5.9.55",
+    "@mdi/font": "^7.3.67",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
+    "axios": "^1.5.1",
     "firebase": "^9.18.0",
     "roboto-fontface": "*",
     "uuid": "^9.0.0",
@@ -18,7 +21,8 @@
     "vue-router": "^4.1.6",
     "vuetify": "^3.1.14",
     "vuex": "^4.0.2",
-    "webfontloader": "^1.0.0"
+    "webfontloader": "^1.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.1.0",
