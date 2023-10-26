@@ -69,7 +69,7 @@ export default {
     menuItems: [
       { title: "Ver calendario", icon: "mdi-eye", event: "show" },
       { title: "Cambiar nombre", icon: "mdi-pencil", event: "rename" },
-      // { title: "Compartir", icon: "mdi-share-variant", event: "share" },
+      { title: "Compartir", icon: "mdi-share-variant", event: "share" },
       // {
       //   title: "Agregar a la cuenta",
       //   icon: "mdi-account-plus",
@@ -104,10 +104,6 @@ export default {
   },
 
   methods: {
-    me() {
-      console.log(this.calendar);
-      console.log(this.cloudIcon);
-    },
     showMe() {
       this.$router.push({
         name: "calendars.show",
