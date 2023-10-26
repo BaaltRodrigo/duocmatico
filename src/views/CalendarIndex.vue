@@ -36,6 +36,7 @@
           @delete="handleDelete"
           @rename="handleRename"
           @show="handleShow"
+          @share="handleShare"
         >
         </dm-calendar-card>
       </v-col>
@@ -59,15 +60,20 @@
       @updated="nameUpdated"
     />
   </v-dialog>
+
+  <v-dialog v-model="showShareDialog">
+    <dm-share-calendar />
+  </v-dialog>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapMutations, mapState } from "vuex";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
 import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
 import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
+import DmShareCalendar from "../components/calendar/DmShareCalendar.vue";
 
 export default {
   name: "CalendarIndexView",
@@ -77,6 +83,7 @@ export default {
     DmCalendarForm,
     DmDeleteCalendar,
     DmEditCalendarName,
+    DmShareCalendar,
   },
 
   data: () => ({
@@ -85,6 +92,7 @@ export default {
     deleteCalendar: false,
     editCalendarName: false,
     calendarToEditName: null,
+    showShareDialog: false,
   }),
 
   computed: {
@@ -117,6 +125,7 @@ export default {
   },
 
   methods: {
+    ...mapMutations("calendars", ["setCalendar"]),
     getCalendars() {
       this.$store.dispatch("calendars/getLocalCalendars");
 
@@ -144,6 +153,11 @@ export default {
     handleRename(calendar) {
       this.calendarToEditName = calendar;
       this.editCalendarName = true;
+    },
+
+    handleShare(calendar) {
+      this.setCalendar(calendar);
+      this.showShareDialog = true;
     },
 
     nameUpdated() {
