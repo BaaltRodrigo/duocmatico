@@ -27,7 +27,6 @@
           size="small"
           class="mr-2 bg-primary"
           variant="outlined"
-          class="text-capitalize mr-2"
           color="primary"
         >
           Iniciar sesion
