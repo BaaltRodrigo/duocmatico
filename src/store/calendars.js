@@ -36,7 +36,7 @@ const mutations = {
   },
 
   updateApiCalendar(state, calendar) {
-    const index = state.apiCalendars.findIndex((c) => c.uid === calendar.uid);
+    const index = state.apiCalendars.findIndex((c) => c.uuid === calendar.uuid);
     state.apiCalendars.splice(index, 1, calendar);
   },
 
@@ -190,6 +190,12 @@ const actions = {
     }
   },
 
+  /**
+   * Change the privacy status of the selected calendar.
+   *
+   * @param {*} uuid
+   * @returns Promise
+   */
   async togglePrivacy({ state, commit, rootState }, uuid) {
     const calendar = state.apiCalendars.find((c) => c.uuid === uuid);
     if (!calendar) {
