@@ -173,7 +173,7 @@ const actions = {
 
         // TODO: send sections to api with an elegant way
         const sectionsId = calendar.sections.map((s) => s.id);
-        const sectionsResponse = await axios.post(
+        const sectionsResponse = await axios.put(
           `${rootState.apiUrl}/calendars/${calendar.uuid}/sections`,
           { sections: sectionsId },
           {
@@ -232,17 +232,16 @@ const actions = {
   async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
     try {
       const { token } = rootState.auth;
+      // If the user is not logged in, we don't send the token
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await axios.get(
         `${rootState.apiUrl}/calendars/${uuid}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        { headers }
       );
       commit("setCalendar", { ...response.data, fromApi: true });
       return response.data;
     } catch (error) {
+      console.log(error);
       return null;
     }
   },
