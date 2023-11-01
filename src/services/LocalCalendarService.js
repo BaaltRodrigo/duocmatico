@@ -10,36 +10,50 @@ export class LocalCalendarService {
   /**
    * Get the calendars from the local storage
    *
-   * @returns Array of calendars
+   * @returns Promise with array of calendars
    */
   index() {
-    return JSON.parse(localStorage.getItem("calendars")) || [];
+    // This promise should never be rejected...
+    return new Promise((resolve, reject) => {
+      const calendars = JSON.parse(localStorage.getItem("calendars")) || [];
+      resolve(calendars);
+    });
   }
 
-  create(calendar) {
-    // Always get the calendars from the local storage as another
-    // tab could have added a new calendar or removed another
-    const calendars = this.index();
-    calendars.push({ ...calendar, uuid: uuidv4() }); // Always generate a new uuid on create
-    localStorage.setItem("calendars", JSON.stringify(calendars));
-    return calendar;
+  /**
+   * Creates a calendar inside the local storage
+   *
+   * @param {Object} calendar
+   * @returns Promise with the calendar
+   */
+  create({ calendar }) {
+    // This promise should never reject...
+    return new Promise((resolve, reject) => {
+      const calendars = this.index();
+      calendars.push({ ...calendar, uuid: uuidv4() }); // Always generate a new uuid on create
+      localStorage.setItem("calendars", JSON.stringify(calendars));
+
+      resolve(calendar);
+    });
   }
 
   /**
    * Get a calendar from the local storage
    * @param {string} uuid
-   * @returns The calendar
+   * @returns Promise with the calendar
    * @throws Error if the calendar is not found on local storage
    */
   get(uuid) {
-    const calendars = this.index();
-    const calendar = calendars.find((c) => c.uuid === uuid);
+    return new Promise((resolve, reject) => {
+      const calendars = this.index();
+      const calendar = calendars.find((c) => c.uuid === uuid);
 
-    if (!calendar) {
-      throw new Error("Calendar not found");
-    }
+      if (!calendar) {
+        reject(new Error("Calendar not found"));
+      }
 
-    return calendar;
+      resolve(calendar);
+    });
   }
 
   /**
@@ -50,23 +64,41 @@ export class LocalCalendarService {
    * @throws Error if the calendar is not found on local storage
    */
   update(calendar) {
-    const calendars = this.index();
-    const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
+    return new Promise((resolve, reject) => {
+      const calendars = this.index();
+      const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
 
-    if (index < 0) {
-      throw new Error("Calendar not found");
-    }
+      if (index < 0) {
+        reject(new Error("Calendar not found"));
+      }
 
-    calendars.splice(index, 1, calendar);
-    localStorage.setItem("calendars", JSON.stringify(calendars));
-    return calendar;
+      calendars.splice(index, 1, calendar);
+      localStorage.setItem("calendars", JSON.stringify(calendars));
+      resolve(calendar);
+    });
   }
 
-  delete(calendar) {
-    const calendars = this.index();
-    const filteredCalendars = calendars.filter((c) => c.uuid !== calendar.uuid);
-    // This way of deleting a calendar should now throw an error
-    localStorage.setItem("calendars", JSON.stringify(filteredCalendars));
-    return calendar;
+  /**
+   * Deletes a calendar from the local storage
+   *
+   * @param {Object} payload
+   * @param {string} payload.uuid The uuid of the calendar to delete
+   * @returns The deleted calendar
+   */
+  delete({ uuid }) {
+    return new Promise((resolve, reject) => {
+      const calendars = this.index();
+      const index = calendars.findIndex((c) => c.uuid === uuid);
+
+      if (index < 0) {
+        reject(new Error("Calendar not found"));
+      }
+
+      const calendar = calendars[index];
+
+      calendars.splice(index, 1);
+      localStorage.setItem("calendars", JSON.stringify(calendars));
+      resolve(calendar);
+    });
   }
 }
