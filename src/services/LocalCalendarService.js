@@ -63,7 +63,7 @@ export class LocalCalendarService {
    * @returns The updated calendar
    * @throws Error if the calendar is not found on local storage
    */
-  update(calendar) {
+  update({ calendar }) {
     return new Promise((resolve, reject) => {
       const calendars = this.index();
       const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
@@ -85,20 +85,20 @@ export class LocalCalendarService {
    * @param {string} payload.uuid The uuid of the calendar to delete
    * @returns The deleted calendar
    */
-  delete({ uuid }) {
-    return new Promise((resolve, reject) => {
-      const calendars = this.index();
-      const index = calendars.findIndex((c) => c.uuid === uuid);
+  delete({ calendar }) {
+    return new Promise(async (resolve, reject) => {
+      const calendars = await this.index();
+      const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
 
       if (index < 0) {
         reject(new Error("Calendar not found"));
       }
 
-      const calendar = calendars[index];
+      const deletedCalendar = calendars[index];
 
       calendars.splice(index, 1);
       localStorage.setItem("calendars", JSON.stringify(calendars));
-      resolve(calendar);
+      resolve(deletedCalendar);
     });
   }
 }
