@@ -48,162 +48,163 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from "vuex";
-import { useDisplay } from "vuetify";
-import VueCal from "vue-cal";
-import "vue-cal/dist/vuecal.css";
-import DmSectionCard from "../components/sections/DmSectionCard.vue";
+  import { mapGetters, mapState } from "vuex";
+  import { useDisplay } from "vuetify";
+  import VueCal from "vue-cal";
+  import "vue-cal/dist/vuecal.css";
+  import DmSectionCard from "../components/sections/DmSectionCard.vue";
+  import { v4 as uuidv4 } from "uuid";
 
-export default {
-  name: "CalendarShow",
+  export default {
+    name: "CalendarShow",
 
-  components: {
-    VueCal,
-    DmSectionCard,
-  },
-
-  computed: {
-    ...mapState("calendars", ["calendar"]),
-    ...mapState("academicCharges", ["secciones"]),
-    ...mapGetters("academicCharges", ["sectionsGroupedByCourse"]),
-
-    calendarEvents() {
-      return this.getCalendarEvents();
+    components: {
+      VueCal,
+      DmSectionCard,
     },
 
-    isMobile() {
-      const { mobile } = useDisplay();
-      return mobile.value;
-    },
-    isCalendarInApi() {
-      return this.$store.getters["calendars/isCalendarInApi"](
-        this.$route.params.uuid
-      );
-    },
-  },
+    computed: {
+      ...mapState("calendars", ["calendar"]),
+      ...mapState("academicCharges", ["secciones"]),
+      ...mapGetters("academicCharges", ["sectionsGroupedByCourse"]),
 
-  data: () => ({
-    loaded: false,
-    sectionInformation: false,
-    section: null,
-  }),
+      calendarEvents() {
+        return this.getCalendarEvents();
+      },
 
-  methods: {
-    // An example of how to get sections
-    handleGetSections() {
-      this.$store.dispatch("academicCharges/getSections", {
-        academicChargeId: this.calendar.academic_charge_id,
-        calendarableType: this.calendar.calendarable_type,
-        calendarableId: this.calendar.calendarable_id,
-      });
+      isMobile() {
+        const { mobile } = useDisplay();
+        return mobile.value;
+      },
+      isCalendarInApi() {
+        return this.$store.getters["calendars/isCalendarInApi"](
+          this.$route.params.uuid
+        );
+      },
     },
 
-    openSectionInformation(sectionId) {
-      this.section = this.secciones.find(
-        (section) => section.seccion === sectionId
-      );
-      this.$nextTick(() => (this.sectionInformation = true));
-    },
+    data: () => ({
+      loaded: false,
+      sectionInformation: false,
+      section: null,
+    }),
 
-    getCalendarEvents() {
-      const { sections } = this.calendar;
-      return sections.map((section) => this.getSectionEvents(section)).flat();
-    },
-
-    getSectionEvents(section) {
-      const { schedules } = section;
-      return schedules
-        .filter((schedule) => schedule.times != "0:00:00 - 0:00:00") // Deleting non valid schedules
-        .map((schedule) => {
-          // const { start, end } = this.getScheduleCalendarEvents(schedule);
-          // For some reason, there is no need to subtract the timezone offset
-          // start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
-          // end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
-          return {
-            title: section.subject.name.toLowerCase(),
-            ...this.getScheduleCalendarEvents(schedule), // start, end, sala
-            color: "purple",
-            class: `text-capitalize`,
-            sectionId: section.code,
-          };
+    methods: {
+      // An example of how to get sections
+      handleGetSections() {
+        this.$store.dispatch("academicCharges/getSections", {
+          academicChargeId: this.calendar.academic_charge_id,
+          calendarableType: this.calendar.calendarable_type,
+          calendarableId: this.calendar.calendarable_id,
         });
+      },
+
+      openSectionInformation(sectionId) {
+        this.section = this.secciones.find(
+          (section) => section.seccion === sectionId
+        );
+        this.$nextTick(() => (this.sectionInformation = true));
+      },
+
+      getCalendarEvents() {
+        const { sections } = this.calendar;
+        return sections.map((section) => this.getSectionEvents(section)).flat();
+      },
+
+      getSectionEvents(section) {
+        const { schedules } = section;
+        return schedules
+          .filter((schedule) => schedule.times != "0:00:00 - 0:00:00") // Deleting non valid schedules
+          .map((schedule) => {
+            // const { start, end } = this.getScheduleCalendarEvents(schedule);
+            // For some reason, there is no need to subtract the timezone offset
+            // start.setHours(start.getHours() - start.getTimezoneOffset() / 60);
+            // end.setHours(end.getHours() - end.getTimezoneOffset() / 60);
+            return {
+              title: section.subject.name.toLowerCase(),
+              ...this.getScheduleCalendarEvents(schedule), // start, end, sala
+              color: "purple",
+              class: `text-capitalize`,
+              sectionId: section.code,
+            };
+          });
+      },
+
+      getScheduleCalendarEvents(schedule) {
+        // The early exit will never be executed because we are filtering
+        if (schedule.times === "0:00:00 - 0:00:00") return null;
+
+        const today = new Date(); // used to calculate current week's monday
+        const monday = new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          today.getDate() - today.getDay() + 1
+        );
+
+        const dayToNumber = {
+          lunes: 1,
+          martes: 2,
+          miercoles: 3,
+          jueves: 4,
+          viernes: 5,
+          sabado: 6,
+        };
+
+        // string without first 3 characters of schedule.horario
+        const [start, end] = schedule.times.slice(3).split(" - ");
+        return {
+          classroom: schedule.classroom,
+          start: new Date(
+            monday.getFullYear(),
+            monday.getMonth(),
+            monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
+            start.split(":")[0],
+            start.split(":")[1]
+          ),
+          end: new Date(
+            monday.getFullYear(),
+            monday.getMonth(),
+            monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
+            end.split(":")[0],
+            end.split(":")[1]
+          ),
+        };
+      },
+      async handleSaveSharedCalendar() {
+        const uuid = this.$route.params.uuid;
+        await this.$store.dispatch(
+          "calendars/saveAndDuplicateSharedCalendar",
+          uuid
+        );
+      },
     },
 
-    getScheduleCalendarEvents(schedule) {
-      // The early exit will never be executed because we are filtering
-      if (schedule.times === "0:00:00 - 0:00:00") return null;
+    /**
+     * Here we check everything we need to show the calendar
+     * If something is missing, we get it from the API
+     * If something is missing on the API, we show an error
+     */
+    async created() {
+      const { uuid } = this.$route.params;
 
-      const today = new Date(); // used to calculate current week's monday
-      const monday = new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate() - today.getDay() + 1
-      );
+      // Calendar is inside local calendars, use that one
+      await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
+      if (this.calendar) return;
 
-      const dayToNumber = {
-        lunes: 1,
-        martes: 2,
-        miercoles: 3,
-        jueves: 4,
-        viernes: 5,
-        sabado: 6,
-      };
+      // Calendar is inside API calendars, use that one
+      await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
+      if (this.calendar) return;
 
-      // string without first 3 characters of schedule.horario
-      const [start, end] = schedule.times.slice(3).split(" - ");
-      return {
-        classroom: schedule.classroom,
-        start: new Date(
-          monday.getFullYear(),
-          monday.getMonth(),
-          monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
-          start.split(":")[0],
-          start.split(":")[1]
-        ),
-        end: new Date(
-          monday.getFullYear(),
-          monday.getMonth(),
-          monday.getDate() + dayToNumber[schedule.day] - 1, // Monday + day of schedule
-          end.split(":")[0],
-          end.split(":")[1]
-        ),
-      };
+      // Calendar is not in local or API calendars, show error
+      this.$store.commit("calendars/setCalendar", null);
+      this.$store.commit("set404", true);
     },
-    async handleSaveSharedCalendar() {
-      const uuid = this.$route.params.uuid;
-      await this.$store.dispatch(
-        "calendars/saveAndDuplicateSharedCalendar",
-        uuid
-      );
-    },
-  },
-
-  /**
-   * Here we check everything we need to show the calendar
-   * If something is missing, we get it from the API
-   * If something is missing on the API, we show an error
-   */
-  async created() {
-    const { uuid } = this.$route.params;
-
-    // Calendar is inside local calendars, use that one
-    await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) return;
-
-    // Calendar is inside API calendars, use that one
-    await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
-    if (this.calendar) return;
-
-    // Calendar is not in local or API calendars, show error
-    this.$store.commit("calendars/setCalendar", null);
-    this.$store.commit("set404", true);
-  },
-};
+  };
 </script>
 
 <!-- Similar border radius to rounded-lg -->
 <style>
-.vuecal__event {
-  border-radius: 0.5rem;
-}
+  .vuecal__event {
+    border-radius: 0.5rem;
+  }
 </style>

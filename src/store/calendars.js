@@ -276,19 +276,16 @@ const actions = {
   },
   async saveAndDuplicateSharedCalendar({ dispatch }, uuid) {
     try {
-      // Obtener el calendario original desde la API
       const originalCalendar = await dispatch("getApiCalendarByUuid", uuid);
-
       if (!originalCalendar) {
         throw new Error("Calendario no encontrado");
       }
-
-      // Guardar una copia local
-      await dispatch("saveSharedCalendar", originalCalendar);
-
-      // Intentar guardar en la API si el usuario está autenticado
+      const newCalendar = await dispatch(
+        "saveSharedCalendar",
+        originalCalendar
+      );
       try {
-        await dispatch("saveSharedCalendarToAPI", originalCalendar);
+        await dispatch("createCalendar", newCalendar);
       } catch (error) {
         console.warn("No se pudo guardar en la API, pero se guardó localmente");
       }
