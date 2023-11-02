@@ -3,11 +3,24 @@
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
 
     <v-card class="my-4 elevation-0" height="70vh">
-      <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
-        :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
+      <vue-cal
+        hide-view-selector
+        hide-title-bar
+        :disable-views="['years', 'year', 'month', 'day']"
+        :hide-weekdays="[7]"
+        :time-from="8 * 60"
+        :time-step="30"
+        locale="es"
+        :events="calendarEvents"
+      >
         <!-- This slot is how every calendar event should render -->
         <template v-slot:event="{ event }">
-          <v-card variant="tonal" height="100%" :color="event.color" @click="openSectionInformation(event.sectionId)">
+          <v-card
+            variant="tonal"
+            height="100%"
+            :color="event.color"
+            @click="openSectionInformation(event.sectionId)"
+          >
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
             </v-card-title>
@@ -23,6 +36,9 @@
     </v-card>
     <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.edit` })">
       Agregar secciones
+    </v-btn>
+    <v-btn class="rounded-xl" @click="handleSaveSharedCalendar(calendar)">
+      Guardar Calendario
     </v-btn>
 
     <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
@@ -59,6 +75,11 @@ export default {
       const { mobile } = useDisplay();
       return mobile.value;
     },
+    isCalendarInApi() {
+      return this.$store.getters["calendars/isCalendarInApi"](
+        this.$route.params.uuid
+      );
+    },
   },
 
   data: () => ({
@@ -68,7 +89,6 @@ export default {
   }),
 
   methods: {
-
     // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {
@@ -148,6 +168,13 @@ export default {
           end.split(":")[1]
         ),
       };
+    },
+    async handleSaveSharedCalendar() {
+      const uuid = this.$route.params.uuid;
+      await this.$store.dispatch(
+        "calendars/saveAndDuplicateSharedCalendar",
+        uuid
+      );
     },
   },
 

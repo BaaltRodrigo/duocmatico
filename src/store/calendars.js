@@ -78,6 +78,11 @@ const actions = {
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
+  async saveSharedCalendar({ commit, dispatch }, sharedCalendar) {
+    const newCalendar = { uuid: uuidv4(), ...sharedCalendar };
+    commit("addLocalCalendar", newCalendar);
+    dispatch("saveLocalCalendars");
+  },
 
   /**
    * Used to get the current user calendars from the API
@@ -246,7 +251,53 @@ const actions = {
       return null;
     }
   },
+  async saveSharedCalendarToAPI({ commit, rootState }, calendar) {
+    const { token } = rootState.auth;
+    if (token) {
+      try {
+        const response = await axios.post(
+          `${rootState.apiUrl}/calendars`,
+          calendar,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        commit("setApiCalendars", [...state.apiCalendars, response.data]);
+        return response.data;
+      } catch (error) {
+        console.error("Error al guardar el calendario en la API:", error);
+        throw error;
+      }
+    } else {
+      throw new Error("El usuario no está autenticado");
+    }
+  },
+  async saveAndDuplicateSharedCalendar({ dispatch }, uuid) {
+    try {
+      // Obtener el calendario original desde la API
+      const originalCalendar = await dispatch("getApiCalendarByUuid", uuid);
 
+      if (!originalCalendar) {
+        throw new Error("Calendario no encontrado");
+      }
+
+      // Guardar una copia local
+      await dispatch("saveSharedCalendar", originalCalendar);
+
+      // Intentar guardar en la API si el usuario está autenticado
+      try {
+        await dispatch("saveSharedCalendarToAPI", originalCalendar);
+      } catch (error) {
+        console.warn("No se pudo guardar en la API, pero se guardó localmente");
+      }
+
+      alert("Calendario guardado con éxito");
+    } catch (error) {
+      alert("Hubo un error al guardar el calendario: " + error.message);
+    }
+  },
   /**
    * The following set of actions are used only to
    * add or remove sections in the calendar editor.
@@ -267,10 +318,16 @@ const actions = {
     dispatch("updateCalendar", calendar);
   },
 };
+const getters = {
+  UuidApiCalendarsExist: (state) => (uuid) => {
+    return state.apiCalendars.some((calendar) => calendar.uuid === uuid);
+  },
+};
 
 export default {
   namespaced: true,
   state,
   mutations,
   actions,
+  getters,
 };
