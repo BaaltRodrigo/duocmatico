@@ -40,6 +40,9 @@
     <v-btn class="rounded-xl" @click="handleSaveSharedCalendar(calendar)">
       Guardar Calendario
     </v-btn>
+    <v-dialog v-model="dialog" width="auto">
+      <calendar-message @close="dialog = false" />
+    </v-dialog>
 
     <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
       <dm-section-card :section="section" hide-add-button></dm-section-card>
@@ -53,7 +56,7 @@
   import VueCal from "vue-cal";
   import "vue-cal/dist/vuecal.css";
   import DmSectionCard from "../components/sections/DmSectionCard.vue";
-  import { v4 as uuidv4 } from "uuid";
+  import CalendarMessage from "../components/calendar/DmCalendarMessage.vue";
 
   export default {
     name: "CalendarShow",
@@ -61,6 +64,7 @@
     components: {
       VueCal,
       DmSectionCard,
+      CalendarMessage,
     },
 
     computed: {
@@ -87,6 +91,7 @@
       loaded: false,
       sectionInformation: false,
       section: null,
+      dialog: false,
     }),
 
     methods: {
@@ -171,11 +176,16 @@
         };
       },
       async handleSaveSharedCalendar() {
-        const uuid = this.$route.params.uuid;
-        await this.$store.dispatch(
-          "calendars/saveAndDuplicateSharedCalendar",
-          uuid
-        );
+        try {
+          const uuid = this.$route.params.uuid;
+          await this.$store.dispatch(
+            "calendars/saveSharedCalendarLocally",
+            uuid
+          );
+          this.dialog = true;
+        } catch (error) {
+          this.dialog = true;
+        }
       },
     },
 

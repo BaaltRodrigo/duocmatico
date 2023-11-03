@@ -5,6 +5,8 @@ const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
   apiCalendars: [],
   calendar: null,
+  error: null,
+  success: null,
 };
 
 const mutations = {
@@ -43,6 +45,12 @@ const mutations = {
   addSection(state, section) {
     state.calendar.sections.push(section);
   },
+  setError(state, error) {
+    state.error = error;
+  },
+  setSuccess(state, success) {
+    state.success = success;
+  },
 };
 
 const actions = {
@@ -78,14 +86,11 @@ const actions = {
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
-  async saveSharedCalendar({ getters, commit, dispatch }, sharedCalendar) {
-    if (getters.isCalendarNameExistInLocalStorage(sharedCalendar.name)) {
-      throw new Error(
-        "Ya existe un calendario con este nombre en el LocalStorage"
-      );
+  async saveSharedCalendar({ getters, commit, dispatch }, calendar) {
+    if (getters.isCalendarNameExistInLocalStorage(calendar.name)) {
+      throw new Error("Ya existe un calendario con este nombre");
     }
-    const newCalendar = { uuid: uuidv4(), ...sharedCalendar };
-    commit("addLocalCalendar", newCalendar);
+    commit("addLocalCalendar", calendar);
     dispatch("saveLocalCalendars");
   },
 
@@ -256,47 +261,21 @@ const actions = {
       return null;
     }
   },
-  async saveSharedCalendarToAPI({ commit, rootState }, calendar) {
-    const { token } = rootState.auth;
-    if (token) {
-      try {
-        const response = await axios.post(
-          `${rootState.apiUrl}/calendars`,
-          calendar,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        commit("setApiCalendars", [...state.apiCalendars, response.data]);
-        return response.data;
-      } catch (error) {
-        console.error("Error al guardar el calendario en la API:", error);
-        throw error;
-      }
-    } else {
-      throw new Error("El usuario no está autenticado");
-    }
-  },
-  async saveAndDuplicateSharedCalendar({ dispatch }, uuid) {
+  async saveSharedCalendarLocally({ dispatch, commit }, uuid) {
     try {
       const originalCalendar = await dispatch("getApiCalendarByUuid", uuid);
       if (!originalCalendar) {
-        throw new Error("Calendario no encontrado");
+        throw new Error("No se puede guardar el calendario");
       }
-      // Crear una copia del calendario original y asignarle un nuevo UUID
       const newCalendar = { ...originalCalendar, uuid: uuidv4() };
       await dispatch("saveSharedCalendar", newCalendar);
-      try {
-        await dispatch("createCalendar", newCalendar);
-      } catch (error) {
-        console.warn("No se pudo guardar en la API, pero se guardó localmente");
-      }
 
-      alert("Calendario guardado con éxito");
+      commit("setSuccess", "Calendario guardado con éxito");
     } catch (error) {
-      alert("Hubo un error al guardar el calendario: " + error.message);
+      commit(
+        "setError",
+        "Hubo un error al guardar el calendario: " + error.message
+      );
     }
   },
   /**
