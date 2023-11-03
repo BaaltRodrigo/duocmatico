@@ -161,15 +161,13 @@ export default {
     // Calendar is inside local calendars, use that one
     await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
     if (this.calendar) {
-      console.log(this.calendar)
+
       return
     };
 
     // Calendar is inside API calendars, use that one
     await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
     if (this.calendar) {
-      console.log("api")
-      console.log(this.calendar)
       return
     };
 

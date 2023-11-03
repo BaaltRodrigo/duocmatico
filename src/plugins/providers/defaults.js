@@ -25,7 +25,6 @@ const base = {
 
   VListItem: {
     VBtn: {
-      icon: true,
       color: "",
     },
   },
