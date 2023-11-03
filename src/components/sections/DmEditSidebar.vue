@@ -1,26 +1,21 @@
 <template>
   <v-navigation-drawer class="px-2" floating :width="450" color="transparent">
     <v-card class="elevation-0">
-      <v-text-field class="pt-3 pl-3 mr-2" v-model="search" prepend-inner-icon="mdi-magnify" clearable label="Asignatura"
-        type="text" variant="outlined" :append-icon="'mdi-cog-outline'" @click:append="showFilter = !showFilter"
-        @click:clear="clearSearch">
-      </v-text-field>
+      <v-container>
+        <v-text-field hide-details v-model="search" prepend-inner-icon="mdi-magnify" clearable label="Asignatura"
+          type="text" variant="outlined" :append-inner-icon="'mdi-cog-outline'"
+          @click:appendInner="showFilter = !showFilter" @click:clear="clearFilters">
+        </v-text-field>
+      </v-container>
       <v-expand-transition v-show="showFilter">
         <v-card-text class="text-subtitle-1">
-          Semestre
-          <v-row>
-            <v-col cols="7" class="mt-1">
-              <v-autocomplete v-model="selectedLevel" chips closable-chips multiple clearable :items="levelOptions"
-                label="Seleccione el nivel" item-title="name" item-value="value"></v-autocomplete>
-            </v-col>
-            <v-col cols="5">
-              <v-radio-group v-model="selectedShift">
-                <v-radio label="Diurno" value="diurno"></v-radio>
-                <v-radio label="Vespertino" value="vespertino"></v-radio>
-              </v-radio-group>
-              <v-btn @click="clearSearch">Limpiar Datos</v-btn>
-            </v-col>
-          </v-row>
+          <v-autocomplete v-model="selectedLevel" chips closable-chips multiple clearable :items="availableLevels"
+            label="Seleccione el semestre"></v-autocomplete>
+          <v-radio-group inline v-model="selectedShift">
+            <v-radio label="Diurno" value="diurno"></v-radio>
+            <v-radio class="mx-auto" label="Vespertino" value="vespertino"></v-radio>
+          </v-radio-group>
+          <v-btn @click="clearFilters">Limpiar Filtros</v-btn>
         </v-card-text>
       </v-expand-transition>
       <v-expansion-panels v-if="groupedSections" variant="accordion">
@@ -48,18 +43,7 @@ export default {
     show: false,
     showFilter: false,
     selectedLevel: [],
-    selectedShift: '',
-    levelOptions: [
-      { value: 0, name: "Optativo" },
-      { value: 1, name: "1" },
-      { value: 2, name: "2" },
-      { value: 3, name: "3" },
-      { value: 4, name: "4" },
-      { value: 5, name: "5" },
-      { value: 6, name: "6" },
-      { value: 7, name: "7" },
-      { value: 8, name: "8" },
-    ]
+    selectedShift: ''
   }),
 
   components: {
@@ -68,6 +52,15 @@ export default {
 
   computed: {
     ...mapState('academicCharges', ['sections']),
+
+    availableLevels() {
+      const levels = this.sections.map((s) => s.subject.level)
+
+      const uniqueLevels = [...new Set(levels)]
+
+      return uniqueLevels.sort().map((i) => ({ value: i, title: i == 0 ? 'Optativo' : i }));
+    },
+
     groupedSections() {
       return this.sections.reduce((acc, section) => {
         const subjectId = section.subject.id;
@@ -78,10 +71,8 @@ export default {
               sections: [],
             };
           }
-
           acc[subjectId].sections.push(section);
         }
-
         return acc;
       }, {});
     },
@@ -117,7 +108,7 @@ export default {
       return sentences.join(" ");
     },
 
-    clearSearch() {
+    clearFilters() {
       this.search = '';
       this.selectedLevel = [];
       this.selectedShift = null;
@@ -125,13 +116,11 @@ export default {
 
   },
   async created() {
-
     await this.getSections({
       academicChargeId: this.calendar.academic_charge.id,
       calendarableId: this.calendar.calendarable.id,
       calendarableType: this.calendar.calendarable_type.toLowerCase(),
     });
-
   },
 };
 </script>
