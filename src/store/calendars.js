@@ -78,7 +78,12 @@ const actions = {
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
-  async saveSharedCalendar({ commit, dispatch }, sharedCalendar) {
+  async saveSharedCalendar({ getters, commit, dispatch }, sharedCalendar) {
+    if (getters.isCalendarNameExistInLocalStorage(sharedCalendar.name)) {
+      throw new Error(
+        "Ya existe un calendario con este nombre en el LocalStorage"
+      );
+    }
     const newCalendar = { uuid: uuidv4(), ...sharedCalendar };
     commit("addLocalCalendar", newCalendar);
     dispatch("saveLocalCalendars");
@@ -280,10 +285,9 @@ const actions = {
       if (!originalCalendar) {
         throw new Error("Calendario no encontrado");
       }
-      const newCalendar = await dispatch(
-        "saveSharedCalendar",
-        originalCalendar
-      );
+      // Crear una copia del calendario original y asignarle un nuevo UUID
+      const newCalendar = { ...originalCalendar, uuid: uuidv4() };
+      await dispatch("saveSharedCalendar", newCalendar);
       try {
         await dispatch("createCalendar", newCalendar);
       } catch (error) {
@@ -316,8 +320,12 @@ const actions = {
   },
 };
 const getters = {
-  UuidApiCalendarsExist: (state) => (uuid) => {
-    return state.apiCalendars.some((calendar) => calendar.uuid === uuid);
+  isCalendarNameExistInLocalStorage: (state) => (calendarName) => {
+    const localStorageCalendars =
+      JSON.parse(localStorage.getItem("calendars")) || [];
+    return localStorageCalendars.some(
+      (calendar) => calendar.name === calendarName
+    );
   },
 };
 
