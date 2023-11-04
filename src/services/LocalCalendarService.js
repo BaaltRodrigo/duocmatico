@@ -12,12 +12,10 @@ export class LocalCalendarService {
    *
    * @returns Promise with array of calendars
    */
-  index() {
+  async index() {
     // This promise should never be rejected...
-    return new Promise((resolve, reject) => {
-      const calendars = JSON.parse(localStorage.getItem("calendars")) || [];
-      resolve(calendars);
-    });
+    const calendars = JSON.parse(localStorage.getItem("calendars")) || [];
+    return calendars;
   }
 
   /**
@@ -43,7 +41,7 @@ export class LocalCalendarService {
    * @returns Promise with the calendar
    * @throws Error if the calendar is not found on local storage
    */
-  get(uuid) {
+  get({ uuid }) {
     return new Promise((resolve, reject) => {
       const calendars = this.index();
       const calendar = calendars.find((c) => c.uuid === uuid);

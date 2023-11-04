@@ -172,7 +172,7 @@ export default {
   },
 
   created() {
-    this.getCalendars();
+    this.$store.dispatch("calendars/getCalendars");
   },
 };
 </script>
