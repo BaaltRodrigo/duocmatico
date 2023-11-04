@@ -86,14 +86,6 @@ const actions = {
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
-  async saveSharedCalendar({ getters, commit, dispatch }, calendar) {
-    if (getters.isCalendarNameExistInLocalStorage(calendar.name)) {
-      throw new Error("Ya existe un calendario con este nombre");
-    }
-    commit("addLocalCalendar", calendar);
-    dispatch("saveLocalCalendars");
-  },
-
   /**
    * Used to get the current user calendars from the API
    */
@@ -145,23 +137,28 @@ const actions = {
 
   async createCalendar({ dispatch, commit, rootState }, calendar) {
     const { token } = rootState.auth;
+    const calendarData = {
+      ...calendar,
+      uuid: uuidv4(),
+    };
+    console.log(calendarData);
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
+      commit("addLocalCalendar", calendarData);
       dispatch("saveLocalCalendars");
-      return calendar;
+      return calendarData;
     } else {
       try {
         const response = await axios.post(
           `${rootState.apiUrl}/calendars`,
-          calendar,
+          calendarData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        return response.data;
+        return { ...response.data, fromApi: true };
       } catch (error) {
         console.error(error);
       }
@@ -260,23 +257,6 @@ const actions = {
       return null;
     }
   },
-  async saveSharedCalendarLocally({ dispatch, commit }, uuid) {
-    try {
-      const originalCalendar = await dispatch("getApiCalendarByUuid", uuid);
-      if (!originalCalendar) {
-        throw new Error("No se puede guardar el calendario");
-      }
-      const newCalendar = { ...originalCalendar, uuid: uuidv4() };
-      await dispatch("saveSharedCalendar", newCalendar);
-
-      commit("setSuccess", "Calendario guardado con éxito");
-    } catch (error) {
-      commit(
-        "setError",
-        "Hubo un error al guardar el calendario: " + error.message
-      );
-    }
-  },
   /**
    * The following set of actions are used only to
    * add or remove sections in the calendar editor.
@@ -296,14 +276,20 @@ const actions = {
     );
     dispatch("updateCalendar", calendar);
   },
-};
-const getters = {
-  isCalendarNameExistInLocalStorage: (state) => (calendarName) => {
-    const localStorageCalendars =
-      JSON.parse(localStorage.getItem("calendars")) || [];
-    return localStorageCalendars.some(
-      (calendar) => calendar.name === calendarName
+  async isCalendarShared({ state }, uuid) {
+    const localCalendar = state.localCalendars.find(
+      (calendar) => calendar.uuid === uuid
     );
+    if (localCalendar) {
+      return true;
+    }
+    const apiCalendar = state.apiCalendars.find(
+      (calendar) => calendar.uuid === uuid
+    );
+    if (apiCalendar) {
+      return true;
+    }
+    return false;
   },
 };
 
@@ -312,5 +298,4 @@ export default {
   state,
   mutations,
   actions,
-  getters,
 };
