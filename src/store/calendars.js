@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { auth } from "../config/firebase";
 import axios from "axios";
 
 const state = {
@@ -84,7 +85,7 @@ const actions = {
    */
   async getApiCalendars({ rootState, commit }) {
     try {
-      const { token } = rootState.auth;
+      const token = await auth.currentUser.getIdToken();
       const response = await axios.get(`${rootState.apiUrl}/calendars`, {
         headers: {
           Authorization: `Bearer ` + token,
@@ -116,7 +117,8 @@ const actions = {
 
     try {
       // Delete if from the api
-      const { token } = rootState.auth;
+      const token = await auth.currentUser.getIdToken();
+
       await axios.delete(`${rootState.apiUrl}/calendars/${calendar.uuid}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -129,7 +131,7 @@ const actions = {
   },
 
   async createCalendar({ dispatch, commit, rootState }, calendar) {
-    const { token } = rootState.auth;
+    const token = await auth.currentUser.getIdToken();
     // Create Local Calendar when token is null
     if (!token) {
       commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
@@ -160,7 +162,8 @@ const actions = {
     } else {
       // TODO: Clean this up
       try {
-        const { token } = rootState.auth;
+        const token = await auth.currentUser.getIdToken();
+
         const response = await axios.put(
           `${rootState.apiUrl}/calendars/${calendar.uuid}`,
           calendar,
@@ -202,7 +205,8 @@ const actions = {
       return Promise.reject("Calendar not found");
     }
 
-    const { token } = rootState.auth;
+    const token = await auth.currentUser.getIdToken();
+
     const response = await axios.patch(
       rootState.apiUrl + "/calendars/" + uuid,
       { is_public: !calendar["is_public"] },
@@ -231,7 +235,8 @@ const actions = {
    */
   async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
     try {
-      const { token } = rootState.auth;
+      const token = await auth.currentUser.getIdToken();
+
       // If the user is not logged in, we don't send the token
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       const response = await axios.get(

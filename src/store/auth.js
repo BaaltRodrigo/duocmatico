@@ -11,9 +11,14 @@ import {
 import { auth } from "../config/firebase";
 import axios from "axios";
 
+const AVAILABLE_PROVIDERS = {
+  google: new GoogleAuthProvider(),
+};
+
 const state = {
   user: null,
-  token: null,
+  isLogged: false,
+  // This comes from the Duocmatico API
   roles: [],
   permissions: [],
 };
@@ -25,20 +30,22 @@ const getters = {
 };
 
 const mutations = {
+  setLoggedIn(state, user) {
+    state.user = user;
+    state.isLogged = true;
+  },
+
+  setLoggedOut(state) {
+    state.user = null;
+    state.isLogged = false;
+  },
+
   setRoles(state, roles) {
     state.roles = roles;
   },
 
   setPermissions(state, permissions) {
     state.permissions = permissions;
-  },
-
-  setUser(state, user) {
-    state.user = user;
-  },
-
-  setToken(state, token) {
-    state.token = token;
   },
 };
 
@@ -49,14 +56,13 @@ const actions = {
 
     if (!user) return; // early exit
 
-    commit("setToken", await user.getIdToken());
-    commit("setUser", user);
+    commit("setLoggedIn", user);
 
     dispatch("getCurrentRolesAndPermission");
   },
 
-  async getCurrentRolesAndPermission({ commit, rootState, state }) {
-    const { token } = state;
+  async getCurrentRolesAndPermission({ commit, rootState }) {
+    const token = await auth.currentUser.getIdToken();
     const response = await axios.get(`${rootState.apiUrl}/auth/me`, {
       headers: {
         Authorization: `Bearer ` + token,
@@ -69,16 +75,19 @@ const actions = {
     commit("setPermissions", permissions);
   },
 
-  async loginWhitGoogle({ commit }) {
+  async loginWhitProvider({ commit }, providerName) {
+    const provider = AVAILABLE_PROVIDERS[providerName];
+    if (!provider) {
+      throw new Error("Invalid provider");
+    }
+
     try {
-      const provider = new GoogleAuthProvider();
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithPopup(auth, provider);
-      const token = await response.user.getIdToken();
 
-      commit("setUser", response.user);
-      commit("setToken", token);
+      commit("setLoggedIn", response.user);
     } catch (error) {
+      //TODO: Handle this error properly
       console.log(error);
     }
   },
@@ -88,9 +97,7 @@ const actions = {
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithEmailAndPassword(auth, email, password);
 
-      const token = await response.user.getIdToken();
       commit("setUser", response.user);
-      commit("setToken", token);
     } catch (error) {
       console.error(error);
     }
@@ -99,8 +106,7 @@ const actions = {
   async logout({ commit }) {
     await signOut(auth);
     // Clean auth status
-    commit("setUser", null);
-    commit("setToken", null);
+    commit("setLoggedOut");
 
     // Clean another modules state if needed
     commit("calendars/setApiCalendars", [], { root: true });
@@ -117,10 +123,8 @@ const actions = {
       email,
       password
     );
-    const token = await response.user.getIdToken();
 
-    commit("setUser", response.user);
-    commit("setToken", token);
+    commit("setLoggedIn", response.user);
   },
 
   async requestPasswordReset({ commit }, email) {

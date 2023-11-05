@@ -1,4 +1,5 @@
 import axios from "axios";
+import { auth } from "../config/firebase";
 
 const state = {
   academicCharges: [],
@@ -72,7 +73,7 @@ const actions = {
       return;
     }
 
-    const { token } = rootState.auth;
+    const token = await auth.currentUser.getIdToken();
     const route = `${rootState.apiUrl}/academic-charges/`;
 
     // send the payload as a file to the api route using token as a bearer
@@ -98,7 +99,8 @@ const actions = {
       return;
     }
 
-    const { token } = rootState.auth;
+    const token = await auth.currentUser.getIdToken();
+
     const route = `${rootState.apiUrl}/academic-charges/${payload.id}`;
 
     const response = await axios.patch(route, payload, {
