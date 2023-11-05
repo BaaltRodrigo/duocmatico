@@ -12,35 +12,30 @@
   </v-form>
 </template>
 
-<script>
-import { mapActions, mapState } from "vuex";
+<script setup>
+import { ref } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
-export default {
-  name: "LoginForm",
+const email = ref(null);
+const password = ref(null);
+const showPassword = ref(false);
 
-  computed: {
-    ...mapState("auth", ["user"]),
-  },
+const store = useStore();
+const router = useRouter();
 
-  data: () => ({
-    email: null,
-    password: null,
-    showPassword: false,
-  }),
+const submitForm = async () => {
+  try {
+    await store.dispatch("auth/login", {
+      email: email.value,
+      password: password.value,
+    });
 
-  methods: {
-    ...mapActions("auth", ["login"]),
+    const { user } = store.state.auth;
 
-    async submitForm() {
-      try {
-        await this.login({ email: this.email, password: this.password });
-
-        if (this.user) return this.$router.push({ name: "home" });
-      } catch (error) {
-        // Do something when the form fails
-        console.log(error);
-      }
-    },
-  },
+    if (user) return router.push({ name: "home" });
+  } catch (error) {
+    console.log(error);
+  }
 };
 </script>
