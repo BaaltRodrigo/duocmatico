@@ -128,8 +128,6 @@ export default {
     ...mapMutations("calendars", ["setCalendar"]),
     getCalendars() {
       this.$store.dispatch("calendars/getLocalCalendars");
-
-      if (!this.token) return;
       this.$store.dispatch("calendars/getApiCalendars");
     },
 
