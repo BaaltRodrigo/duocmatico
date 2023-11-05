@@ -84,8 +84,10 @@ const actions = {
    * Used to get the current user calendars from the API
    */
   async getApiCalendars({ rootState, commit }) {
+    if (!auth.currentUser) return null; // early exit
+    const token = await auth.currentUser.getIdToken();
+
     try {
-      const token = await auth.currentUser.getIdToken();
       const response = await axios.get(`${rootState.apiUrl}/calendars`, {
         headers: {
           Authorization: `Bearer ` + token,
@@ -116,7 +118,7 @@ const actions = {
     dispatch("saveLocalCalendars");
 
     try {
-      // Delete if from the api
+      if (!auth.currentUser) return null; // early exit
       const token = await auth.currentUser.getIdToken();
 
       await axios.delete(`${rootState.apiUrl}/calendars/${calendar.uuid}`, {
@@ -205,6 +207,7 @@ const actions = {
       return Promise.reject("Calendar not found");
     }
 
+    if (!auth.currentUser) return null; // early exit
     const token = await auth.currentUser.getIdToken();
 
     const response = await axios.patch(
@@ -235,6 +238,7 @@ const actions = {
    */
   async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
     try {
+      if (!auth.currentUser) return null; // early exit
       const token = await auth.currentUser.getIdToken();
 
       // If the user is not logged in, we don't send the token
