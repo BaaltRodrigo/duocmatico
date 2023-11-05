@@ -5,8 +5,6 @@ const state = {
   localCalendars: [], // Starts empty, then gets populated with the calendars from the local storage
   apiCalendars: [],
   calendar: null,
-  error: null,
-  success: null,
 };
 
 const mutations = {
@@ -44,12 +42,6 @@ const mutations = {
 
   addSection(state, section) {
     state.calendar.sections.push(section);
-  },
-  setError(state, error) {
-    state.error = error;
-  },
-  setSuccess(state, success) {
-    state.success = success;
   },
 };
 
