@@ -97,7 +97,7 @@ const actions = {
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithEmailAndPassword(auth, email, password);
 
-      commit("setUser", response.user);
+      commit("setLoggedIn", response.user);
     } catch (error) {
       console.error(error);
     }
