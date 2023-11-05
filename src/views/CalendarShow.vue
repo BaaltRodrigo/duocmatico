@@ -38,12 +38,13 @@
       Agregar secciones
     </v-btn>
     <v-btn
-      class="rounded-xl"
-      v-if="!calendarShared"
+      class="rounded-xl ml-2"
+      v-if="!calendarExists"
       @click="handleSaveSharedCalendar(calendar)"
     >
       Guardar Calendario
     </v-btn>
+
     <v-dialog v-model="dialog" width="auto">
       <calendar-message @close="dialog = false" />
     </v-dialog>
@@ -55,7 +56,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState, mapActions } from "vuex";
+import { mapGetters, mapState } from "vuex";
 import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
@@ -84,8 +85,8 @@ export default {
       const { mobile } = useDisplay();
       return mobile.value;
     },
-    isCalendarInApi() {
-      return this.$store.getters["calendars/isCalendarInApi"](
+    calendarExists() {
+      return this.$store.getters["calendars/calendarExists"](
         this.$route.params.uuid
       );
     },
@@ -100,13 +101,6 @@ export default {
   }),
 
   methods: {
-    ...mapActions("calendars", ["isCalendarShared"]),
-
-    async checkIfCalendarShared() {
-      this.calendarShared = await this.isCalendarShared(this.calendar.id);
-    },
-
-    // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {
         academicChargeId: this.calendar.academic_charge_id,
@@ -230,7 +224,6 @@ export default {
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);
     this.$store.commit("set404", true);
-    await this.checkIfCalendarShared();
   },
 };
 </script>

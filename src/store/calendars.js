@@ -276,20 +276,18 @@ const actions = {
     );
     dispatch("updateCalendar", calendar);
   },
-  async isCalendarShared({ state }, uuid) {
-    const localCalendar = state.localCalendars.find(
+};
+const getters = {
+  calendarExists: (state) => (uuid) => {
+    const existsLocally = state.localCalendars.some(
       (calendar) => calendar.uuid === uuid
     );
-    if (localCalendar) {
-      return true;
-    }
-    const apiCalendar = state.apiCalendars.find(
+
+    const existsInApi = state.apiCalendars.some(
       (calendar) => calendar.uuid === uuid
     );
-    if (apiCalendar) {
-      return true;
-    }
-    return false;
+
+    return existsLocally || existsInApi;
   },
 };
 
@@ -298,4 +296,5 @@ export default {
   state,
   mutations,
   actions,
+  getters,
 };
