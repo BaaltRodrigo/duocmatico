@@ -133,7 +133,6 @@ const actions = {
       ...calendar,
       uuid: uuidv4(),
     };
-    console.log(calendarData);
     // Create Local Calendar when token is null
     if (!token) {
       commit("addLocalCalendar", calendarData);

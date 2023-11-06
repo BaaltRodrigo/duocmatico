@@ -39,14 +39,14 @@
     </v-btn>
     <v-btn
       class="rounded-xl ml-2"
-      v-if="!calendarExists"
+      v-if="!calendarExists && !calendarSaved"
       @click="handleSaveSharedCalendar(calendar)"
     >
       Guardar Calendario
     </v-btn>
 
-    <v-dialog v-model="dialog" width="auto">
-      <calendar-message @close="dialog = false" />
+    <v-dialog v-model="dialogCardMessage" width="auto">
+      <Dm-Calendar-Message @close="dialogCardMessage = false" />
     </v-dialog>
 
     <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
@@ -61,7 +61,7 @@ import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
-import CalendarMessage from "../components/calendar/DmCalendarMessage.vue";
+import DmCalendarMessage from "../components/calendar/DmCalendarMessage.vue";
 
 export default {
   name: "CalendarShow",
@@ -69,7 +69,7 @@ export default {
   components: {
     VueCal,
     DmSectionCard,
-    CalendarMessage,
+    DmCalendarMessage,
   },
 
   computed: {
@@ -96,8 +96,9 @@ export default {
     loaded: false,
     sectionInformation: false,
     section: null,
-    dialog: false,
+    dialogCardMessage: false,
     calendarShared: false,
+    calendarSaved: false,
   }),
 
   methods: {
@@ -198,9 +199,10 @@ export default {
             sections: this.calendar.sections,
           });
         }
-        this.dialog = true;
+        this.calendarSaved = true;
+        this.dialogCardMessage = true;
       } catch (error) {
-        this.dialog = true;
+        this.dialogCardMessage = true;
       }
     },
   },
