@@ -37,6 +37,7 @@ export default {
     confirmDelete() {
       if (this.calendar) {
         this.deleteCalendar(this.calendar).then(() => {
+          this.$store.dispatch("calendars/getApiCalendars");
           this.$emit("deleted-successfully");
         });
       }

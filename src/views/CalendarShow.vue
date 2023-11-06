@@ -3,11 +3,24 @@
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
 
     <v-card class="my-4 elevation-0" height="70vh">
-      <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
-        :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
+      <vue-cal
+        hide-view-selector
+        hide-title-bar
+        :disable-views="['years', 'year', 'month', 'day']"
+        :hide-weekdays="[7]"
+        :time-from="8 * 60"
+        :time-step="30"
+        locale="es"
+        :events="calendarEvents"
+      >
         <!-- This slot is how every calendar event should render -->
         <template v-slot:event="{ event }">
-          <v-card variant="tonal" height="100%" :color="event.color" @click="openSectionInformation(event.sectionId)">
+          <v-card
+            variant="tonal"
+            height="100%"
+            :color="event.color"
+            @click="openSectionInformation(event.sectionId)"
+          >
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
             </v-card-title>
@@ -24,6 +37,17 @@
     <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.edit` })">
       Agregar secciones
     </v-btn>
+    <v-btn
+      class="rounded-xl ml-2"
+      v-if="!calendarExists && !calendarSaved"
+      @click="handleSaveSharedCalendar(calendar)"
+    >
+      Guardar Calendario
+    </v-btn>
+
+    <v-dialog v-model="dialogCardMessage" width="auto">
+      <Dm-Calendar-Message @close="dialogCardMessage = false" />
+    </v-dialog>
 
     <v-dialog v-model="sectionInformation" :width="isMobile ? '' : '50%'">
       <dm-section-card :section="section" hide-add-button></dm-section-card>
@@ -37,6 +61,7 @@ import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
+import DmCalendarMessage from "../components/calendar/DmCalendarMessage.vue";
 
 export default {
   name: "CalendarShow",
@@ -44,6 +69,7 @@ export default {
   components: {
     VueCal,
     DmSectionCard,
+    DmCalendarMessage,
   },
 
   computed: {
@@ -59,17 +85,22 @@ export default {
       const { mobile } = useDisplay();
       return mobile.value;
     },
+    calendarExists() {
+      return this.$store.getters["calendars/calendarExists"](
+        this.$route.params.uuid
+      );
+    },
   },
 
   data: () => ({
     loaded: false,
     sectionInformation: false,
     section: null,
+    dialogCardMessage: false,
+    calendarSaved: false,
   }),
 
   methods: {
-
-    // An example of how to get sections
     handleGetSections() {
       this.$store.dispatch("academicCharges/getSections", {
         academicChargeId: this.calendar.academic_charge_id,
@@ -148,6 +179,30 @@ export default {
           end.split(":")[1]
         ),
       };
+    },
+    async handleSaveSharedCalendar() {
+      try {
+        const calendar = {
+          ...this.calendar,
+          calendarable_type: this.calendar.calendarable_type.toLowerCase(),
+          calendarable_id: this.calendar.calendarable.id,
+          academic_charge_id: this.calendar.academic_charge.id,
+        };
+        const response = await this.$store.dispatch(
+          "calendars/createCalendar",
+          calendar
+        );
+        if (this.calendar.fromApi) {
+          await this.$store.dispatch("calendars/updateCalendar", {
+            ...response,
+            sections: this.calendar.sections,
+          });
+        }
+        this.calendarSaved = true;
+        this.dialogCardMessage = true;
+      } catch (error) {
+        this.dialogCardMessage = true;
+      }
     },
   },
 

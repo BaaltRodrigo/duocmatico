@@ -78,7 +78,6 @@ const actions = {
     commit("addCalendar", { uuid: uuidv4(), ...calendar });
     dispatch("saveLocalCalendars");
   },
-
   /**
    * Used to get the current user calendars from the API
    */
@@ -130,23 +129,27 @@ const actions = {
 
   async createCalendar({ dispatch, commit, rootState }, calendar) {
     const { token } = rootState.auth;
+    const calendarData = {
+      ...calendar,
+      uuid: uuidv4(),
+    };
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
+      commit("addLocalCalendar", calendarData);
       dispatch("saveLocalCalendars");
-      return calendar;
+      return calendarData;
     } else {
       try {
         const response = await axios.post(
           `${rootState.apiUrl}/calendars`,
-          calendar,
+          calendarData,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        return response.data;
+        return { ...response.data, fromApi: true };
       } catch (error) {
         console.error(error);
       }
@@ -245,7 +248,6 @@ const actions = {
       return null;
     }
   },
-
   /**
    * The following set of actions are used only to
    * add or remove sections in the calendar editor.
@@ -266,10 +268,24 @@ const actions = {
     dispatch("updateCalendar", calendar);
   },
 };
+const getters = {
+  calendarExists: (state) => (uuid) => {
+    const existsLocally = state.localCalendars.some(
+      (calendar) => calendar.uuid === uuid
+    );
+
+    const existsInApi = state.apiCalendars.some(
+      (calendar) => calendar.uuid === uuid
+    );
+
+    return existsLocally || existsInApi;
+  },
+};
 
 export default {
   namespaced: true,
   state,
   mutations,
   actions,
+  getters,
 };
