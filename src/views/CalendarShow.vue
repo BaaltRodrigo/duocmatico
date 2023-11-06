@@ -97,7 +97,6 @@ export default {
     sectionInformation: false,
     section: null,
     dialogCardMessage: false,
-    calendarShared: false,
     calendarSaved: false,
   }),
 
