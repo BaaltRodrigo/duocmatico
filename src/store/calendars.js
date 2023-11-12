@@ -241,8 +241,7 @@ const actions = {
    */
   async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
     try {
-      if (!auth.currentUser) return null; // early exit
-      const token = await auth.currentUser.getIdToken();
+      const token = await auth.currentUser?.getIdToken();
 
       // If the user is not logged in, we don't send the token
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
