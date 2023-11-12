@@ -277,6 +277,7 @@ const actions = {
     dispatch("updateCalendar", calendar);
   },
 };
+
 const getters = {
   calendarExists: (state) => (uuid) => {
     const existsLocally = state.localCalendars.some(
