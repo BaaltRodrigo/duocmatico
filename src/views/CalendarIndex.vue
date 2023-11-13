@@ -172,5 +172,13 @@ export default {
   created() {
     this.getCalendars();
   },
+
+  mounted() {
+    const localUuids = this.localCalendars.map((c) => c.uuid);
+    console.log("localUuids", localUuids.length);
+    const uniques = [...new Set(localUuids)];
+    console.log("uniques", uniques.length);
+    console.log(localUuids);
+  },
 };
 </script>

@@ -180,6 +180,7 @@ export default {
         ),
       };
     },
+
     async handleSaveSharedCalendar() {
       try {
         const calendar = {
@@ -188,19 +189,25 @@ export default {
           calendarable_id: this.calendar.calendarable.id,
           academic_charge_id: this.calendar.academic_charge.id,
         };
+
+        // Create the calendar locally or in the API
         const response = await this.$store.dispatch(
           "calendars/createCalendar",
           calendar
         );
-        if (this.calendar.fromApi) {
-          await this.$store.dispatch("calendars/updateCalendar", {
-            ...response,
-            sections: this.calendar.sections,
-          });
-        }
-        this.calendarSaved = true;
+
+        console.log(response);
+
+        // Update the calendar locally or in the API
+        await this.$store.dispatch("calendars/updateCalendar", {
+          ...response,
+          sections: this.calendar.sections,
+        });
+
+        // this.calendarSaved = true;
         this.dialogCardMessage = true;
       } catch (error) {
+        console.log(error);
         this.dialogCardMessage = true;
       }
     },

@@ -38,6 +38,7 @@ export default {
       if (this.calendar) {
         this.deleteCalendar(this.calendar).then(() => {
           this.$store.dispatch("calendars/getApiCalendars");
+          console.log();
           this.$emit("deleted-successfully");
         });
       }

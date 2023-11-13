@@ -132,16 +132,17 @@ const actions = {
   },
 
   async createCalendar({ dispatch, commit, rootState }, calendar) {
-    const token = await auth.currentUser.getIdToken();
+    const token = await auth.currentUser?.getIdToken();
+
     const calendarData = {
       ...calendar,
       uuid: uuidv4(),
     };
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addLocalCalendar", calendarData);
+      commit("addLocalCalendar", { ...calendarData, fromApi: undefined });
       dispatch("saveLocalCalendars");
-      return calendarData;
+      return { ...calendarData, fromApi: undefined };
     } else {
       try {
         const response = await axios.post(
