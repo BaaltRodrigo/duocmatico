@@ -72,7 +72,7 @@ const actions = {
    * @param {string} uuid
    * @returns
    */
-  async deleteCalendar({ dispatch, rootState }, calendar) {
+  async deleteCalendar({ rootState }, calendar) {
     const { token } = rootState.auth;
     const { fromApi } = calendar;
     const service = fromApi ? apiService : localService;
@@ -211,7 +211,6 @@ const localActions = {
     commit("setCalendar", calendar);
     dispatch("saveLocalCalendars");
   },
-
   /**
    * This action keep the local storage updated to every change
    * made by the user or duocmatico inside the local calendars.
@@ -292,9 +291,13 @@ const apiActions = {
     }
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addLocalCalendar", { uuid: uuidv4(), ...calendar });
+      commit("addLocalCalendar", {
+        ...calendarData,
+        fromApi: false,
+        is_public: false,
+      });
       dispatch("saveLocalCalendars");
-      return calendar;
+      return { ...calendarData, fromApi: false, is_public: false };
     } else {
       try {
         const response = await apiService.create(token, calendar);
@@ -368,7 +371,7 @@ const apiActions = {
    * Fetch a calendar from the API by its uuid
    * If the calendar is not found, it returns null
    */
-  async getApiCalendarByUuid({ state, commit, rootState }, uuid) {
+  async getApiCalendarByUuid({ commit, rootState }, uuid) {
     try {
       const { token } = rootState.auth;
       const response = await apiService.get(token, uuid);
@@ -380,7 +383,6 @@ const apiActions = {
       return null;
     }
   },
-
   /**
    * The following set of actions are used only to
    * add or remove sections in the calendar editor.
@@ -400,10 +402,24 @@ const apiActions = {
   },
 };
 
+const getters = {
+  calendarExists: (state) => (uuid) => {
+    const existsLocally = state.localCalendars.some(
+      (calendar) => calendar.uuid === uuid
+    );
+
+    const existsInApi = state.apiCalendars.some(
+      (calendar) => calendar.uuid === uuid
+    );
+
+    return existsLocally || existsInApi;
+  },
+};
+
 export default {
   namespaced: true,
   state,
   mutations,
   actions,
-  // actions: { ...localActions, ...apiActions },
+  getters,
 };

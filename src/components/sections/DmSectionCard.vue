@@ -6,7 +6,7 @@
         {{ formatGroupName(section.subject.name) }}
       </v-list-item-subtitle>
       <template #append>
-        <v-btn variant="outlined" class="rounded-pill text-capitalize" size="small"
+        <v-btn variant="outlined" class="rounded-xl text-capitalize" size="small"
           @click="!isAdded ? addSection(section) : removeSection(section)">
           {{ !isAdded ? "Agregar" : "Quitar" }}
         </v-btn>
@@ -126,7 +126,7 @@ export default {
     },
 
     showMoreInformation() {
-      return this.show || !this.isInSelection;
+      return this.show || this.isInSelection;
     },
   },
 
