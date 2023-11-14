@@ -3,11 +3,24 @@
     <dm-edit-sidebar :calendar="calendar" />
     <h4 class="text-h4 mb-2">{{ calendar.name }}</h4>
     <v-card class="my-4 elevation-0" height="70vh">
-      <vue-cal hide-view-selector hide-title-bar :disable-views="['years', 'year', 'month', 'day']" :hide-weekdays="[7]"
-        :time-from="8 * 60" :time-step="30" locale="es" :events="calendarEvents">
+      <vue-cal
+        hide-view-selector
+        hide-title-bar
+        :disable-views="['years', 'year', 'month', 'day']"
+        :hide-weekdays="[7]"
+        :time-from="8 * 60"
+        :time-step="30"
+        locale="es"
+        :events="calendarEvents"
+      >
         <!-- This slot is how every calendar event should render -->
         <template v-slot:event="{ event }">
-          <v-card variant="tonal" height="100%" :color="event.color" @click="openSectionInformation(event.sectionId)">
+          <v-card
+            variant="tonal"
+            height="100%"
+            :color="event.color"
+            @click="openSectionInformation(event.sectionId)"
+          >
             <v-card-title class="text-capitalize text-body-2">
               {{ event.title }}
             </v-card-title>
@@ -22,19 +35,17 @@
       </vue-cal>
     </v-card>
 
-    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.show` })">
-      Finalizar
-    </v-btn>
+    <v-btn class="rounded-xl" @click="handleSubmit"> Finalizar </v-btn>
   </v-container>
 </template>
-  
+
 <script>
 import { mapActions, mapState } from "vuex";
 import { useDisplay } from "vuetify";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
-import DmEditSidebar from "../components/sections/DmEditSidebar.vue"
+import DmEditSidebar from "../components/sections/DmEditSidebar.vue";
 
 export default {
   name: "CalendarShow",
@@ -42,7 +53,7 @@ export default {
   components: {
     VueCal,
     DmSectionCard,
-    DmEditSidebar
+    DmEditSidebar,
   },
 
   computed: {
@@ -75,7 +86,6 @@ export default {
         calendarableType: this.calendar.calendarable_type,
         calendarableId: this.calendar.calendarable.id,
       });
-
     },
 
     openSectionInformation(sectionId) {
@@ -149,6 +159,18 @@ export default {
         ),
       };
     },
+
+    async handleSubmit() {
+      const response = await this.$store.dispatch(
+        "calendars/addSections",
+        this.calendar
+      );
+
+      this.$router.push({
+        name: "calendars.show",
+        params: { uuid: this.calendar.uuid },
+      });
+    },
   },
 
   /**
@@ -159,17 +181,12 @@ export default {
   async created() {
     const { uuid } = this.$route.params;
     // Calendar is inside local calendars, use that one
-    await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) {
 
-      return
-    };
-
-    // Calendar is inside API calendars, use that one
-    await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
+    await this.$store.dispatch("calendars/getCalendar", uuid);
     if (this.calendar) {
-      return
-    };
+      // this.loaded = true;
+      return;
+    }
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);
@@ -177,8 +194,8 @@ export default {
   },
 };
 </script>
-  
-  <!-- Similar border radius to rounded-lg -->
+
+<!-- Similar border radius to rounded-lg -->
 <style>
 .vuecal__event {
   border-radius: 0.5rem;
