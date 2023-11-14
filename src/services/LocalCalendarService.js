@@ -87,7 +87,7 @@ export class LocalCalendarService {
    * @param {string} payload.uuid The uuid of the calendar to delete
    * @returns The deleted calendar
    */
-  async delete({ calendar }) {
+  async delete(calendar) {
     const calendars = await this.index();
     const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
 
