@@ -214,13 +214,11 @@ export default {
   async created() {
     const { uuid } = this.$route.params;
 
-    // Calendar is inside local calendars, use that one
-    await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) return;
-
-    // Calendar is inside API calendars, use that one
-    await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
-    if (this.calendar) return;
+    // Get general calendar from both, API and Local Service
+    await this.$store.dispatch("calendars/getCalendar", uuid);
+    if (this.calendar) {
+      return; // Found a calendar, return
+    }
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);
