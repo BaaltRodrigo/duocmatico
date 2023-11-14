@@ -1,6 +1,13 @@
 <template>
   <v-card title="Nuevo Calendario">
     <v-card-text>
+      <v-alert
+        class="mb-4"
+        icon="mdi-information-outline"
+        color="blue-lighten-4"
+      >
+        {{ whereIsSaved }}
+      </v-alert>
       <v-form ref="form">
         <v-text-field
           v-model="name"
@@ -70,6 +77,14 @@ export default {
 
   computed: {
     ...mapState("academicCharges", ["academicCharges", "academicCharge"]),
+
+    whereIsSaved() {
+      if (this.source === CALENDAR_SOURCES.LOCAL) {
+        return "Este calendario se guardará en este dispositivo";
+      } else {
+        return "Este calendario se guardará en tu cuenta";
+      }
+    },
 
     isDisabled() {
       return !(this.name && this.chargeId && this.calendarableId);
