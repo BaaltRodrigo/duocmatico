@@ -33,7 +33,7 @@ export class LocalCalendarService {
       ...calendar,
       uuid: uuidv4(),
       source: CALENDAR_SOURCES.LOCAL,
-      public: false, // By default, any local calendar is private
+      is_public: false, // By default, any local calendars are private
     };
     calendars.push(createdCalendar); // Always generate a new uuid on create
 
