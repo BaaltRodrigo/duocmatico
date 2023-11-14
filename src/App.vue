@@ -33,13 +33,6 @@ export default {
       isMobile: mobile.value,
     };
   },
-
-  async created() {
-    // get load saved local calendars
-    await this.$store.dispatch("calendars/getLocalCalendars");
-    // add uuid to all calendars without uuid
-    await this.$store.dispatch("calendars/addUuidToCalendars");
-  },
 };
 </script>
 

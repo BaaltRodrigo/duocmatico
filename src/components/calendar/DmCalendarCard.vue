@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import { CALENDAR_SOURCES } from "../../helpers/constants";
+
 export default {
   name: "DmCalendarCard",
 
@@ -57,11 +59,6 @@ export default {
     calendar: {
       type: Object,
       required: true,
-    },
-
-    selected: {
-      type: Boolean,
-      default: false,
     },
   },
 
@@ -81,8 +78,8 @@ export default {
 
   computed: {
     menuOptions() {
-      // remove sycnronize option if calendar is from api
-      if (this.calendar.fromApi) {
+      // remove synchronize option if calendar is from api
+      if (this.calendar.source === CALENDAR_SOURCES.API) {
         return this.menuItems.filter((item) => item.event !== "synchronize");
       }
 
@@ -90,7 +87,7 @@ export default {
     },
 
     cloudIcon() {
-      if (!this.calendar.fromApi) {
+      if (this.calendar.source === CALENDAR_SOURCES.LOCAL) {
         return "mdi-earth-off";
       }
 

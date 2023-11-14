@@ -34,16 +34,18 @@
         </template>
       </vue-cal>
     </v-card>
-    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.edit` })">
-      Agregar secciones
-    </v-btn>
-    <v-btn
-      class="rounded-xl ml-2"
-      v-if="!calendarExists && !calendarSaved"
-      @click="handleSaveSharedCalendar(calendar)"
-    >
-      Guardar Calendario
-    </v-btn>
+
+    <section>
+      <v-btn
+        v-if="!isSharedCalendar"
+        @click="$router.push({ name: `calendars.edit` })"
+      >
+        Agregar secciones
+      </v-btn>
+      <v-btn v-else @click="handleSaveSharedCalendar(calendar)">
+        Guardar Calendario
+      </v-btn>
+    </section>
 
     <v-dialog v-model="dialogCardMessage" width="auto">
       <Dm-Calendar-Message @close="dialogCardMessage = false" />
@@ -62,6 +64,8 @@ import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
 import DmCalendarMessage from "../components/calendar/DmCalendarMessage.vue";
+import { auth } from "../config/firebase";
+import { CALENDAR_SOURCES } from "../helpers/constants";
 
 export default {
   name: "CalendarShow",
@@ -85,10 +89,15 @@ export default {
       const { mobile } = useDisplay();
       return mobile.value;
     },
-    calendarExists() {
-      return this.$store.getters["calendars/calendarExists"](
-        this.$route.params.uuid
-      );
+
+    isSharedCalendar() {
+      // Local calendar can never be shared
+      if (this.calendar.source === CALENDAR_SOURCES.LOCAL) {
+        return false;
+      }
+
+      // If calendar is from API, check if its from the current user
+      return this.calendar.owner_id != auth.currentUser?.uid;
     },
   },
 
@@ -180,24 +189,33 @@ export default {
         ),
       };
     },
+
     async handleSaveSharedCalendar() {
       try {
+        // To indicate where to save the calendar
+        const source = auth.currentUser
+          ? CALENDAR_SOURCES.API
+          : CALENDAR_SOURCES.LOCAL;
+
         const calendar = {
           ...this.calendar,
-          calendarable_type: this.calendar.calendarable_type.toLowerCase(),
-          calendarable_id: this.calendar.calendarable.id,
-          academic_charge_id: this.calendar.academic_charge.id,
+          source: source,
         };
+
+        // If calendar is local, create it should be enough to get the sections
         const response = await this.$store.dispatch(
           "calendars/createCalendar",
           calendar
         );
-        if (this.calendar.fromApi) {
-          await this.$store.dispatch("calendars/updateCalendar", {
+
+        // When calendar is from API, we need to update it with the sections
+        if (source === CALENDAR_SOURCES.API) {
+          await this.$store.dispatch("calendars/addSections", {
             ...response,
             sections: this.calendar.sections,
           });
         }
+
         this.calendarSaved = true;
         this.dialogCardMessage = true;
       } catch (error) {
@@ -214,13 +232,14 @@ export default {
   async created() {
     const { uuid } = this.$route.params;
 
-    // Calendar is inside local calendars, use that one
-    await this.$store.dispatch("calendars/getLocalCalendarByUuid", uuid);
-    if (this.calendar) return;
-
-    // Calendar is inside API calendars, use that one
-    await this.$store.dispatch("calendars/getApiCalendarByUuid", uuid);
-    if (this.calendar) return;
+    // Get general calendar from both, API and Local Service
+    await this.$store.dispatch("calendars/getCalendar", uuid);
+    if (this.calendar) {
+      console.log(auth.currentUser?.uid);
+      console.log(this.calendar.owner_id);
+      console.log(this.calendar.owner_id === auth.currentUser?.uid);
+      return; // Found a calendar, return
+    }
 
     // Calendar is not in local or API calendars, show error
     this.$store.commit("calendars/setCalendar", null);

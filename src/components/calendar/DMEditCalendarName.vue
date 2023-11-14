@@ -37,13 +37,13 @@ export default {
   },
 
   methods: {
-    updateCalendarName() {
+    async updateCalendarName() {
       if (this.editedName.length === 0) {
         this.nameErrorMessages = ["El nombre es obligatorio"];
         return;
       }
 
-      this.$store.dispatch("calendars/updateCalendar", {
+      await this.$store.dispatch("calendars/updateCalendar", {
         ...this.calendar,
         name: this.editedName,
       });

@@ -1,6 +1,13 @@
 <template>
   <v-card title="Nuevo Calendario">
     <v-card-text>
+      <v-alert
+        class="mb-4"
+        icon="mdi-information-outline"
+        color="blue-lighten-4"
+      >
+        {{ whereIsSaved }}
+      </v-alert>
       <v-form ref="form">
         <v-text-field
           v-model="name"
@@ -61,13 +68,23 @@
 </template>
 
 <script>
+import { auth } from "../../config/firebase";
 import { mapActions, mapState } from "vuex";
+import { CALENDAR_SOURCES } from "../../helpers/constants";
 
 export default {
   name: "DmCalendarForm",
 
   computed: {
     ...mapState("academicCharges", ["academicCharges", "academicCharge"]),
+
+    whereIsSaved() {
+      if (this.source === CALENDAR_SOURCES.LOCAL) {
+        return "Este calendario se guardará en este dispositivo";
+      } else {
+        return "Este calendario se guardará en tu cuenta";
+      }
+    },
 
     isDisabled() {
       return !(this.name && this.chargeId && this.calendarableId);
@@ -86,6 +103,7 @@ export default {
   data: () => ({
     name: null,
     chargeId: null,
+    source: CALENDAR_SOURCES.LOCAL, // Local as default source
     calendarableId: null,
     calendarableType: "career",
     calendarableLoading: false, // Used to disable the autocomplete while loading
@@ -126,16 +144,20 @@ export default {
       );
 
       // This calendar object is using the API name convention
-      await this.createCalendar({
+      const calendar = {
         name: this.name,
         description: "",
-        academic_charge_id: this.chargeId,
-        academic_charge: this.academicCharge,
-        calendarable: calendarable,
-        calendarable_id: this.calendarableId,
-        calendarable_type: this.calendarableType,
-        sections: [],
-      });
+        academic_charge: {
+          id: this.chargeId,
+        },
+        calendarable: {
+          id: this.calendarableId,
+          type: this.calendarableType,
+        },
+        source: this.source,
+      };
+      await this.createCalendar(calendar);
+
       this.$emit("created");
     },
   },
@@ -144,6 +166,12 @@ export default {
 
   async mounted() {
     await this.getAcademicCharges();
+
+    if (auth.currentUser) {
+      this.source = CALENDAR_SOURCES.API;
+    }
+
+    console.log("Source:", this.source);
   },
 };
 </script>

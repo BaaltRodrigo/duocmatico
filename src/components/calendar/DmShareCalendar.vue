@@ -89,7 +89,7 @@ export default {
 
       const response = await this.$store.dispatch(
         "calendars/togglePrivacy",
-        this.calendar.uuid
+        this.calendar
       );
 
       this.loading = false;
