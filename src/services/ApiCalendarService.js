@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CALENDAR_SOURCES } from "../helpers/constants";
 
 /**
  * Service to get calendars from the API.
@@ -12,8 +13,9 @@ import axios from "axios";
  * @see https://github.com/BaaltRodrigo/duocmatico-api/blob/main/app/Http/Controllers/CalendarController.php
  */
 export class ApiCalendarService {
-  constructor(apiUrl) {
+  constructor(apiUrl, auth) {
     this.apiUrl = apiUrl;
+    this.auth = auth;
   }
 
   /**
@@ -22,11 +24,20 @@ export class ApiCalendarService {
    * @param {string} token The firebase token provided to the user
    * @returns Object with authorization header or empty object
    */
-  #getAuthorizationHeader(token) {
+  async #getAuthorizationHeader() {
+    const token = await this.auth.currentUser?.getIdToken();
     return token ? { Authorization: `Bearer ${token}` } : {};
   }
 
-  #requireToken(token) {
+  /**
+   * Function to prevent the utilization of a method if it required
+   * a token to be authorized.
+   *
+   * @throws Error if the the current user cannot get a token
+   */
+  #requireToken() {
+    const token = this.auth.currentUser?.getIdToken();
+
     if (!token) {
       throw new Error("Token is required to perform this action");
     }
@@ -38,92 +49,72 @@ export class ApiCalendarService {
    * @param {string} token The firebase token provided to the user
    * @returns Promise with the calendars or error from axios
    */
-  async index({ token }) {
-    this.#requireToken(token);
+  async index() {
+    this.#requireToken();
 
-    console.log("token", token);
+    const response = await axios.get(`${this.apiUrl}/calendars`, {
+      headers: await this.#getAuthorizationHeader(),
+    });
 
-    try {
-      const response = await axios.get(`${this.apiUrl}/calendars`, {
-        headers: this.#getAuthorizationHeader(token),
-      });
-
-      // Need to modify response to add the fromApi flag
-      const calendars = response.data.map((c) => ({ ...c, fromApi: true }));
-      return calendars;
-    } catch (error) {
-      // Here you can send the error to a logger service
-      return null;
-    }
+    // Need to modify response to add the fromApi flag
+    const calendars = response.data.map((c) => ({
+      ...c,
+      source: CALENDAR_SOURCES.API,
+    }));
+    return calendars;
   }
 
   /**
    * Create a calendar for the current user inside API
    *
-   * @param {string} token
    * @param {Object} calendar
    *
    * @returns Promise with the calendar or error from axios
    */
-  create({ token, calendar }) {
-    this.#requireToken(token);
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios.post(
-          `${this.apiUrl}/calendars`,
-          calendar,
-          { headers: this.#getAuthorizationHeader(token) }
-        );
+  async create(calendar) {
+    console.log("[ApiCalendarService] create", calendar);
+    this.#requireToken();
 
-        resolve({ ...response.data, fromApi: true });
-      } catch (error) {
-        // Here you can send the error to a logger service
-        reject(error);
-      }
+    const response = await axios.post(`${this.apiUrl}/calendars`, calendar, {
+      headers: await this.#getAuthorizationHeader(),
     });
+
+    console.log("[ApiCalendarService] create response", response);
+    return { ...response.data, source: CALENDAR_SOURCES.API };
   }
 
   /**
    * Update a calendar for the current user inside API
    *
-   * @param {string} token
    * @param {Object} calendar
    * @returns Promise with the calendar or error from axios
    */
-  async update({ token, calendar }) {
-    try {
-      const response = await axios.put(
-        `${this.apiUrl}/calendars/${calendar.uuid}`,
-        calendar,
-        { headers: this.#getAuthorizationHeader(token) }
-      );
-      resolve({ ...response.data, fromApi: true });
-    } catch (error) {
-      // Here you can send the error to a logger service
-      reject(error);
-    }
+  async update(calendar) {
+    this.#requireToken();
+
+    const response = await axios.put(
+      `${this.apiUrl}/calendars/${calendar.uuid}`,
+      calendar,
+      { headers: await this.#getAuthorizationHeader() }
+    );
+
+    return { ...response.data, source: CALENDAR_SOURCES.API };
   }
 
   /**
    * Delete a calendar for the current user inside API
    *
-   * @param {string} token
    * @param {Object} calendar
    * @returns Promise with the calendar or error from axios
    */
-  delete({ token, calendar }) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        await axios.delete(`${this.apiUrl}/calendars/${calendar.uuid}`, {
-          headers: this.#getAuthorizationHeader(token),
-        });
-        // Returned the calendar deleted, in case we needed to undo the action
-        resolve({ ...calendar, fromApi: true });
-      } catch (error) {
-        // Here you can send the error to a logger service
-        reject(error);
-      }
+  async delete({ uuid }) {
+    this.#requireToken();
+    const response = await axios.delete(`${this.apiUrl}/calendars/${uuid}`, {
+      headers: await this.#getAuthorizationHeader(),
     });
+
+    // Returned the calendar deleted, in case we needed to undo the action
+    return { ...calendar, source: CALENDAR_SOURCES.API };
   }
 
   /**
@@ -134,10 +125,12 @@ export class ApiCalendarService {
    * @param {string} uuid Calendar UUID
    * @returns
    */
-  get({ token, uuid }) {
-    return axios.get(`${this.apiUrl}/calendars/${uuid}`, {
-      headers: this.#getAuthorizationHeader(token),
+  async get({ uuid }) {
+    const response = await axios.get(`${this.apiUrl}/calendars/${uuid}`, {
+      headers: await this.#getAuthorizationHeader(),
     });
+
+    return { ...response.data, source: CALENDAR_SOURCES.API };
   }
 
   /**
@@ -148,20 +141,18 @@ export class ApiCalendarService {
    *
    * @returns Promise with the events or error from axios
    */
-  getSections(token, uuid) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const response = await axios.get(
-          `${this.apiUrl}/calendars/${uuid}/sections`,
-          { headers: this.#getAuthorizationHeader(token) }
-        );
+  async getSections(uuid) {
+    try {
+      const response = await axios.get(
+        `${this.apiUrl}/calendars/${uuid}/sections`,
+        { headers: await this.#getAuthorizationHeader(token) }
+      );
 
-        resolve({ ...response.data, fromApi: true });
-      } catch (error) {
-        // Here you can send the error to a logger service
-        reject(error);
-      }
-    });
+      return { ...response.data };
+    } catch (error) {
+      // Here you can send the error to a logger service
+      return error;
+    }
   }
 
   /**
@@ -172,26 +163,24 @@ export class ApiCalendarService {
    * @param {Object} calendar The calendar with the sections to update
    * @returns
    */
-  async updateSections({ token, calendar }) {
-    return new Promise(async (resolve, reject) => {
-      try {
-        // The route gets a list of the sections id
-        const sectionsId = calendar.sections.map((s) => s.id);
+  async updateSections({ calendar }) {
+    try {
+      // The route gets a list of the sections id
+      const sectionsId = calendar.sections.map((s) => s.id);
 
-        const response = await axios.put(
-          `${this.apiUrl}/calendars/${uuid}/sections`,
-          { sections: sectionsId },
-          {
-            headers: this.#getAuthorizationHeader(token),
-          }
-        );
+      const response = await axios.put(
+        `${this.apiUrl}/calendars/${uuid}/sections`,
+        { sections: sectionsId },
+        {
+          headers: await this.#getAuthorizationHeader(token),
+        }
+      );
 
-        // Only sections are returned
-        resolve(response.data);
-      } catch (error) {
-        // Here you can send the error to a logger service
-        reject(error);
-      }
-    });
+      // Only sections are returned
+      return response.data;
+    } catch (error) {
+      // Here you can send the error to a logger service
+      return null;
+    }
   }
 }
