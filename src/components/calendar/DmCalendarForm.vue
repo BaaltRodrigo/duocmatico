@@ -61,7 +61,9 @@
 </template>
 
 <script>
+import { auth } from "../../config/firebase";
 import { mapActions, mapState } from "vuex";
+import { CALENDAR_SOURCES } from "../../helpers/constants";
 
 export default {
   name: "DmCalendarForm",
@@ -86,6 +88,7 @@ export default {
   data: () => ({
     name: null,
     chargeId: null,
+    source: CALENDAR_SOURCES.LOCAL, // Local as default source
     calendarableId: null,
     calendarableType: "career",
     calendarableLoading: false, // Used to disable the autocomplete while loading
@@ -135,6 +138,7 @@ export default {
         calendarable_id: this.calendarableId,
         calendarable_type: this.calendarableType,
         sections: [],
+        source: this.source,
       });
       this.$emit("created");
     },
@@ -144,6 +148,12 @@ export default {
 
   async mounted() {
     await this.getAcademicCharges();
+
+    if (auth.currentUser) {
+      this.source = CALENDAR_SOURCES.API;
+    }
+
+    console.log("Source:", this.source);
   },
 };
 </script>
