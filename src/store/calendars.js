@@ -2,9 +2,11 @@ import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import { ApiCalendarService } from "../services/ApiCalendarService";
 import { LocalCalendarService } from "../services/LocalCalendarService";
+import { CALENDAR_SOURCES } from "../helpers/constants";
+import { auth } from "../config/firebase";
 
 // Services configurations
-const apiService = new ApiCalendarService(import.meta.env.VITE_API_URL);
+const apiService = new ApiCalendarService(import.meta.env.VITE_API_URL, auth);
 const localService = new LocalCalendarService();
 const services = { api: apiService, local: localService };
 
@@ -41,24 +43,23 @@ const mutations = {
 const actions = {
   /**
    * Action to create a calendar either in the API or Locally
-   * depending on the token.
+   * depending on the calendar source
    *
-   * @param {Object} payload.calendar Calendar to create
-   * @param {string} payload.mode api|local to override the token and decide where to create the calendar
+   * The calendar source is defined where the action is used
+   *
+   * @param {Object} calendar Calendar to create
    * @return created calendar
    */
-  async createCalendar({ commit, rootState }, payload) {
-    const { token } = rootState.auth;
-    const servicePayload = {
-      token, // Api service uses tokens
-      calendar: payload.calendar,
-    };
-    // If payload.mode is set, use that service. Otherwise, token decides
-    const service =
-      service[payload.mode] || token ? services.api : services.local;
+  async createCalendar({ commit }, calendar) {
+    // check if payload source exist in CALENDAR_SOURCES
+    if (!Object.values(CALENDAR_SOURCES).includes(calendar.source)) {
+      throw new Error("Invalid calendar source");
+    }
+
+    const service = services[calendar.source];
 
     try {
-      const serviceResponse = await service.create(servicePayload);
+      const serviceResponse = await service.create(calendar);
       commit("setCalendar", serviceResponse);
       return serviceResponse;
     } catch (error) {
@@ -72,13 +73,12 @@ const actions = {
    * @param {string} uuid
    * @returns
    */
-  async deleteCalendar({ rootState }, calendar) {
-    const { token } = rootState.auth;
-    const { fromApi } = calendar;
-    const service = fromApi ? apiService : localService;
+  async deleteCalendar(_, calendar) {
+    // _ as first because we don't need the state
+    const service = services[calendar.source];
 
     // This should throw an error when calendar is not found
-    const deleted = await service.delete({ token, calendar });
+    const deleted = await service.delete(calendar);
     return deleted;
   },
 
@@ -90,11 +90,11 @@ const actions = {
    * @param {string} uuid The uuid for a desired calendar
    * @returns Calendar or null if not found
    */
-  async getCalendar({ commit, rootState }, uuid) {
+  async getCalendar({ commit }, uuid) {
     try {
       const [localCalendar, apiCalendar] = await Promise.all([
-        localService.get({ uuid }).catch(() => null),
-        apiService.get({ token: rootState.auth.token, uuid }).catch(() => null),
+        localService.get(uuid).catch(() => null),
+        apiService.get(uuid).catch(() => null),
       ]);
 
       const calendar = localCalendar ?? apiCalendar;
@@ -112,7 +112,7 @@ const actions = {
    *
    * TODO: Handle errors properly
    */
-  getCalendars({ commit, rootState }) {
+  getCalendars({ commit }) {
     localService
       .index()
       .then((calendars) => {
@@ -125,25 +125,24 @@ const actions = {
         commit("setLocalCalendars", []);
       });
 
-    const { token } = rootState.auth;
-    apiService
-      .index({ token })
-      .then((calendars) => {
-        commit("setApiCalendars", calendars);
-      })
-      .catch((error) => {
-        // Log the error somewhere
-        console.log(error);
-        commit("setApiCalendars", []);
-      });
+    if (auth.currentUser) {
+      apiService
+        .index()
+        .then((calendars) => {
+          commit("setApiCalendars", calendars);
+        })
+        .catch((error) => {
+          // Log the error somewhere
+          console.log(error);
+          commit("setApiCalendars", []);
+        });
+    }
   },
 
-  async updateCalendar({ commit, rootState }, calendar) {
-    const { fromApi } = calendar;
-    const { token } = rootState.auth;
-    const service = fromApi ? apiService : localService;
+  async updateCalendar({ commit }, calendar) {
+    const service = services[calendar.source];
 
-    const updated = await service.update({ token, calendar });
+    const updated = await service.update(calendar);
 
     commit("setCalendar", updated);
     return updated;
