@@ -49,7 +49,7 @@ export class LocalCalendarService {
    * @throws Error if the calendar is not found on local storage
    */
   async get({ uuid }) {
-    const calendars = this.index();
+    const calendars = await this.index();
     const calendar = calendars.find((c) => c.uuid === uuid);
 
     if (!calendar) {
@@ -66,8 +66,8 @@ export class LocalCalendarService {
    * @returns The updated calendar
    * @throws Error if the calendar is not found on local storage
    */
-  async update({ calendar }) {
-    const calendars = this.index();
+  async update(calendar) {
+    const calendars = await this.index();
     const index = calendars.findIndex((c) => c.uuid === calendar.uuid);
 
     if (index < 0) {
