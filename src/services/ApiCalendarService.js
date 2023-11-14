@@ -122,7 +122,7 @@ export class ApiCalendarService {
    * @param {string} uuid Calendar UUID
    * @returns
    */
-  async get({ uuid }) {
+  async get(uuid) {
     const response = await axios.get(`${this.apiUrl}/calendars/${uuid}`, {
       headers: await this.#getAuthorizationHeader(),
     });
