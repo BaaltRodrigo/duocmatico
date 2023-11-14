@@ -34,16 +34,18 @@
         </template>
       </vue-cal>
     </v-card>
-    <v-btn class="rounded-xl" @click="$router.push({ name: `calendars.edit` })">
-      Agregar secciones
-    </v-btn>
-    <v-btn
-      class="rounded-xl ml-2"
-      v-if="!calendarExists && !calendarSaved"
-      @click="handleSaveSharedCalendar(calendar)"
-    >
-      Guardar Calendario
-    </v-btn>
+
+    <section>
+      <v-btn
+        v-if="!isSharedCalendar"
+        @click="$router.push({ name: `calendars.edit` })"
+      >
+        Agregar secciones
+      </v-btn>
+      <v-btn v-else @click="handleSaveSharedCalendar(calendar)">
+        Guardar Calendario
+      </v-btn>
+    </section>
 
     <v-dialog v-model="dialogCardMessage" width="auto">
       <Dm-Calendar-Message @close="dialogCardMessage = false" />
@@ -87,10 +89,15 @@ export default {
       const { mobile } = useDisplay();
       return mobile.value;
     },
-    calendarExists() {
-      return this.$store.getters["calendars/calendarExists"](
-        this.$route.params.uuid
-      );
+
+    isSharedCalendar() {
+      // Local calendar can never be shared
+      if (this.calendar.source === CALENDAR_SOURCES.LOCAL) {
+        return false;
+      }
+
+      // If calendar is from API, check if its from the current user
+      return this.calendar.owner_id != auth.currentUser?.uid;
     },
   },
 
@@ -231,6 +238,9 @@ export default {
     // Get general calendar from both, API and Local Service
     await this.$store.dispatch("calendars/getCalendar", uuid);
     if (this.calendar) {
+      console.log(auth.currentUser?.uid);
+      console.log(this.calendar.owner_id);
+      console.log(this.calendar.owner_id === auth.currentUser?.uid);
       return; // Found a calendar, return
     }
 
