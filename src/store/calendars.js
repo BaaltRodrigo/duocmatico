@@ -135,9 +135,13 @@ const actions = {
     };
     // Create Local Calendar when token is null
     if (!token) {
-      commit("addLocalCalendar", calendarData);
+      commit("addLocalCalendar", {
+        ...calendarData,
+        fromApi: false,
+        is_public: false,
+      });
       dispatch("saveLocalCalendars");
-      return calendarData;
+      return { ...calendarData, fromApi: false, is_public: false };
     } else {
       try {
         const response = await axios.post(
