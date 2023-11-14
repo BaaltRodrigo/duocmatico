@@ -83,8 +83,8 @@ export default {
 
   computed: {
     menuOptions() {
-      // remove sycnronize option if calendar is from api
-      if (this.calendar.fromApi) {
+      // remove synchronize option if calendar is from api
+      if (this.calendar.source === CALENDAR_SOURCES.API) {
         return this.menuItems.filter((item) => item.event !== "synchronize");
       }
 
