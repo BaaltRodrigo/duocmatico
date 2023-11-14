@@ -97,7 +97,6 @@ export default {
 
   computed: {
     ...mapState("calendars", ["localCalendars", "apiCalendars", "calendar"]),
-    ...mapState("auth", ["token"]),
 
     isMobile() {
       const { mobile, smAndDown } = useDisplay();
@@ -162,12 +161,12 @@ export default {
 
     nameUpdated() {
       this.editCalendarName = false;
-      this.$store.dispatch("calendars/getApiCalendars");
+      this.$store.dispatch("calendars/getCalendars");
     },
 
     handleCreated() {
       this.newCalendarForm = false;
-      this.$store.dispatch("calendars/getApiCalendars");
+      this.$store.dispatch("calendars/getCalendars");
     },
   },
 
