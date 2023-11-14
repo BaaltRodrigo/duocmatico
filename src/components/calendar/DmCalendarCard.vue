@@ -50,6 +50,8 @@
 </template>
 
 <script>
+import { CALENDAR_SOURCES } from "../../helpers/constants";
+
 export default {
   name: "DmCalendarCard",
 
@@ -90,7 +92,7 @@ export default {
     },
 
     cloudIcon() {
-      if (!this.calendar.fromApi) {
+      if (this.calendar.source === CALENDAR_SOURCES.LOCAL) {
         return "mdi-earth-off";
       }
 
