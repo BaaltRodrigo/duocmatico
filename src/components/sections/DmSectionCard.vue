@@ -82,16 +82,15 @@
             </v-table>
           </v-card>
         </v-col>
-        <v-col cols="12" v-if="!hideAddButton">
-          <v-btn
-            text="Ver más"
-            class="rounded-pill"
-            block
-            @click="toggleExpand(section.id)"
-          >
-            {{ showMoreInformation ? "Ocultar" : "Ver Mas" }}
-          </v-btn>
-        </v-col>
+        <v-btn
+          v-if="!hideAddButton"
+          text="Ver más"
+          class="rounded-pill"
+          block
+          @click="toggleExpand(section.id)"
+        >
+          {{ showMoreInformation ? "Ocultar" : "Ver Mas" }}
+        </v-btn>
       </v-row>
     </v-container>
   </v-card>
