@@ -144,17 +144,20 @@ export default {
       );
 
       // This calendar object is using the API name convention
-      await this.createCalendar({
+      const calendar = {
         name: this.name,
         description: "",
-        academic_charge_id: this.chargeId,
-        academic_charge: this.academicCharge,
-        calendarable: calendarable,
-        calendarable_id: this.calendarableId,
-        calendarable_type: this.calendarableType,
-        sections: [],
+        academic_charge: {
+          id: this.chargeId,
+        },
+        calendarable: {
+          id: this.calendarableId,
+          type: this.calendarableType,
+        },
         source: this.source,
-      });
+      };
+      await this.createCalendar(calendar);
+
       this.$emit("created");
     },
   },
