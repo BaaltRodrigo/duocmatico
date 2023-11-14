@@ -11,7 +11,7 @@ export class LocalCalendarService {
   /**
    * Get the calendars from the local storage
    *
-   * @returns Promise with array of calendars
+   * @returns An array of calendars or an empty array
    */
   async index() {
     // This promise should never be rejected...
@@ -22,8 +22,8 @@ export class LocalCalendarService {
   /**
    * Creates a calendar inside the local storage
    *
-   * @param {Object} calendar
-   * @returns Promise with the calendar
+   * @param {Object} calendar A representation of a calendar
+   * @returns A new Calendar
    */
   async create(calendar) {
     // This promise should never reject..
@@ -44,11 +44,11 @@ export class LocalCalendarService {
 
   /**
    * Get a calendar from the local storage
-   * @param {string} uuid
-   * @returns Promise with the calendar
+   * @param {string} uuid The uuid of the calendar to get
+   * @returns A calendar
    * @throws Error if the calendar is not found on local storage
    */
-  async get({ uuid }) {
+  async get(uuid) {
     const calendars = await this.index();
     const calendar = calendars.find((c) => c.uuid === uuid);
 
@@ -83,8 +83,7 @@ export class LocalCalendarService {
   /**
    * Deletes a calendar from the local storage
    *
-   * @param {Object} payload
-   * @param {string} payload.uuid The uuid of the calendar to delete
+   * @param {Object} calendar
    * @returns The deleted calendar
    */
   async delete(calendar) {
