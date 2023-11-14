@@ -92,6 +92,8 @@ const actions = {
    */
   async getCalendar({ commit }, uuid) {
     try {
+      // We always get an error from one service, so we need to handle it
+      // to not break the App, as a calendar cannot exist in both services
       const [localCalendar, apiCalendar] = await Promise.all([
         localService.get(uuid).catch(() => null),
         apiService.get(uuid).catch(() => null),
@@ -112,30 +114,22 @@ const actions = {
    *
    * TODO: Handle errors properly
    */
-  getCalendars({ commit }) {
-    localService
-      .index()
-      .then((calendars) => {
-        console.log("LocalCalendars:", calendars);
-        commit("setLocalCalendars", calendars);
-      })
-      .catch((error) => {
-        // Log the error somewhere
-        console.log(error);
-        commit("setLocalCalendars", []);
-      });
+  async getCalendars({ commit }) {
+    // Local calendars should never throw an error...
+    const locals = await localService.index();
+    commit("setLocalCalendars", locals);
 
-    if (auth.currentUser) {
-      apiService
-        .index()
-        .then((calendars) => {
-          commit("setApiCalendars", calendars);
-        })
-        .catch((error) => {
-          // Log the error somewhere
-          console.log(error);
-          commit("setApiCalendars", []);
-        });
+    try {
+      if (!auth.currentUser) return; // Not logged so not api calendars
+      const apiCalendars = await apiService.index();
+      commit("setApiCalendars", apiCalendars);
+    } catch (error) {
+      // Handle the error properly
+      // Possible errors:
+      // - No token
+      // - Invalid token
+      // - Network error
+      // - Server error
     }
   },
 
