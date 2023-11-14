@@ -199,9 +199,6 @@ export default {
 
         const calendar = {
           ...this.calendar,
-          calendarable_type: this.calendar.calendarable_type.toLowerCase(),
-          calendarable_id: this.calendar.calendarable.id,
-          academic_charge_id: this.calendar.academic_charge.id,
           source: source,
         };
 
