@@ -101,13 +101,14 @@ export class ApiCalendarService {
    * Delete a calendar for the current user inside API
    *
    * @param {Object} calendar
-   * @returns Promise with the calendar or error from axios
+   * @returns An axios response
    */
-  async delete({ uuid }) {
+  async delete(calendar) {
     this.#requireToken();
-    const response = await axios.delete(`${this.apiUrl}/calendars/${uuid}`, {
-      headers: await this.#getAuthorizationHeader(),
-    });
+    const response = await axios.delete(
+      `${this.apiUrl}/calendars/${calendar.uuid}`,
+      { headers: await this.#getAuthorizationHeader() }
+    );
 
     // Returned the calendar deleted, in case we needed to undo the action
     return { ...calendar, source: CALENDAR_SOURCES.API };
