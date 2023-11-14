@@ -160,16 +160,16 @@ export class ApiCalendarService {
    * @param {Object} calendar The calendar with the sections to update
    * @returns
    */
-  async updateSections({ calendar }) {
+  async updateSections(calendar) {
     try {
       // The route gets a list of the sections id
       const sectionsId = calendar.sections.map((s) => s.id);
 
       const response = await axios.put(
-        `${this.apiUrl}/calendars/${uuid}/sections`,
+        `${this.apiUrl}/calendars/${calendar.uuid}/sections`,
         { sections: sectionsId },
         {
-          headers: await this.#getAuthorizationHeader(token),
+          headers: await this.#getAuthorizationHeader(),
         }
       );
 

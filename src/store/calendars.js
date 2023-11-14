@@ -38,6 +38,11 @@ const mutations = {
   addSection(state, section) {
     state.calendar.sections.push(section);
   },
+
+  removeSection(state, section) {
+    const index = state.calendar.sections.findIndex((s) => s.id === section.id);
+    state.calendar.sections.splice(index, 1);
+  },
 };
 
 const actions = {
@@ -108,7 +113,8 @@ const actions = {
       commit("setCalendar", calendar);
       return calendar;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
+      return null;
     }
   },
 
@@ -176,6 +182,26 @@ const actions = {
     const toggledCalendar = { ...calendar, is_public: !calendar.is_public };
 
     const updated = await apiService.update(toggledCalendar);
+
+    commit("setCalendar", updated);
+    commit("updateApiCalendar", updated);
+    return updated;
+  },
+
+  /**
+   * This action is used to add a section to a calendar.
+   * When the calendar is local, we dispatch updateCalendar
+   *
+   * @param {Object} payload
+   * @returns
+   */
+  async addSections({ commit }, calendar) {
+    // Local calendars are updated differently
+    if (calendar.source === CALENDAR_SOURCES.LOCAL) {
+      return dispatch("updateCalendar", calendar);
+    }
+
+    const updated = await apiService.updateSections(calendar);
 
     commit("setCalendar", updated);
     commit("updateApiCalendar", updated);
