@@ -74,6 +74,11 @@ const actions = {
    * @returns
    */
   async deleteCalendar(_, calendar) {
+    // check if payload source exist in CALENDAR_SOURCES
+    if (!Object.values(CALENDAR_SOURCES).includes(calendar.source)) {
+      throw new Error("Invalid calendar source");
+    }
+
     // _ as first because we don't need the state
     const service = services[calendar.source];
 
@@ -133,12 +138,29 @@ const actions = {
     }
   },
 
+  /**
+   * Updates a calendar from the local storage or the API.
+   * The calendar source is defined where the action is used.
+   *
+   * @param {Object} calendar
+   * @returns The updated calendar
+   */
   async updateCalendar({ commit }, calendar) {
+    // check if payload source exist in CALENDAR_SOURCES
+    if (!Object.values(CALENDAR_SOURCES).includes(calendar.source)) {
+      throw new Error("Invalid calendar source");
+    }
+
     const service = services[calendar.source];
 
     const updated = await service.update(calendar);
 
+    const updateMutation =
+      calendar.source === CALENDAR_SOURCES.API
+        ? "updateApiCalendar"
+        : "updateLocalCalendar";
     commit("setCalendar", updated);
+    commit(updateMutation, updated);
     return updated;
   },
 
@@ -147,251 +169,17 @@ const actions = {
    * It's a shortcut to update the calendar and set the is_public
    * attribute to the opposite value.
    *
-   * @param {*} calendar
+   * @param {Object} calendar
    * @returns
    */
-  async togglePrivacy({ commit, rootState }, calendar) {
-    const { token } = rootState.auth;
+  async togglePrivacy({ commit }, calendar) {
     const toggledCalendar = { ...calendar, is_public: !calendar.is_public };
 
-    const updated = await apiService.togglePrivacy({
-      token,
-      calendar: toggledCalendar,
-    });
+    const updated = await apiService.update(toggledCalendar);
 
     commit("setCalendar", updated);
+    commit("updateApiCalendar", updated);
     return updated;
-  },
-};
-
-/**
- |--------------------------------------------------
- | Local Calendars Actions
- |--------------------------------------------------
- | Here you can find all the actions related to the
- | local calendars. This calendars are the ones
- | that are not stored inside the API.
- */
-
-const localActions = {
-  async addLocalCalendar({ commit, dispatch }, calendar) {
-    // adds uuid to calendar
-    commit("addCalendar", { uuid: uuidv4(), ...calendar });
-    dispatch("saveLocalCalendars");
-  },
-
-  async deleteLocalCalendar({ state, commit, dispatch }, calendar) {
-    const filteredCalendars = state.localCalendars.filter(
-      (c) => c.uuid !== calendar.uuid
-    );
-    commit("setLocalCalendars", filteredCalendars);
-    dispatch("saveLocalCalendars");
-  },
-
-  async getLocalCalendars({ commit }) {
-    const calendars = JSON.parse(localStorage.getItem("calendars")) ?? [];
-    commit("setLocalCalendars", calendars);
-  },
-
-  async updateLocalCalendar({ state, commit, dispatch }, calendar) {
-    const index = state.localCalendars.findIndex(
-      (c) => c.uuid === calendar.uuid
-    );
-
-    // Cant remember is splice was a destructive method
-    state.localCalendars.splice(index, 1, calendar);
-    commit("setLocalCalendars", state.localCalendars);
-    commit("setCalendar", calendar);
-    dispatch("saveLocalCalendars");
-  },
-  /**
-   * This action keep the local storage updated to every change
-   * made by the user or duocmatico inside the local calendars.
-   *
-   * This code was called over and over again, so we moved
-   * it to an action.
-   */
-  async saveLocalCalendars({ state }) {
-    localStorage.setItem("calendars", JSON.stringify(state.localCalendars));
-  },
-
-  // Is this used?
-  async setLocalCalendars({ commit, dispatch }, calendars) {
-    commit("setLocalCalendars", calendars);
-    dispatch("saveLocalCalendars");
-  },
-};
-
-/**
- |--------------------------------------------------
- | API Calendars Actions
- |--------------------------------------------------
- | The following actions are the ones related to the
- | calendars that are stored inside the API. This
- | actions commonly needs a token to work.
- */
-const apiActions = {
-  async createCalendar({ dispatch, commit, rootState }, calendar) {
-    const { token } = rootState.auth;
-    const response = await apiService.create(token, calendar);
-    return response.data;
-  },
-
-  async getApiCalendars({ rootState, commit }) {
-    try {
-      const { token } = rootState.auth;
-      const response = await apiService.index(token);
-
-      const calendars = response.data.map((calendar) => {
-        return { ...calendar, fromApi: true };
-      });
-
-      commit("setApiCalendars", calendars);
-      return calendars;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  },
-
-  /**
-   * This function is a general way to delete calendars. It first
-   * check if the calendar is inside the local calendars.
-   * We always check inside the API because the user could have
-   * deleted the calendar from the API.
-   */
-  async deleteCalendar({ commit, dispatch, rootState }, calendar) {
-    try {
-      // Delete if from the api
-      const { token } = rootState.auth;
-      const response = await apiService.delete(token, calendar);
-      // Do something with the response...
-    } catch (error) {
-      // If there is an error, the calendar does not exists on API
-      // or it's not owned by the user, so we can safely ignore it
-    }
-  },
-
-  async createCalendar({ dispatch, commit, rootState }, calendar) {
-    const { token } = rootState.auth;
-
-    // Code
-    try {
-      // More code
-    } catch (error) {
-      // Handle error
-      throw new Error("Ups");
-    }
-    // Create Local Calendar when token is null
-    if (!token) {
-      commit("addLocalCalendar", {
-        ...calendarData,
-        fromApi: false,
-        is_public: false,
-      });
-      dispatch("saveLocalCalendars");
-      return { ...calendarData, fromApi: false, is_public: false };
-    } else {
-      try {
-        const response = await apiService.create(token, calendar);
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  },
-
-  async updateCalendar({ commit, dispatch, rootState }, calendar) {
-    if (!calendar.fromApi) {
-      commit("updateLocalCalendar", calendar);
-      dispatch("saveLocalCalendars");
-    } else {
-      // TODO: Clean this up
-      try {
-        const { token } = rootState.auth;
-        const response = await apiService.update(token, calendar);
-
-        // TODO: send sections to api with an elegant way
-        const sectionsId = calendar.sections.map((s) => s.id);
-        const sectionsResponse = await axios.put(
-          `${rootState.apiUrl}/calendars/${calendar.uuid}/sections`,
-          { sections: sectionsId },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        return response.data;
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  },
-
-  /**
-   * Change the privacy status of the selected calendar.
-   *
-   * @param {*} uuid
-   * @returns Promise
-   */
-  async togglePrivacy({ state, commit, rootState }, uuid) {
-    const calendar = state.apiCalendars.find((c) => c.uuid === uuid);
-    if (!calendar) {
-      return Promise.reject("Calendar not found");
-    }
-
-    const { token } = rootState.auth;
-    const response = await apiService.update(token, {
-      ...calendar,
-      ["is_public"]: !calendar["is_public"],
-    });
-    const apiCalendar = { ...response.data, fromApi: true };
-
-    commit("updateApiCalendar", apiCalendar);
-    commit("setCalendar", apiCalendar);
-
-    return Promise.resolve(apiCalendar);
-  },
-
-  async getLocalCalendarByUuid({ state, commit }, uuid) {
-    const calendar = state.localCalendars.find((c) => c.uuid === uuid);
-    commit("setCalendar", calendar);
-  },
-
-  /**
-   * Fetch a calendar from the API by its uuid
-   * If the calendar is not found, it returns null
-   */
-  async getApiCalendarByUuid({ commit, rootState }, uuid) {
-    try {
-      const { token } = rootState.auth;
-      const response = await apiService.get(token, uuid);
-
-      commit("setCalendar", { ...response.data, fromApi: true });
-      return response.data;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  },
-  /**
-   * The following set of actions are used only to
-   * add or remove sections in the calendar editor.
-   * They are not used anywhere else.
-   */
-  async updateSections({ state, dispatch, commit }, sections) {
-    const calendar = state.calendar;
-
-    const response = await apiService.updateSections(
-      token,
-      calendar.uuid,
-      sections
-    );
-
-    commit("setSections", response.data);
-    dispatch("updateCalendar", calendar);
   },
 };
 
