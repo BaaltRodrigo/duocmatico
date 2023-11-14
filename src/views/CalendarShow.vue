@@ -62,6 +62,8 @@ import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
 import DmSectionCard from "../components/sections/DmSectionCard.vue";
 import DmCalendarMessage from "../components/calendar/DmCalendarMessage.vue";
+import { auth } from "../config/firebase";
+import { CALENDAR_SOURCES } from "../helpers/constants";
 
 export default {
   name: "CalendarShow",
@@ -180,24 +182,36 @@ export default {
         ),
       };
     },
+
     async handleSaveSharedCalendar() {
       try {
+        // To indicate where to save the calendar
+        const source = auth.currentUser
+          ? CALENDAR_SOURCES.API
+          : CALENDAR_SOURCES.LOCAL;
+
         const calendar = {
           ...this.calendar,
           calendarable_type: this.calendar.calendarable_type.toLowerCase(),
           calendarable_id: this.calendar.calendarable.id,
           academic_charge_id: this.calendar.academic_charge.id,
+          source: source,
         };
+
+        // If calendar is local, create it should be enough to get the sections
         const response = await this.$store.dispatch(
           "calendars/createCalendar",
           calendar
         );
-        if (this.calendar.fromApi) {
-          await this.$store.dispatch("calendars/updateCalendar", {
+
+        // When calendar is from API, we need to update it with the sections
+        if (source === CALENDAR_SOURCES.API) {
+          await this.$store.dispatch("calendars/addSections", {
             ...response,
             sections: this.calendar.sections,
           });
         }
+
         this.calendarSaved = true;
         this.dialogCardMessage = true;
       } catch (error) {

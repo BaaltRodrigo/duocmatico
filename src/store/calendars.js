@@ -29,6 +29,13 @@ const mutations = {
     state.calendar = calendar;
   },
 
+  updateLocalCalendar(state, calendar) {
+    const index = state.localCalendars.findIndex(
+      (c) => c.uuid === calendar.uuid
+    );
+    state.localCalendars.splice(index, 1, calendar);
+  },
+
   updateApiCalendar(state, calendar) {
     const index = state.apiCalendars.findIndex((c) => c.uuid === calendar.uuid);
     state.apiCalendars.splice(index, 1, calendar);
@@ -65,7 +72,7 @@ const actions = {
 
     try {
       const serviceResponse = await service.create(calendar);
-      commit("setCalendar", serviceResponse);
+      // commit("setCalendar", serviceResponse);
       return serviceResponse;
     } catch (error) {
       console.log(error);
@@ -195,7 +202,7 @@ const actions = {
    * @param {Object} payload
    * @returns
    */
-  async addSections({ commit }, calendar) {
+  async addSections({ commit, dispatch }, calendar) {
     // Local calendars are updated differently
     if (calendar.source === CALENDAR_SOURCES.LOCAL) {
       return dispatch("updateCalendar", calendar);
@@ -203,7 +210,7 @@ const actions = {
 
     const updated = await apiService.updateSections(calendar);
 
-    commit("setCalendar", updated);
+    // commit("setCalendar", updated);
     commit("updateApiCalendar", updated);
     return updated;
   },
