@@ -33,12 +33,10 @@ export class ApiCalendarService {
    * Function to prevent the utilization of a method if it required
    * a token to be authorized.
    *
-   * @throws Error if the the current user cannot get a token
+   * @throws Error if the the current user is null
    */
   #requireToken() {
-    const token = this.auth.currentUser?.getIdToken();
-
-    if (!token) {
+    if (!this.auth.currentUser) {
       throw new Error("Token is required to perform this action");
     }
   }
@@ -72,14 +70,12 @@ export class ApiCalendarService {
    * @returns Promise with the calendar or error from axios
    */
   async create(calendar) {
-    console.log("[ApiCalendarService] create", calendar);
     this.#requireToken();
 
     const response = await axios.post(`${this.apiUrl}/calendars`, calendar, {
       headers: await this.#getAuthorizationHeader(),
     });
 
-    console.log("[ApiCalendarService] create response", response);
     return { ...response.data, source: CALENDAR_SOURCES.API };
   }
 
