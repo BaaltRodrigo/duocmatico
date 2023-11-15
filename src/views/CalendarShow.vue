@@ -235,9 +235,6 @@ export default {
     // Get general calendar from both, API and Local Service
     await this.$store.dispatch("calendars/getCalendar", uuid);
     if (this.calendar) {
-      console.log(auth.currentUser?.uid);
-      console.log(this.calendar.owner_id);
-      console.log(this.calendar.owner_id === auth.currentUser?.uid);
       return; // Found a calendar, return
     }
 
