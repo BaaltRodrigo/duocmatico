@@ -36,7 +36,8 @@
         <v-btn
           @click="changeRoute('login')"
           size="small"
-          class="mr-2 bg-primary"
+          class="mr-2"
+          color="black"
           variant="outlined"
         >
           Iniciar sesion
@@ -44,7 +45,7 @@
         <v-btn
           @click="changeRoute('registration')"
           size="small"
-          variant="outlined"
+          variant="flat"
           class="text-capitalize"
         >
           Registrarse</v-btn
