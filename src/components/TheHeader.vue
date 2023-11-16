@@ -2,7 +2,7 @@
   <v-app-bar app fixed>
     <v-app-bar-title @click="changeRoute('home')">
       Duocmatico
-      <v-chip variant="flat" size="small" label color="primary"> Beta </v-chip>
+      <v-chip variant="flat" size="small" color="primary"> Beta </v-chip>
     </v-app-bar-title>
     <template #append>
       <v-btn v-if="!!user" icon class="rounded-pill">
@@ -37,7 +37,7 @@
           @click="changeRoute('login')"
           size="small"
           class="mr-2"
-          color="black"
+          color="white"
           variant="outlined"
         >
           Iniciar sesion
@@ -45,6 +45,7 @@
         <v-btn
           @click="changeRoute('registration')"
           size="small"
+          color="white"
           variant="flat"
           class="text-capitalize"
         >
