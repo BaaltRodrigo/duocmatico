@@ -88,7 +88,6 @@ const apiCalendars = computed(() =>
 );
 
 const email = computed(() => {
-  console.log(!!auth.currentUser?.email);
   return auth.currentUser?.email;
 });
 
@@ -98,34 +97,37 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Hero when user is not logged in -->
-  <v-container class="d-flex align-center" style="height: 50vh">
-    <dm-hero></dm-hero>
-  </v-container>
+  <!-- Render this when there is no account -->
+  <div v-if="!email">
+    <v-container class="d-flex align-center" style="height: 50vh">
+      <dm-hero></dm-hero>
+    </v-container>
 
-  <!-- Some of the Features -->
-  <v-container class="bg-white rounded-xl pa-10 mb-6" style="min-height: 50vh">
-    <h4 class="text-h4 text-center mb-8">
-      Descubre lo que puedes hacer con Duocmatico
-    </h4>
-    <v-row>
-      <v-col v-for="feature in features" :key="feature.title">
-        <dm-feature-card
-          class="h-100"
-          :icon="feature.icon"
-          :image="feature.image"
-          :title="feature.title"
-          :description="feature.description"
-          :key-actions="feature.keyActions"
-        ></dm-feature-card>
-      </v-col>
-    </v-row>
-  </v-container>
+    <!-- Some of the Features -->
+    <v-container class="bg-white rounded-xl pa-10" style="min-height: 50vh">
+      <h4 class="text-h4 text-center mb-8">
+        Descubre lo que puedes hacer con Duocmatico
+      </h4>
+      <v-row>
+        <v-col v-for="feature in features" :key="feature.title">
+          <dm-feature-card
+            class="h-100"
+            :icon="feature.icon"
+            :image="feature.image"
+            :title="feature.title"
+            :description="feature.description"
+            :key-actions="feature.keyActions"
+          ></dm-feature-card>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 
-  <v-container class="d-flex flex-column align-center">
-    <!-- <dm-hero></dm-hero> -->
+  <!-- To render when there is an account -->
+  <div v-else>
     <!-- Section with the last calendars created -->
-    <section style="max-width: 55rem">
+    <v-container style="max-width: 55rem">
+      <h3 class="text-h3 mb-6">Hola otra vez!</h3>
       <!-- Api calendars -->
       <dm-calendar-panels
         v-if="email"
@@ -142,36 +144,26 @@ onMounted(async () => {
         title="Calendarios en este dispositivo"
         :calendars="localCalendars"
       />
+    </v-container>
+  </div>
 
-      <v-card
-        class="my-b pa-4 d-flex flex-wrap justify-space-around align-center"
-      >
-        <v-img :src="prototypingProcess" width="80" max-width="240"></v-img>
-        <v-card-text class="text-h6 text-center">
-          ¿Tienes planificar tu proximo semestre?
-        </v-card-text>
-        <v-card-text>
-          <v-btn variant="outlined" block size="large">
-            Crea un calendario
-          </v-btn>
-        </v-card-text>
-      </v-card>
-      <section class="my-8">
-        <p class="text-center text-h6">
-          ¿Tus calendarios estan en otra cuenta?
-          <v-btn
-            variant="outlined"
-            color="white"
-            size="large"
-            class="mx-2 text-h6"
-          >
-            Prueba ingresando con una cuenta distinta
-          </v-btn>
-        </p>
-        <p class="text-center text-caption">
-          Esta accion cerrara la cuenta actual
-        </p>
-      </section>
-    </section>
+  <!-- This always renders -->
+  <v-container style="max-width: 55rem">
+    <v-card class="pa-4 d-flex flex-wrap justify-space-around align-center">
+      <v-img :src="prototypingProcess" width="80" max-width="240"></v-img>
+      <v-card-text class="text-h6 text-center">
+        ¿Tienes planificar tu proximo semestre?
+      </v-card-text>
+      <v-card-text>
+        <v-btn
+          @click="router.push({ name: 'login' })"
+          variant="outlined"
+          block
+          size="large"
+        >
+          Crea un calendario
+        </v-btn>
+      </v-card-text>
+    </v-card>
   </v-container>
 </template>
