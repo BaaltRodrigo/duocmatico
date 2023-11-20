@@ -83,6 +83,7 @@ export default {
 
     async handleLogout() {
       await this.$store.dispatch("auth/logout");
+      window.location.reload();
     },
   },
 };
