@@ -3,8 +3,10 @@
     <!-- <dm-section-selector-nav></dm-section-selector-nav> -->
     <the-header></the-header>
     <v-main>
-      <not-found v-if="show404" />
-      <router-view v-else></router-view>
+      <v-container style="max-width: 80rem">
+        <not-found v-if="show404" />
+        <router-view v-else></router-view>
+      </v-container>
     </v-main>
   </v-app>
 </template>
