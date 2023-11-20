@@ -143,19 +143,20 @@ export default {
         (c) => c.id === this.calendarableId
       );
 
+      const charge = this.academicCharges.find((c) => c.id === this.chargeId);
+
       // This calendar object is using the API name convention
       const calendar = {
         name: this.name,
         description: "",
-        academic_charge: {
-          id: this.chargeId,
-        },
+        academic_charge: { ...charge },
         calendarable: {
-          id: this.calendarableId,
+          ...calendarable,
           type: this.calendarableType,
         },
         source: this.source,
       };
+
       await this.createCalendar(calendar);
 
       this.$emit("created");
