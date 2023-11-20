@@ -1,12 +1,12 @@
 <template>
-  <v-app-bar color="transparent">
+  <v-toolbar color="transparent" scroll-behavior="elevate">
     <template #prepend>
       <v-avatar image="logo.png"></v-avatar>
     </template>
-    <v-app-bar-title @click="changeRoute('home')">
+    <v-toolbar-title @click="changeRoute('home')">
       Duocmatico
       <v-chip variant="flat" size="small" color="primary"> Beta </v-chip>
-    </v-app-bar-title>
+    </v-toolbar-title>
     <template #append>
       <v-btn v-if="!!user" icon class="rounded-pill">
         <v-avatar>
@@ -59,7 +59,7 @@
     <!-- <v-btn icon href="https://github.com/BaaltRodrigo/duocmatico" target="none">
       <v-icon size="x-large">{{ "mdi-github" }}</v-icon>
     </v-btn> -->
-  </v-app-bar>
+  </v-toolbar>
 </template>
 
 <script>
