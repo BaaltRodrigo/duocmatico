@@ -127,7 +127,7 @@ onMounted(async () => {
   <div v-else>
     <!-- Section with the last calendars created -->
     <v-container style="max-width: 55rem">
-      <h3 class="text-h3 mb-6">Hola otra vez!</h3>
+      <h4 class="text-h4 mb-4">Acceso rapido</h4>
       <!-- Api calendars -->
       <dm-calendar-panels
         v-if="email"
