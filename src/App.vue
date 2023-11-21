@@ -1,10 +1,12 @@
 <template>
-  <v-app>
-    <the-header></the-header>
+  <v-app :class="outsideApp ? 'bg-transparent ' : 'bg-pink-darken-4'">
     <!-- <dm-section-selector-nav></dm-section-selector-nav> -->
+    <the-header></the-header>
     <v-main>
-      <not-found v-if="show404" />
-      <router-view v-else></router-view>
+      <v-container style="max-width: 80rem">
+        <not-found v-if="show404" />
+        <router-view v-else></router-view>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -25,6 +27,10 @@ export default {
 
   computed: {
     ...mapState(["show404"]),
+
+    outsideApp() {
+      return this.$route.name !== "home";
+    },
   },
 
   provide() {
@@ -37,11 +43,6 @@ export default {
 </script>
 
 <style>
-/* Set de background color in all views */
-.my-app {
-  background-color: #fff7ea;
-}
-
 /* Set the style for the entire scrollbar */
 ::-webkit-scrollbar {
   width: 5px;

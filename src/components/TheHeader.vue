@@ -1,9 +1,12 @@
 <template>
-  <v-app-bar app fixed>
-    <v-app-bar-title @click="changeRoute('home')">
+  <v-toolbar color="transparent" scroll-behavior="elevate">
+    <template #prepend>
+      <v-avatar image="logo.png"></v-avatar>
+    </template>
+    <v-toolbar-title @click="changeRoute('home')">
       Duocmatico
-      <v-chip variant="flat" size="small" label color="primary"> Beta </v-chip>
-    </v-app-bar-title>
+      <v-chip variant="flat" size="small" color="primary"> Beta </v-chip>
+    </v-toolbar-title>
     <template #append>
       <v-btn v-if="!!user" icon class="rounded-pill">
         <v-avatar>
@@ -32,12 +35,12 @@
         </v-avatar>
       </v-btn>
 
-      <div v-else>
+      <div v-else-if="$route.name === 'home'">
         <v-btn
           @click="changeRoute('login')"
           size="small"
           class="mr-2"
-          color="black"
+          color="white"
           variant="outlined"
         >
           Iniciar sesion
@@ -45,6 +48,7 @@
         <v-btn
           @click="changeRoute('registration')"
           size="small"
+          color="white"
           variant="flat"
           class="text-capitalize"
         >
@@ -55,7 +59,7 @@
     <!-- <v-btn icon href="https://github.com/BaaltRodrigo/duocmatico" target="none">
       <v-icon size="x-large">{{ "mdi-github" }}</v-icon>
     </v-btn> -->
-  </v-app-bar>
+  </v-toolbar>
 </template>
 
 <script>
@@ -79,6 +83,7 @@ export default {
 
     async handleLogout() {
       await this.$store.dispatch("auth/logout");
+      window.location.reload();
     },
   },
 };

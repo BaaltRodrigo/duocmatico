@@ -4,7 +4,7 @@ const customLightTheme = {
   dark: false,
   colors: {
     background: colors.grey.lighten5,
-    primary: colors.green.accent1,
+    primary: colors.pink.darken3,
   },
 };
 
