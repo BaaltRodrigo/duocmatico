@@ -1,5 +1,5 @@
 <template>
-  <v-container class>
+  <v-container style="max-width: 90rem">
     <h4 class="text-h4 mb-2">Mis calendarios</h4>
     <v-card class="my-4" :width="isMobile ? '100%' : '480'">
       <v-text-field
