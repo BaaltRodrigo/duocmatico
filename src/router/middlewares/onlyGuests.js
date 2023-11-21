@@ -1,4 +1,4 @@
-import store from "../../store";
+import { auth } from "../../config/firebase";
 
 /**
  * Use this middleware to ensure that not user is
@@ -8,9 +8,7 @@ import store from "../../store";
  * the home page.
  */
 async function onlyGuests(req, res, next) {
-  const { user } = store.state.auth;
-
-  if (user) {
+  if (auth.currentUser) {
     return next({ name: "home" });
   }
 
