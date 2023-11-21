@@ -1,7 +1,6 @@
 <script setup>
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import prototypingProcess from "../assets/images/undraw_prototyping_process.svg";
 import { computed, onMounted, ref } from "vue";
 import { auth } from "../config/firebase";
 // Components
@@ -9,6 +8,7 @@ import DmCalendarPanels from "../components/home/DmCalendarPanels.vue";
 import DmHero from "../components/landing/DmHero.vue";
 import DmFeatureCard from "../components/home/DmFeatureCard.vue";
 // Images
+import prototypingProcess from "../assets/images/undraw_prototyping_process.svg";
 import undrawCloudFiles from "../assets/images/undraw_cloud_files.svg";
 import undrawShareLink from "../assets/images/undraw_share_link.svg";
 import undrawPortfolio from "../assets/images/undraw_portfolio_update.svg";
