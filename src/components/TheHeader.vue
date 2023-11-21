@@ -35,7 +35,7 @@
         </v-avatar>
       </v-btn>
 
-      <div v-else>
+      <div v-else-if="$route.name === 'home'">
         <v-btn
           @click="changeRoute('login')"
           size="small"
