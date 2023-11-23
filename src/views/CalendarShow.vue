@@ -231,11 +231,24 @@ export default {
    */
   async created() {
     const { uuid } = this.$route.params;
+    this.$store.commit("calendars/setCalendar", null); // Reset the state
 
-    // Get general calendar from both, API and Local Service
-    await this.$store.dispatch("calendars/getCalendar", uuid);
+    // First, try to get local calendar
+    await this.$store.dispatch("calendars/getCalendar", {
+      uuid: uuid,
+      source: CALENDAR_SOURCES.LOCAL,
+    });
     if (this.calendar) {
-      return; // Found a calendar, return
+      return;
+    }
+
+    // If there is no local calendar, try to get it from the API
+    await this.$store.dispatch("calendars/getCalendar", {
+      uuid: uuid,
+      source: CALENDAR_SOURCES.API,
+    });
+    if (this.calendar) {
+      return;
     }
 
     // Calendar is not in local or API calendars, show error
