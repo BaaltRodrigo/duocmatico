@@ -12,6 +12,7 @@ import prototypingProcess from "../assets/images/undraw_prototyping_process.svg"
 import undrawCloudFiles from "../assets/images/undraw_cloud_files.svg";
 import undrawShareLink from "../assets/images/undraw_share_link.svg";
 import undrawPortfolio from "../assets/images/undraw_portfolio_update.svg";
+import { CALENDAR_SOURCES } from "../helpers/constants";
 
 const MAX_CALENDARS = 3;
 
@@ -92,7 +93,8 @@ const email = computed(() => {
 });
 
 onMounted(async () => {
-  await store.dispatch("calendars/getCalendars");
+  store.dispatch("calendars/getCalendars", { source: CALENDAR_SOURCES.LOCAL });
+  store.dispatch("calendars/getCalendars", { source: CALENDAR_SOURCES.API });
 });
 </script>
 

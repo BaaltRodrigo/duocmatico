@@ -104,23 +104,23 @@ const actions = {
    * We search locally and inside the API for the calendar.
    * And always prioritize local calendars over the API ones.
    *
-   * @param {string} uuid The uuid for a desired calendar
+   * @param {string} payload.source The source of the calendar. Either "local" or "api"
+   * @param {string} payload.uuid The uuid for a desired calendar
    * @returns Calendar or null if not found
    */
-  async getCalendar({ commit }, uuid) {
-    try {
-      // We always get an error from one service, so we need to handle it
-      // to not break the App, as a calendar cannot exist in both services
-      const [localCalendar, apiCalendar] = await Promise.all([
-        localService.get(uuid).catch(() => null),
-        apiService.get(uuid).catch(() => null),
-      ]);
+  async getCalendar({ commit }, payload) {
+    if (!Object.values(CALENDAR_SOURCES).includes(payload.source)) {
+      throw new Error("Invalid calendar source");
+    }
 
-      const calendar = localCalendar ?? apiCalendar;
+    // This two lines may fail if the calendar is not found
+    try {
+      const service = services[payload.source];
+      const calendar = await service.get(payload.uuid);
+
       commit("setCalendar", calendar);
       return calendar;
     } catch (error) {
-      // console.log(error);
       return null;
     }
   },
@@ -130,17 +130,24 @@ const actions = {
    * If some error happens when getting those calendars, it
    * should be handled separately.
    *
-   * TODO: Handle errors properly
+   * @param {string} payload.source The source of the calendar. Either "local" or "api"
    */
-  async getCalendars({ commit }) {
-    // Local calendars should never throw an error...
-    const locals = await localService.index();
-    commit("setLocalCalendars", locals);
+  async getCalendars({ commit }, payload) {
+    if (!Object.values(CALENDAR_SOURCES).includes(payload.source)) {
+      throw new Error("Invalid calendar source");
+    }
 
     try {
-      if (!auth.currentUser) return; // Not logged so not api calendars
-      const apiCalendars = await apiService.index();
-      commit("setApiCalendars", apiCalendars);
+      const service = services[payload.source];
+      const calendars = await service.index();
+
+      const mutation =
+        payload.source === CALENDAR_SOURCES.API
+          ? "setApiCalendars"
+          : "setLocalCalendars";
+      commit(mutation, calendars);
+
+      return calendars;
     } catch (error) {
       // Handle the error properly
       // Possible errors:
@@ -148,6 +155,7 @@ const actions = {
       // - Invalid token
       // - Network error
       // - Server error
+      return [];
     }
   },
 
