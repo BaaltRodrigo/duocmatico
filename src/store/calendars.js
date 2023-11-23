@@ -115,7 +115,6 @@ const actions = {
 
     // This two lines may fail if the calendar is not found
     try {
-      console.log("[store] Getting a calendar from", payload.source);
       const service = services[payload.source];
       const calendar = await service.get(payload.uuid);
 
@@ -139,8 +138,6 @@ const actions = {
     }
 
     try {
-      console.log("[store] Getting a list of calendars from", payload.source);
-
       const service = services[payload.source];
       const calendars = await service.index();
 
