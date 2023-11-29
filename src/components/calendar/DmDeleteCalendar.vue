@@ -14,7 +14,7 @@
         color="error"
         variant="flat"
         class="rounded-pill mt-3"
-        @click="confirmDelete"
+        @click="$emit('delete')"
       >
         Sí, eliminar este calendario
       </v-btn>
@@ -23,25 +23,20 @@
 </template>
 
 <script>
-import { mapActions } from "vuex";
-
 export default {
   name: "DmDeleteCalendar",
 
   props: {
-    calendar: Object,
+    calendar: { type: Object, required: true },
   },
 
   methods: {
-    ...mapActions("calendars", ["deleteCalendar"]),
-    confirmDelete() {
-      if (this.calendar) {
-        this.deleteCalendar(this.calendar).then(() => {
-          this.$store.dispatch("calendars/getCalendars");
-          this.$emit("deleted-successfully");
-        });
-      }
+    async deleteCalendar() {
+      await this.$store.dispatch("calendars/deleteCalendar", this.calendar);
+      this.$emit("done");
     },
   },
+
+  emits: ["done"],
 };
 </script>

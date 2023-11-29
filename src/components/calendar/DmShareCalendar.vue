@@ -16,9 +16,9 @@
             <v-icon>{{ isPublic ? "mdi-earth" : "mdi-lock-outline" }}</v-icon>
           </v-avatar>
         </template>
-        <v-list-item-title>{{
-          isPublic ? "Publico" : "Privado"
-        }}</v-list-item-title>
+        <v-list-item-title>
+          {{ isPublic ? "Publico" : "Privado" }}
+        </v-list-item-title>
         <v-list-item-subtitle>
           {{
             isPublic
@@ -58,13 +58,18 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-
 export default {
   name: "DmShareCalendar",
 
+  props: {
+    calendar: {
+      type: Object,
+      required: true,
+    },
+  },
+
   computed: {
-    ...mapState("calendars", ["calendar"]),
+    // ...mapState("calendars", ["calendar"]),
 
     isPublic() {
       return this.calendar["is_public"];

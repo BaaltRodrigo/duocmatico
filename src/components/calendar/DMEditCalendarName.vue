@@ -48,11 +48,11 @@ export default {
         name: this.editedName,
       });
 
-      this.$emit("updated");
+      this.$emit("done");
       this.nameErrorMessages = [];
     },
   },
 
-  emits: ["updated"],
+  emits: ["done"],
 };
 </script>
