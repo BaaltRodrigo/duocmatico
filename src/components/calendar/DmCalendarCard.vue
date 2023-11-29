@@ -33,7 +33,7 @@
               <v-list-item
                 v-for="item in menuOptions"
                 :key="item.id"
-                @click="$emit(item.event, calendar)"
+                @click="handleMenuAction(item.event)"
                 :class="item.color ? `text-${item.color}` : ''"
               >
                 <v-list-item-title>{{ item.title }}</v-list-item-title>
@@ -47,45 +47,34 @@
       </template>
     </v-list-item>
   </v-card>
+
+  <!-- Dialogs related to a calendar actions -->
+  <v-dialog v-model="showDialog" width="auto">
+    <component
+      :is="formComponent"
+      :calendar="calendar"
+      @done="showDialog = false"
+    />
+  </v-dialog>
 </template>
 
 <script>
 import { CALENDAR_SOURCES } from "../../helpers/constants";
+// components
+import DmDeleteCalendar from "./DmDeleteCalendar.vue";
+import DmEditCalendarName from "./DmEditCalendarName.vue";
+import DmShareCalendar from "./DmShareCalendar.vue";
 
 export default {
   name: "DmCalendarCard",
 
-  props: {
-    calendar: {
-      type: Object,
-      required: true,
-    },
+  components: {
+    DmDeleteCalendar,
+    DmEditCalendarName,
+    DmShareCalendar,
   },
 
-  data: () => ({
-    menuItems: [
-      { title: "Ver calendario", icon: "mdi-eye", event: "show" },
-      { title: "Cambiar nombre", icon: "mdi-pencil", event: "rename" },
-      { title: "Compartir", icon: "mdi-share-variant", event: "share" },
-      // {
-      //   title: "Agregar a la cuenta",
-      //   icon: "mdi-account-plus",
-      //   event: "synchronize",
-      // },
-      { title: "Eliminar", icon: "mdi-delete", event: "delete", color: "red" },
-    ],
-  }),
-
   computed: {
-    menuOptions() {
-      // remove synchronize option if calendar is from api
-      if (this.calendar.source === CALENDAR_SOURCES.API) {
-        return this.menuItems.filter((item) => item.event !== "synchronize");
-      }
-
-      return this.menuItems.filter((item) => item.event !== "share");
-    },
-
     cloudIcon() {
       if (this.calendar.source === CALENDAR_SOURCES.LOCAL) {
         return "mdi-earth-off";
@@ -98,10 +87,99 @@ export default {
       const { academic_charge, calendarable } = this.calendar;
       return `${academic_charge.season} -  ${calendarable.name}`.toLowerCase();
     },
+
+    menuOptions() {
+      // remove synchronize option if calendar is from api
+      if (this.calendar.source === CALENDAR_SOURCES.API) {
+        return this.menuItems.filter((item) => item.event !== "synchronize");
+      }
+
+      return this.menuItems.filter((item) => item.event !== "share");
+    },
   },
 
+  data: () => ({
+    showDialog: false,
+    formComponent: null,
+    /**
+     * This array contain the items to show inside the menu.
+     * Each item has the following properties:
+     * - title: The text to show in the menu item
+     * - icon: The icon to show in the menu item
+     * - color: The color of the text in the menu item
+     */
+    menuItems: [
+      {
+        title: "Ver calendario",
+        icon: "mdi-eye",
+        event: "show",
+      },
+      {
+        title: "Cambiar nombre",
+        icon: "mdi-pencil",
+        event: "rename",
+      },
+      {
+        title: "Compartir",
+        icon: "mdi-share-variant",
+        event: "share",
+      },
+      // {
+      //   title: "Agregar a la cuenta",
+      //   icon: "mdi-account-plus",
+      //   event: "synchronize",
+      // },
+      {
+        title: "Eliminar",
+        icon: "mdi-delete",
+        event: "delete",
+        color: "error",
+      },
+    ],
+  }),
+
   methods: {
-    showMe() {
+    selectDelete() {
+      this.formComponent = "DmDeleteCalendar";
+      this.showDialog = true;
+    },
+
+    selectRename() {
+      this.formComponent = "DmEditCalendarName";
+      this.showDialog = true;
+    },
+
+    selectShare() {
+      this.formComponent = "DmShareCalendar";
+      this.showDialog = true;
+    },
+
+    /**
+     * This function wraps the possible actions that can be executed
+     * from the menu. Each action is a function that can be called.
+     *
+     * @param {string} event
+     */
+    handleMenuAction(event) {
+      // Without parenthesis to pass the method as a reference
+      const actions = {
+        show: this.showCalendar,
+        rename: this.selectRename,
+        share: this.selectShare,
+        // synchronize: this.test,
+        delete: this.selectDelete,
+      };
+
+      // With parenthesis to actually call the method
+      return actions[event]();
+    },
+
+    handleDeleteCalendar() {
+      store.dispatch("calendars/deleteCalendar", this.calendar);
+      this.showDeleteForm = false;
+    },
+
+    showCalendar() {
       this.$router.push({
         name: "calendars.show",
         params: { uuid: this.calendar.uuid },
@@ -109,6 +187,11 @@ export default {
     },
   },
 
-  emits: ["show", "rename", "share", "synchronize", "delete"],
+  props: {
+    calendar: {
+      type: Object,
+      required: true,
+    },
+  },
 };
 </script>
