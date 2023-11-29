@@ -14,7 +14,7 @@
         color="error"
         variant="flat"
         class="rounded-pill mt-3"
-        @click="$emit('delete')"
+        @click="deleteCalendar"
       >
         Sí, eliminar este calendario
       </v-btn>
