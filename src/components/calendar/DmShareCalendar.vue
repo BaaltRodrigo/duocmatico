@@ -52,7 +52,7 @@
         <v-icon class="mr-3">mdi-link</v-icon>
         Copiar enlace
       </v-btn>
-      <v-btn @click="$emit('close')">Listo</v-btn>
+      <v-btn @click="$emit('done')">Listo</v-btn>
     </v-card-text>
   </v-card>
 </template>
@@ -101,6 +101,6 @@ export default {
     },
   },
 
-  emits: ["close"],
+  emits: ["done"],
 };
 </script>
