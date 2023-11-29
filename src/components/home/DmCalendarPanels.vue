@@ -37,14 +37,13 @@ const panels = ref(props.startOpen ? [0] : []);
         {{ title }}
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <section v-for="calendar in calendars" :key="calendar.uuid">
-          <dm-calendar-card :calendar="calendar" class="my-4">
-          </dm-calendar-card>
-        </section>
+        <div class="my-4" v-for="calendar in calendars" :key="calendar.uuid">
+          <dm-calendar-card :calendar="calendar" />
+        </div>
         <section class="text-center">
-          <v-btn size="large" @click="router.push({ name: 'calendars.index' })"
-            >Ver mas calendarios</v-btn
-          >
+          <v-btn size="large" @click="router.push({ name: 'calendars.index' })">
+            Ver mas calendarios
+          </v-btn>
         </section>
       </v-expansion-panel-text>
     </v-expansion-panel>
