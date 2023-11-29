@@ -31,38 +31,14 @@
         v-for="calendar in filteredCalendars"
         :key="`calendar-${calendar.uuid}`"
       >
-        <dm-calendar-card
-          :calendar="calendar"
-          @delete="handleDelete"
-          @rename="handleRename"
-          @show="handleShow"
-          @share="handleShare"
-        >
-        </dm-calendar-card>
+        <dm-calendar-card :calendar="calendar" />
       </v-col>
     </v-row>
   </v-container>
+
   <!-- Option dialogs -->
   <v-dialog v-model="newCalendarForm">
     <dm-calendar-form @created="handleCreated"></dm-calendar-form>
-  </v-dialog>
-
-  <v-dialog v-model="deleteCalendar">
-    <dm-delete-calendar
-      @deleted-successfully="deleteCalendar = false"
-      :calendar="calendarToDelete"
-    ></dm-delete-calendar>
-  </v-dialog>
-
-  <v-dialog v-model="editCalendarName" @done="getCalendars()">
-    <dm-edit-calendar-name
-      :calendar="calendarEditName"
-      @updated="nameUpdated"
-    />
-  </v-dialog>
-
-  <v-dialog v-model="showShareDialog">
-    <dm-share-calendar @close="showShareDialog = false" />
   </v-dialog>
 </template>
 
@@ -71,9 +47,6 @@ import { mapMutations, mapState } from "vuex";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import DmCalendarCard from "../components/calendar/DmCalendarCard.vue";
 import DmCalendarForm from "../components/calendar/DmCalendarForm.vue";
-import DmDeleteCalendar from "../components/calendar/DmDeleteCalendar.vue";
-import DmEditCalendarName from "../components/calendar/DmEditCalendarName.vue";
-import DmShareCalendar from "../components/calendar/DmShareCalendar.vue";
 import { CALENDAR_SOURCES } from "../helpers/constants";
 import { auth } from "../config/firebase";
 
@@ -83,18 +56,11 @@ export default {
   components: {
     DmCalendarCard,
     DmCalendarForm,
-    DmDeleteCalendar,
-    DmEditCalendarName,
-    DmShareCalendar,
   },
 
   data: () => ({
     search: "",
     newCalendarForm: false,
-    deleteCalendar: false,
-    editCalendarName: false,
-    calendarToEditName: null,
-    showShareDialog: false,
   }),
 
   computed: {
@@ -141,33 +107,6 @@ export default {
     openEditCalendarNameCard(calendar) {
       this.calendarToEditName = calendar;
       this.editCalendarName = true;
-    },
-
-    handleShow(calendar) {
-      this.$router.push({
-        name: "calendars.show",
-        params: { uuid: calendar.uuid },
-      });
-    },
-
-    handleDelete(calendar) {
-      this.calendarToDelete = calendar;
-      this.deleteCalendar = true;
-    },
-
-    handleRename(calendar) {
-      this.calendarToEditName = calendar;
-      this.editCalendarName = true;
-    },
-
-    handleShare(calendar) {
-      this.setCalendar(calendar);
-      this.showShareDialog = true;
-    },
-
-    nameUpdated() {
-      this.editCalendarName = false;
-      this.getCalendars();
     },
 
     handleCreated() {
