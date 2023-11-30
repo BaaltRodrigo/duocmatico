@@ -18,11 +18,11 @@ const state = {
 
 const mutations = {
   setLocalCalendars(state, calendars) {
-    state.localCalendars = calendars;
+    state.localCalendars = [...calendars];
   },
 
   setApiCalendars(state, calendars) {
-    state.apiCalendars = calendars;
+    state.apiCalendars = [...calendars];
   },
 
   setCalendar(state, calendar) {
@@ -69,10 +69,21 @@ const actions = {
     }
 
     const service = services[calendar.source];
+    console.log("Api calendars", state.apiCalendars);
 
     try {
       const serviceResponse = await service.create(calendar);
-      // commit("setCalendar", serviceResponse);
+
+      console.log(serviceResponse);
+
+      const mutation =
+        calendar.source === CALENDAR_SOURCES.API
+          ? { name: "setApiCalendars", calendars: [...state.apiCalendars] }
+          : { name: "setLocalCalendars", calendars: [...state.localCalendars] };
+
+      console.log(mutation);
+      commit(mutation.name, [...mutation.calendars, serviceResponse]);
+
       return serviceResponse;
     } catch (error) {
       console.log(error);
@@ -82,20 +93,33 @@ const actions = {
 
   /**
    * Deletes a calendar from where the calendar lives. Locally or in the API.
+   * It change the states of apiCalendars and localCalendars.
+   *
    * @param {string} uuid
    * @returns
    */
-  async deleteCalendar(_, calendar) {
+  async deleteCalendar({ commit, state }, calendar) {
     // check if payload source exist in CALENDAR_SOURCES
     if (!Object.values(CALENDAR_SOURCES).includes(calendar.source)) {
       throw new Error("Invalid calendar source");
     }
 
-    // _ as first because we don't need the state
     const service = services[calendar.source];
 
     // This should throw an error when calendar is not found
     const deleted = await service.delete(calendar);
+
+    // Mutation to update the calendar list
+    const mutation =
+      calendar.source === CALENDAR_SOURCES.API
+        ? { name: "setApiCalendars", calendars: state.apiCalendars }
+        : { name: "setLocalCalendars", calendars: state.localCalendars };
+
+    commit(
+      mutation.name,
+      mutation.calendars.filter((c) => c.uuid !== calendar.uuid)
+    );
+
     return deleted;
   },
 
@@ -225,6 +249,19 @@ const actions = {
 };
 
 const getters = {
+  // Get the last N calendars from a source
+  lastCalendars: (state) => (payload) => {
+    if (!Object.values(CALENDAR_SOURCES).includes(payload.source)) {
+      throw new Error("Invalid calendar source");
+    }
+
+    const source = payload.source === CALENDAR_SOURCES.API ? "api" : "local";
+    // A copy of the array reversed to show the last calendars first
+    const calendars = [...state[`${source}Calendars`]].reverse();
+
+    return calendars.slice(0, payload.limit);
+  },
+
   calendarExists: (state) => (uuid) => {
     const existsLocally = state.localCalendars.some(
       (calendar) => calendar.uuid === uuid
