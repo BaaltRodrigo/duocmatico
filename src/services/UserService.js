@@ -1,4 +1,10 @@
-import { addDoc, collection, updateDoc, doc, getDoc } from "firebase/firestore";
+import {
+  updateDoc,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 /**
  * This class is a wrapper to interact with Firebase as a REST API.
@@ -59,17 +65,18 @@ export default class UserService {
     const userRef = doc(this.firestore, this.collection, uid);
 
     // Add user
-    const response = await addDoc(userRef, {
+    await setDoc(userRef, {
       email,
       displayName,
       roles: this.defaultRoles, // Roles are always added by default as a common user
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     });
 
-    // Fetch user from firestore
-    const userSnap = await getDoc(response);
+    const userSnap = await getDoc(userRef);
 
     return {
-      id: userSnap.id,
+      uid,
       ...userSnap.data(),
     };
   }
