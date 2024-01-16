@@ -26,9 +26,10 @@ const db = getFirestore(app);
 const analytics = getAnalytics(app);
 const auth = getAuth(app);
 
+// Firebase emulator loading when local environment set
 const environment = import.meta.env.VITE_ENV;
 if (environment === "local") {
-  connectAuthEmulator(auth, "http://localhost:9099");
+  connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: true });
   connectFirestoreEmulator(db, "localhost", 8080);
 }
 
