@@ -24,5 +24,10 @@ pnpm-debug.log*
 # Firebase cache directory
 .firebase
 
+# Emulators related files
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
 # Distribution directory
 dist
