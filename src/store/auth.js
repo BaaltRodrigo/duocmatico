@@ -8,20 +8,14 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth";
-import { auth } from "../config/firebase";
-import axios from "axios";
+import { auth, db } from "../config/firebase";
+import UserService from "../services/UserService";
+
+const userService = new UserService(db, "users");
 
 const state = {
   user: null,
-  token: null,
   roles: [],
-  permissions: [],
-};
-
-const getters = {
-  user(state) {
-    return state.user;
-  },
 };
 
 const mutations = {
@@ -29,44 +23,31 @@ const mutations = {
     state.roles = roles;
   },
 
-  setPermissions(state, permissions) {
-    state.permissions = permissions;
-  },
-
   setUser(state, user) {
     state.user = user;
-  },
-
-  setToken(state, token) {
-    state.token = token;
   },
 };
 
 const actions = {
-  async checkUser({ commit, dispatch }) {
+  /**
+   * This action will run at the start of the application to check for a logged in user.
+   * If a user is logged in, it will fetch the user data from firestore.
+   * If no user is logged in, it will do nothing.
+   *
+   * @param {*} param0
+   * @returns
+   */
+  async checkUser({ commit }) {
     await setPersistence(auth, browserLocalPersistence);
-    const user = auth.currentUser;
+    const { currentUser } = auth;
 
-    if (!user) return; // early exit
+    if (!currentUser) return; // early exit
 
-    commit("setToken", await user.getIdToken());
+    // Fetch user from firestore
+    const user = await userService.show(currentUser.uid);
     commit("setUser", user);
 
-    dispatch("getCurrentRolesAndPermission");
-  },
-
-  async getCurrentRolesAndPermission({ commit, rootState, state }) {
-    const { token } = state;
-    const response = await axios.get(`${rootState.apiUrl}/auth/me`, {
-      headers: {
-        Authorization: `Bearer ` + token,
-      },
-    });
-
-    const { roles, permissions } = response.data;
-
-    commit("setRoles", roles);
-    commit("setPermissions", permissions);
+    // TODO: Fetch user form firestore collection
   },
 
   async loginWhitGoogle({ commit }) {
@@ -74,10 +55,15 @@ const actions = {
       const provider = new GoogleAuthProvider();
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithPopup(auth, provider);
-      const token = await response.user.getIdToken();
 
-      commit("setUser", response.user);
-      commit("setToken", token);
+      // Fetch user from firestore
+      let user = await userService.show(response.user.uid);
+      if (!user) {
+        // Create user in firestore
+        user = await userService.store(response.user);
+      }
+
+      commit("setUser", user);
     } catch (error) {
       console.log(error);
     }
@@ -88,9 +74,14 @@ const actions = {
       await setPersistence(auth, browserLocalPersistence);
       const response = await signInWithEmailAndPassword(auth, email, password);
 
-      const token = await response.user.getIdToken();
-      commit("setUser", response.user);
-      commit("setToken", token);
+      // Fetch user from firestore
+      let user = await userService.show(response.user.uid);
+      if (!user) {
+        // Create user in firestore
+        user = await userService.store(response.user);
+      }
+
+      commit("setUser", user);
     } catch (error) {
       console.error(error);
     }
@@ -100,10 +91,8 @@ const actions = {
     await signOut(auth);
     // Clean auth status
     commit("setUser", null);
-    commit("setToken", null);
 
-    // Clean another modules state if needed
-    commit("calendars/setApiCalendars", [], { root: true });
+    // TODO: Clean firestore calendars
   },
 
   async registration({ commit }, payload) {
@@ -117,13 +106,14 @@ const actions = {
       email,
       password
     );
-    const token = await response.user.getIdToken();
 
-    commit("setUser", response.user);
-    commit("setToken", token);
+    // Create new user. createWithEmailAndPassword throws an error if the user already exists.
+    const user = await userService.store(response.user);
+
+    commit("setUser", user);
   },
 
-  async requestPasswordReset({ commit }, email) {
+  async requestPasswordReset(_, email) {
     try {
       const resetResponse = await sendPasswordResetEmail(auth, email);
       return resetResponse;
@@ -137,7 +127,6 @@ const actions = {
 export default {
   namespaced: true,
   state,
-  getters,
   mutations,
   actions,
 };
