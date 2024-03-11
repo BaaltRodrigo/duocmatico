@@ -1,11 +1,7 @@
 <template>
-  <v-app>
-    <v-main class="background-constellation">
-      <v-container>
-        <h1>Home</h1>
-      </v-container>
-    </v-main>
-  </v-app>
+  <nuxt-layout :name="'home'">
+    <h1>Home</h1>
+  </nuxt-layout>
 </template>
 
 <script lang="ts" setup></script>
