@@ -1,8 +1,13 @@
 <template>
   <v-card class="rounded-xl bg-white" variant="outlined" height="100%">
     <v-card-text>
-      <v-card height="200" variant="tonal" color="grey" class="rounded-xl pa-2">
-        <v-img :src="feature.image" :aspect-ration="9 / 16"></v-img>
+      <v-card
+        height="200"
+        variant="tonal"
+        color="grey"
+        class="rounded-xl pa-2 d-flex align-center"
+      >
+        <v-img :src="feature.image" alt="feature image"></v-img>
       </v-card>
       <v-card-title class="px-1"> {{ feature.title }} </v-card-title>
       <v-list-item v-for="item in feature.items" :key="item.title" class="mt-2">
