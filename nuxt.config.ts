@@ -3,8 +3,9 @@ import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 // @see https://vuetifyjs.com/en/getting-started/installation/#using-nuxt-3
 export default defineNuxtConfig({
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   css: ["./assets/style/app.scss"],
+  ssr: true,
   build: {
     transpile: ["vuetify"],
   },
