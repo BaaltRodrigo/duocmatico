@@ -5,19 +5,17 @@
       la que te encuentres
     </h1>
     <v-btn
-      class="rounded-lg text-none mt-6"
+      class="rounded-lg text-none mt-6 cursor-not-allowed"
       size="x-large"
       color="white"
-      @click="$router.push({ name: 'login' })"
+      @click=""
     >
-      Empieza ahora
+      Proximamente
     </v-btn>
   </div>
 </template>
 
-<script lang="ts" setup>
-import { useDisplay } from "vuetify";
-</script>
+<script lang="ts" setup></script>
 
 <style scoped>
 .text-wrap-balance {
