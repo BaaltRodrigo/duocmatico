@@ -1,9 +1,9 @@
 <template>
   <v-app id="home-app">
     <v-main class="background-constellation">
-      <v-container>
-        <slot />
-      </v-container>
+      <slot />
     </v-main>
   </v-app>
 </template>
+
+<script lang="ts" setup></script>
