@@ -1,6 +1,5 @@
 .background-constellation {
-  background: url("../svg/endless-constellation.svg") repeat center center fixed;
-  background-size: auto;
+  background-image: url("../svg/endless-constellation.svg");
+  background-repeat: repeat;
   background-color: #330033;
-  // Add a filter to make the background darker
 }
